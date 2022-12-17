@@ -1,0 +1,207 @@
+[
+	{
+		"id": 1,
+		"about": {
+			"title": "Название_1",
+			"period": "1 день",
+			"description": "1",
+			"whom": "1",
+			"results": "1",
+			"image": "/images/courses/Courses__Course-Image.png",
+			"price": "По договоренности",
+			"category": "Медицина"
+		},
+		"program": [
+			{
+				"id": 1,
+				"title": "",
+				"description": "",
+				"tasks": []
+			}
+		]
+	},
+	{
+		"id": 2,
+		"about": {
+			"title": "Название_2",
+			"period": "2 дня",
+			"description": "2",
+			"whom": "2",
+			"results": "2",
+			"image": "/images/courses/Courses__Course-Image.png",
+			"price": "По договоренности",
+			"category": "Медицина"
+		},
+		"program": [
+			{
+				"id": 1,
+				"title": "Название_2",
+				"description": "Описание_2",
+				"tasks": [
+					{
+						"title": "Название_2",
+						"type": "",
+						"description": ""
+					},
+					{
+						"title": "Название_2",
+						"type": "",
+						"description": ""
+					}
+				]
+			},
+			{
+				"id": 2,
+				"title": "Название_2",
+				"description": "Описание_2",
+				"tasks": [
+					{
+						"title": "Название_2",
+						"type": "",
+						"description": ""
+					},
+					{
+						"title": "Название_2",
+						"type": "",
+						"description": ""
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": 3,
+		"about": {
+			"title": "Название_3",
+			"period": "3 дня",
+			"description": "3",
+			"whom": "3",
+			"results": "3",
+			"image": "/images/courses/Courses__Course-Image.png",
+			"price": "По договоренности",
+			"category": "Медицина"
+		},
+		"program": [
+			{
+				"id": 3,
+				"title": "",
+				"description": "",
+				"tasks": [
+					{
+						"title": "",
+						"type": "",
+						"description": ""
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": 4,
+		"about": {
+			"title": "Название_3",
+			"period": "3 дня",
+			"description": "3",
+			"whom": "3",
+			"results": "3",
+			"image": "/images/courses/Courses__Course-Image.png",
+			"price": "По договоренности",
+			"category": "Медицина"
+		},
+		"program": [
+			{
+				"id": 3,
+				"title": "",
+				"description": "",
+				"tasks": [
+					{
+						"title": "",
+						"type": "",
+						"description": ""
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": 5,
+		"about": {
+			"title": "Название_3",
+			"period": "3 дня",
+			"description": "3",
+			"whom": "3",
+			"results": "3",
+			"image": "/images/courses/Courses__Course-Image.png",
+			"price": "По договоренности",
+			"category": "Медицина"
+		},
+		"program": [
+			{
+				"id": 3,
+				"title": "",
+				"description": "",
+				"tasks": [
+					{
+						"title": "",
+						"type": "",
+						"description": ""
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": 6,
+		"about": {
+			"title": "Название_3",
+			"period": "3 дня",
+			"description": "3",
+			"whom": "3",
+			"results": "3",
+			"image": "/images/courses/Courses__Course-Image.png",
+			"price": "По договоренности",
+			"category": "Медицина"
+		},
+		"program": [
+			{
+				"id": 3,
+				"title": "",
+				"description": "",
+				"tasks": [
+					{
+						"title": "",
+						"type": "",
+						"description": ""
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": 7,
+		"about": {
+			"title": "Название_3",
+			"period": "3 дня",
+			"description": "3",
+			"whom": "3",
+			"results": "3",
+			"image": "/images/courses/Courses__Course-Image.png",
+			"price": "По договоренности",
+			"category": "Медицина"
+		},
+		"program": [
+			{
+				"id": 3,
+				"title": "",
+				"description": "",
+				"tasks": [
+					{
+						"title": "",
+						"type": "",
+						"description": ""
+					}
+				]
+			}
+		]
+	}
+]

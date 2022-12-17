@@ -1,0 +1,127 @@
+:root {
+	--desktop-width-large: 1920px;
+	--mobile--breakpoint: 800px;
+	--nav-width-large: 400px;
+
+	--c__blue_dark: #353B55;
+	--c__white: #FFF;
+	--c__violet: #8B2CF5;
+	--c__light-violet: #cb9dff;
+	--c__orange: #EB8246;
+	--c__red: #ff5b51;
+	--c__light-blue: #F6F4FF;
+	--c__grey: #999999;
+	--c__light-violet: #DBD5FF;
+
+	--f__mazzard-sb: "Mazzard SemiBold", sans-serif;
+	--f__montserrat-sb: "Montserrat", sans-serif;
+	--transition-03: all .3s ease;
+}
+
+@font-face {
+	font-family: "Mazzard";
+	src: url("./assets/fonts/Mazzard-Regular.woff");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Mazzard SemiBold";
+	src: url("./assets/fonts/Mazzard-SemiBold.woff");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Philosopher";
+	src: url("./assets/fonts/Philosopher_Regular.woff");
+	font-weight: 400;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Montserrat";
+	src: url("./assets/fonts/MontserratAlternates_SemiBold.woff");
+	font-display: swap;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	outline: none;
+	box-sizing: border-box;
+	font-family: "Mazzard", sans-serif, Arial, Helvetica;
+}
+
+html {
+	font-size: calc(100vw/137);
+}
+
+html, body, #app {
+	width: 100%;
+	height: 100%;
+	min-height: 100vh;
+}
+
+*.no-scroll {
+	overflow: hidden !important;
+}
+
+#app {
+	display: flex;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+* ::-webkit-scrollbar {
+	width: .5rem;
+}
+
+* ::-webkit-scrollbar-track {
+	background-color: transparent;
+}
+
+* ::-webkit-scrollbar-thumb {
+	border-radius: .25rem;
+	overflow: hidden;
+	background-color: #4ad34e;
+}
+
+.list-enter-active,
+.list-leave-active {
+	transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+	opacity: 0;
+	transform: translateX(3rem);
+}
+
+.fade-enter-active, .fade-leave-active {
+	transition: opacity .5s;
+}
+
+.fade-enter, .fade-leave-to {
+	opacity: 0;
+}
+
+@media screen and (max-width: 800px) {
+	html {
+		font-size: calc(100vw/45);
+	}
+
+	#app {
+		flex-direction: column;
+	}
+
+	* ::-webkit-scrollbar {
+		width: 0;
+		width: none;
+	}
+
+	* ::-webkit-scrollbar-track {
+		background-color: transparent;
+	}
+}

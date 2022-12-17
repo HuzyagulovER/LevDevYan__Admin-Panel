@@ -1,0 +1,122 @@
+<template>
+	<TheNavbar v-if="idSignIn" />
+	<main class="main" :class="{ 'sign-in': route.path === '/sign-in' }">
+		<div class="main__container" :class="{ 'no-scroll': no_scroll }">
+			<header class="main__header header" v-if="idSignIn">
+				<h2 class="header__title">{{ mainTitle || route.meta.title }}</h2>
+				<div class="header__account account">
+					<div class="account__wrapper"></div>
+					<div class="account__wrapper">
+						<div class="account__image">
+							<img :src="href" alt="Account image" />
+						</div>
+					</div>
+				</div>
+			</header>
+			<RouterView v-slot="{ Component }">
+				<Component :is="Component" />
+			</RouterView>
+		</div>
+	</main>
+	<MainLoader v-if="loading" />
+	<Popup />
+</template>
+
+<script setup lang="ts">
+import Popup from "@add-comps/Popup.vue";
+import TheNavbar from "@comps/TheNavbar.vue";
+import MainLoader from "@add-comps/MainLoader.vue";
+import { computed, inject, watch } from "@vue/runtime-core";
+import { ComputedRef, Ref, ref } from "@vue/reactivity";
+import { RouterView, useRoute } from "vue-router";
+import { StoreGeneric, storeToRefs } from "pinia";
+
+const route = useRoute();
+const store = <StoreGeneric>inject("Store");
+const { loading, mainTitle, popup } = storeToRefs(store);
+
+store.updateTime();
+let idSignIn: ComputedRef<boolean> = computed(() => route.path !== "/sign-in");
+let no_scroll: ComputedRef<boolean> = computed(
+	() => loading.value || popup.value.isActive
+);
+
+const href: Ref<string> = ref(
+	"https://levdevyan.com/images/avatars/avatar__user_default.png"
+);
+
+watch(
+	() => no_scroll.value,
+	() => {
+		no_scroll.value
+			? document.body.classList.add("no-scroll")
+			: document.body.classList.remove("no-scroll");
+	}
+);
+</script>
+
+<style lang="scss">
+@import "style.scss";
+
+.main {
+	flex-grow: 1;
+
+	&__container {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		padding: 3rem 3.5rem;
+		overflow: auto;
+	}
+
+	.header {
+		display: flex;
+		margin-bottom: 2rem;
+		align-items: center;
+
+		&__title {
+			flex: 1;
+			font: {
+				size: 2rem;
+				family: "Montserrat";
+			}
+		}
+
+		.account {
+			&__image {
+				width: 5rem;
+				height: 5rem;
+				border-radius: 50%;
+				overflow: hidden;
+
+				img {
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+				}
+			}
+		}
+	}
+
+	@media screen and (max-width: $mobile--breakpoint) {
+		&.sign-in {
+			margin-top: 0;
+		}
+
+		margin-top: 8.3rem;
+
+		&__container {
+			padding: 2rem 2.5rem;
+			overflow: auto;
+		}
+
+		.header {
+			&__title {
+				font: {
+					size: 2.5rem;
+				}
+			}
+		}
+	}
+}
+</style>
