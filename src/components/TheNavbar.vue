@@ -318,7 +318,7 @@ watch(
 		max-width: unset;
 		width: 100%;
 		border-radius: 0;
-		padding: 2.5rem;
+		padding: 1.8rem;
 
 		&__line {
 			margin-bottom: 0;
@@ -326,6 +326,7 @@ watch(
 
 		&__main-title {
 			margin-bottom: 0;
+			font-size: 2.8rem;
 		}
 
 		.pages {
@@ -338,6 +339,7 @@ watch(
 			&.open,
 			&.opening {
 				margin-top: 2rem;
+				padding-bottom: 1rem;
 			}
 
 			&.open {

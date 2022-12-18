@@ -127,6 +127,7 @@ function confirmDeletingActive() {
 		line-height: 1.4rem;
 		border: 0.2rem solid var(--c__light-violet);
 		transition: var(--transition-03);
+		text-align: center;
 
 		&:hover {
 			color: var(--c__white);
@@ -153,7 +154,7 @@ function confirmDeletingActive() {
 
 			& > * {
 				font-size: 1.7rem;
-				margin-bottom: 0.5rem;
+				margin-bottom: 0.8rem;
 			}
 		}
 
@@ -180,6 +181,7 @@ function confirmDeletingActive() {
 			border-radius: 0.8rem;
 			font-size: 1.7rem;
 			line-height: unset;
+			width: 100%;
 		}
 	}
 }

@@ -127,6 +127,14 @@ function createNewDay(): void {
 @import "../style.scss";
 
 .courses-create-edit {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+
+	&__container {
+		flex: 1;
+	}
+
 	.top-line {
 		display: flex;
 		margin-bottom: 2rem;
@@ -181,12 +189,13 @@ function createNewDay(): void {
 				flex: 2;
 			}
 
-			&__button-create {
+			.button-create {
 				display: flex;
 				justify-content: center;
-				font-size: 2rem;
 				padding: 1.5rem 3rem;
 				margin: 1rem auto 0;
+				width: 100%;
+				font-size: 2rem;
 			}
 		}
 	}

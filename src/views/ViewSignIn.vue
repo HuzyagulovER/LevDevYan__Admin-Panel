@@ -123,7 +123,6 @@ async function signIn(e: Event) {
 		}
 
 		&__input_password {
-			width: 100%;
 			color: transparent;
 			caret-color: var(--c__white);
 			background-color: transparent;

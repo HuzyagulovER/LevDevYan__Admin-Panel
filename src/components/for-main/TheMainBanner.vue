@@ -71,7 +71,6 @@ let { currentTime } = storeToRefs(store);
 
 			p {
 				font-size: 1.2rem;
-				height: 1.3rem;
 			}
 			svg {
 				height: 100%;

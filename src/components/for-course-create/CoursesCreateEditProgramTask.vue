@@ -14,7 +14,6 @@
 						id="task-title"
 						name="title"
 						class="form__input"
-						placeholder="Название задания"
 						v-model="task.title"
 					/>
 				</label>
@@ -25,7 +24,6 @@
 						id="task-type"
 						name="type"
 						class="form__input"
-						placeholder="Тип задания"
 						v-model="task.type"
 					/>
 				</label>
@@ -36,7 +34,6 @@
 						id="task-description"
 						name="description"
 						class="form__textarea"
-						placeholder="Описание задания"
 						v-model="task.description"
 					></textarea>
 				</label>

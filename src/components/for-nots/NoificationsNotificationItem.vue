@@ -85,7 +85,11 @@ function confirmDeletingActive() {
 
 	&__wrapper {
 		display: flex;
-		margin-top: 1.5rem;
+		align-self: stretch;
+
+		div + div {
+			margin-left: 2rem;
+		}
 	}
 
 	&__time,
@@ -107,7 +111,6 @@ function confirmDeletingActive() {
 	}
 
 	&__time {
-		margin-right: 2rem;
 		padding: 0 2rem;
 	}
 
@@ -165,21 +168,35 @@ function confirmDeletingActive() {
 			grid-template: 1fr / 1fr 1fr;
 			column-gap: 3rem;
 			width: 100%;
+			margin-top: 1.5rem;
 
 			& > * {
 				flex: 1;
-				margin: 0;
 
 				p {
 					padding: 0.5rem;
 					text-align: center;
 					width: 100%;
+					height: unset;
 				}
+			}
+
+			.notification__time,
+			.notification__date,
+			.notification__type {
+				margin: 0;
+			}
+
+			.notification__type {
+				margin-top: 0.8rem;
 			}
 		}
 
+		&__time {
+			margin-right: 2rem;
+		}
+
 		&__type {
-			margin-top: 0.8rem;
 			grid-column: 1/3;
 			word-break: break-all;
 			white-space: break-spaces;

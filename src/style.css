@@ -75,6 +75,11 @@ a {
 	color: inherit;
 }
 
+p {
+	height: 1em;
+	line-height: 1.25em;
+}
+
 * ::-webkit-scrollbar {
 	width: .5rem;
 }
@@ -111,6 +116,10 @@ a {
 @media screen and (max-width: 800px) {
 	html {
 		font-size: calc(100vw/45);
+	}
+
+	html, body, #app {
+		height: auto;
 	}
 
 	#app {

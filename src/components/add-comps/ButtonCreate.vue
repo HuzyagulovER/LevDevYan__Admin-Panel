@@ -1,11 +1,15 @@
 <template>
 	<RouterLink :to="to" class="button-create" v-if="to">
-		<span>+</span>
-		{{ create_name }}
+		<p>
+			<span>+</span>
+			{{ create_name }}
+		</p>
 	</RouterLink>
 	<button :to="to" class="button-create" v-else>
-		<span>+</span>
-		{{ create_name }}
+		<p>
+			<span>+</span>
+			{{ create_name }}
+		</p>
 	</button>
 </template>
 
@@ -21,10 +25,10 @@ defineProps<{ create_name: string; to?: string }>();
 	color: var(--c__white);
 	display: flex;
 	align-items: center;
-	font-size: 1.5rem;
 	line-height: 1.5rem;
 	border-radius: 0.7rem;
 	cursor: pointer;
+	font-size: 1.5rem;
 
 	span {
 		margin-right: 0.8rem;

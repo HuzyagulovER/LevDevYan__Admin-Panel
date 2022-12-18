@@ -10,7 +10,7 @@
 					<div class="account__wrapper"></div>
 					<div class="account__wrapper">
 						<div class="account__image">
-							<img :src="href" alt="Account image" />
+							<img src="@images/user_default.png" alt="Account image" />
 						</div>
 					</div>
 				</div>
@@ -43,9 +43,9 @@ let no_scroll: ComputedRef<boolean> = computed(
 	() => loading.value || popup.value.isActive
 );
 
-const href: Ref<string> = ref(
-	"https://levdevyan.com/images/avatars/avatar__user_default.png"
-);
+// const href: Ref<string> = ref(
+// 	"https://levdevyan.com/images/avatars/avatar__user_default.png"
+// );
 
 watch(
 	() => no_scroll.value,
@@ -66,6 +66,7 @@ watch(
 	&__container {
 		display: flex;
 		flex-direction: column;
+		width: 100%;
 		height: 100%;
 		padding: 3rem 3.5rem;
 		overflow: auto;
@@ -101,16 +102,24 @@ watch(
 	}
 
 	@media screen and (max-width: $mobile--breakpoint) {
+		display: flex;
+
 		&.sign-in {
 			margin-top: 0;
+			display: flex;
+			align-items: center;
+
+			.main__container {
+				width: 100%;
+			}
 		}
 
-		margin-top: 8.3rem;
+		margin-top: 6.6rem;
 
 		&__container {
 			padding: 2rem 2.5rem;
 			overflow-x: hidden;
-			overflow-y: auto;
+			height: unset;
 		}
 
 		.header {
