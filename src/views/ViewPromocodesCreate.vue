@@ -88,6 +88,8 @@ function addPromocode() {
 </script>
 
 <style scoped lang="scss">
+@import "../style.scss";
+
 .promocodes-create {
 	.form {
 		display: flex;
@@ -121,6 +123,29 @@ function addPromocode() {
 
 			&._error {
 				border-color: red;
+			}
+		}
+	}
+
+	@media screen and (max-width: $mobile--breakpoint) {
+		.form {
+			&__label {
+				font-size: 2rem;
+			}
+
+			&__input {
+				height: unset;
+				padding: 0.5rem 1.2rem;
+				font-size: 1.8rem;
+				margin-bottom: 0;
+			}
+
+			input + label {
+				margin-top: 1.3rem;
+			}
+
+			button {
+				margin-top: 2rem;
 			}
 		}
 	}

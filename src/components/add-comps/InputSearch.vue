@@ -16,6 +16,8 @@ import IconSearch from "@icons/IconSearch.vue";
 </script>
 
 <style scoped lang="scss">
+@import "../../style.scss";
+
 .input-search {
 	width: 100%;
 	height: auto;
@@ -46,6 +48,17 @@ import IconSearch from "@icons/IconSearch.vue";
 		border: 0;
 		background-color: transparent;
 		font-size: 1.3rem;
+	}
+
+	@media screen and (max-width: $mobile--breakpoint) {
+		&__icon {
+			height: 50%;
+			margin-right: 12%;
+		}
+
+		&__input {
+			font-size: 1.5rem;
+		}
 	}
 }
 </style>

@@ -2,9 +2,11 @@
 	<nav class="nav">
 		<div class="nav__container">
 			<div class="nav__line">
-				<h1 class="nav__main-title">
-					LEV<span class="nav__main-title_colored">DEV</span>YAN
-				</h1>
+				<RouterLink to="/">
+					<h1 class="nav__main-title">
+						LEV<span class="nav__main-title_colored">DEV</span>YAN
+					</h1>
+				</RouterLink>
 				<div
 					class="nav__burger burger"
 					@click="toggleBurger"

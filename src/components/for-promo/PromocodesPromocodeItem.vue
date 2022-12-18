@@ -4,11 +4,13 @@
 			<p class="promocode__promocode">
 				{{ promocode.promocode }}
 			</p>
-			<div class="promocode__value">
-				<p>{{ promocode.value }}</p>
-			</div>
-			<div class="promocode__type">
-				<p>{{ promocode.type }}</p>
+			<div class="promocode__wrapper">
+				<div class="promocode__value">
+					<p>{{ promocode.value }}</p>
+				</div>
+				<div class="promocode__type">
+					<p>{{ promocode.type }}</p>
+				</div>
 			</div>
 			<div class="promocode__active active">
 				<input
@@ -54,6 +56,8 @@ function confirmDeletingActive() {
 </script>
 
 <style lang="scss" scoped>
+@import "../../style.scss";
+
 .promocode {
 	padding: 0.8rem 2rem;
 	border: 0.25rem solid var(--c__light-violet);
@@ -67,6 +71,11 @@ function confirmDeletingActive() {
 		display: flex;
 		align-items: center;
 		height: 2.3rem;
+	}
+
+	&__wrapper {
+		display: flex;
+		height: 100%;
 	}
 
 	&__promocode {
@@ -183,6 +192,65 @@ function confirmDeletingActive() {
 			height: 100%;
 			object-fit: cover;
 			fill: var(--c__red);
+		}
+	}
+
+	@media screen and (max-width: $mobile--breakpoint) {
+		padding: 1rem 2rem;
+
+		&__container {
+			flex-wrap: wrap;
+			height: auto;
+			overflow: hidden;
+
+			& > * {
+				order: 4;
+			}
+		}
+
+		&__wrapper {
+			width: 100%;
+			margin-top: 1.5rem;
+		}
+
+		&__value,
+		&__type {
+			padding: 0.4rem 3rem;
+
+			p {
+				text-align: center;
+				word-break: break-all;
+				white-space: break-spaces;
+
+				font: {
+					size: 1.7rem;
+				}
+			}
+		}
+
+		&__promocode {
+			margin: 0 0 0 1rem;
+			order: 1;
+			width: 70%;
+			font-size: 1.9rem;
+			line-height: unset;
+			text-align: left;
+		}
+
+		&__delete,
+		.active {
+			width: 2.3rem;
+			height: 2.3rem;
+		}
+
+		&__delete {
+			width: 2.3rem;
+			height: 2.3rem;
+			order: 3;
+		}
+
+		.active {
+			order: 2;
 		}
 	}
 }

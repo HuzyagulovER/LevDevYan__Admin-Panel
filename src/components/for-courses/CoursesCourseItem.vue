@@ -89,7 +89,7 @@ function confirmDeletingActive() {
 		& > * {
 			font-size: 1.4rem;
 			white-space: break-spaces;
-			overflow-wrap: anywhere;
+			word-break: break-all;
 
 			span {
 				font-family: var(--f__mazzard-sb);

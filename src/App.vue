@@ -3,7 +3,9 @@
 	<main class="main" :class="{ 'sign-in': route.path === '/sign-in' }">
 		<div class="main__container" :class="{ 'no-scroll': no_scroll }">
 			<header class="main__header header" v-if="idSignIn">
-				<h2 class="header__title">{{ mainTitle || route.meta.title }}</h2>
+				<h2 class="header__title">
+					{{ mainTitle || route.meta.title }}
+				</h2>
 				<div class="header__account account">
 					<div class="account__wrapper"></div>
 					<div class="account__wrapper">
@@ -107,7 +109,8 @@ watch(
 
 		&__container {
 			padding: 2rem 2.5rem;
-			overflow: auto;
+			overflow-x: hidden;
+			overflow-y: auto;
 		}
 
 		.header {

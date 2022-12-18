@@ -1,7 +1,7 @@
 <template>
 	<section class="courses">
 		<CoursesSearch class="courses__search" />
-		<div class="courses__empty" v-if="isEmpty">
+		<div class="courses__empty" v-if="isEmpty && !loading">
 			<img src="@images/Courses__Empty-Courses.png" alt="" />
 			<p>Курсов еще нет...</p>
 		</div>
@@ -22,7 +22,14 @@ import CoursesCourseItem from "@for-courses/CoursesCourseItem.vue";
 import CoursesSearch from "@for-courses/CoursesSearch.vue";
 import Popup from "@add-comps/Popup.vue";
 import TheLoader from "@add-comps/TheLoader.vue";
-import { inject, ref, Ref, watch } from "@vue/runtime-core";
+import {
+	computed,
+	ComputedRef,
+	inject,
+	ref,
+	Ref,
+	watch,
+} from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 
@@ -32,16 +39,13 @@ const { courses } = storeToRefs(store);
 const route = useRoute();
 
 const loading: Ref<boolean> = ref(true);
-let isEmpty: Ref<boolean> = ref(false);
+let isEmpty: ComputedRef<boolean> = computed(() => !courses.value.length);
 let popup: Ref<boolean> = ref(false);
 let deleteIndex: Ref<number> = ref(0);
 
-// store.getCourses().then(() => {
-// 	loading.value = false;
-// 	if (!courses.value.length && !loading.value) {
-// 		isEmpty.value = true;
-// 	}
-// });
+store.getCourses().then(() => {
+	loading.value = false;
+});
 
 async function confirmDeletingActive(index: number) {
 	deleteIndex.value = index;
@@ -52,6 +56,11 @@ async function confirmDeletingActive(index: number) {
 		}
 	});
 }
+
+watch(
+	() => courses.value.length,
+	() => {}
+);
 </script>
 
 <style scoped lang="scss">
@@ -59,9 +68,6 @@ async function confirmDeletingActive(index: number) {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-
-	&__container {
-	}
 
 	&__empty {
 		width: 100%;
@@ -71,15 +77,16 @@ async function confirmDeletingActive(index: number) {
 		justify-content: center;
 		flex-direction: column;
 
+		img {
+			transform: translateX(10%);
+		}
+
 		p {
 			font: {
 				size: 1.8rem;
 				weight: bold;
 			}
 		}
-	}
-
-	&__search {
 	}
 }
 </style>

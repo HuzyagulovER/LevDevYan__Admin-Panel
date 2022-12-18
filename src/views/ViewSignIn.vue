@@ -19,6 +19,7 @@
 						class="form__input_password"
 						placeholder="Пароль"
 						v-model="userCreds.password"
+						spellcheck="false"
 					/>
 					<p class="form__mask">{{ pass_mask }}</p>
 				</div>
@@ -193,7 +194,7 @@ async function signIn(e: Event) {
 			width: 100%;
 			max-width: unset;
 			height: auto;
-			padding: 3.2rem 4.5rem;
+			padding: 2.8rem 3.5rem;
 			border-radius: 3.6rem;
 		}
 

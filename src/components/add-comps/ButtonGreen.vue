@@ -11,6 +11,8 @@ const props = defineProps<{
 </script>
 
 <style lang="scss" scoped>
+@import "../../style.scss";
+
 .form-button {
 	background-color: #31ac71;
 	border: 0;
@@ -24,6 +26,12 @@ const props = defineProps<{
 	&.disabled {
 		background-color: var(--c__grey);
 		cursor: auto;
+	}
+
+	@media screen and (max-width: $mobile--breakpoint) {
+		height: unset;
+		font-size: 1.9rem;
+		padding: 0.8rem 5rem;
 	}
 }
 </style>

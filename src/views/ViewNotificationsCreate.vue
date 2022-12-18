@@ -288,6 +288,49 @@ function addNotification(e: Event) {
 	@media screen and (max-width: $mobile--breakpoint) {
 		.form {
 			max-width: unset;
+
+			.file-input {
+				border-width: 0.3rem;
+				height: 18rem;
+
+				svg {
+					width: 2.6rem;
+					height: 2.6rem;
+				}
+
+				p {
+					font: {
+						size: 1.7rem;
+					}
+				}
+			}
+
+			&__label {
+				font: {
+					size: 2rem;
+				}
+			}
+
+			&__input {
+				font: {
+					size: 1.7rem;
+				}
+				padding: 0.5rem 1.2rem;
+				height: unset;
+				margin: 0;
+
+				&._error {
+					border-color: red;
+				}
+			}
+
+			input + label {
+				margin-top: 1.5rem !important;
+			}
+
+			button {
+				margin-top: 2rem;
+			}
 		}
 	}
 }

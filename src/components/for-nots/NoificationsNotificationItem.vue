@@ -2,11 +2,16 @@
 	<div class="notification">
 		<div class="notification__container">
 			<p class="notification__notification">{{ notification.title }}</p>
-			<div class="notification__value">
-				<p>{{ notification.time }}</p>
-			</div>
-			<div class="notification__type">
-				<p>{{ notification.date }}</p>
+			<div class="notification__wrapper">
+				<div class="notification__time">
+					<p>{{ notification.time }}</p>
+				</div>
+				<div class="notification__date">
+					<p>{{ notification.date }}</p>
+				</div>
+				<div class="notification__type">
+					<p>{{ notification.type }}</p>
+				</div>
 			</div>
 			<div class="notification__repeat">
 				<svg
@@ -50,6 +55,8 @@ function confirmDeletingActive() {
 </script>
 
 <style lang="scss" scoped>
+@import "../../style.scss";
+
 .notification {
 	padding: 0.8rem 2rem;
 	border: 0.25rem solid var(--c__light-violet);
@@ -76,7 +83,13 @@ function confirmDeletingActive() {
 		min-width: 10rem;
 	}
 
-	&__value,
+	&__wrapper {
+		display: flex;
+		margin-top: 1.5rem;
+	}
+
+	&__time,
+	&__date,
 	&__type {
 		background-color: var(--c__light-blue);
 		align-self: stretch;
@@ -93,11 +106,12 @@ function confirmDeletingActive() {
 		}
 	}
 
-	&__value {
+	&__time {
 		margin-right: 2rem;
 		padding: 0 2rem;
 	}
 
+	&__date,
 	&__type {
 		padding: 0 3rem;
 
@@ -131,6 +145,60 @@ function confirmDeletingActive() {
 			height: 100%;
 			object-fit: cover;
 			fill: var(--c__red);
+		}
+	}
+
+	@media screen and (max-width: $mobile--breakpoint) {
+		padding: 1.5rem 2rem;
+
+		&__container {
+			flex-wrap: wrap;
+			height: auto;
+
+			& > * {
+				order: 3;
+			}
+		}
+
+		&__wrapper {
+			display: grid;
+			grid-template: 1fr / 1fr 1fr;
+			column-gap: 3rem;
+			width: 100%;
+
+			& > * {
+				flex: 1;
+				margin: 0;
+
+				p {
+					padding: 0.5rem;
+					text-align: center;
+					width: 100%;
+				}
+			}
+		}
+
+		&__type {
+			margin-top: 0.8rem;
+			grid-column: 1/3;
+			word-break: break-all;
+			white-space: break-spaces;
+		}
+
+		&__notification {
+			order: 1;
+			font-size: 1.8rem;
+			line-height: unset;
+		}
+
+		&__repeat,
+		&__delete {
+			order: 2;
+			width: 2.3rem;
+			height: 2.3rem;
+		}
+
+		&__delete {
 		}
 	}
 }
