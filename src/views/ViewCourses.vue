@@ -2,7 +2,12 @@
 	<section class="courses">
 		<CoursesSearch class="courses__search" />
 		<div class="courses__empty" v-if="isEmpty && !loading">
-			<img src="@images/Courses__Empty-Courses.png" alt="" />
+			<img
+				src="@images/Courses__Empty-Courses.png"
+				alt=""
+				width="281"
+				height="255"
+			/>
 			<p>Курсов еще нет...</p>
 		</div>
 		<TransitionGroup tag="div" name="list" v-else>
@@ -78,12 +83,14 @@ watch(
 		flex-direction: column;
 
 		img {
+			width: 20rem;
+			height: auto;
 			transform: translateX(10%);
 		}
 
 		p {
 			font: {
-				size: 1.8rem;
+				size: 1.9rem;
 				weight: bold;
 			}
 		}

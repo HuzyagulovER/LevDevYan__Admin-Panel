@@ -44,7 +44,7 @@
 					@keypress="confirmSignOut"
 				>
 					<div class="pages__link">
-						<div class="pages__icon">
+						<div class="pages__icon sign-out">
 							<IconLogout />
 						</div>
 						<p>Выход</p>
@@ -234,6 +234,10 @@ watch(
 			display: flex;
 			justify-content: center;
 			align-items: center;
+
+			&.sign-out {
+				transform: scale(0.9);
+			}
 		}
 
 		&__link {
@@ -322,6 +326,9 @@ watch(
 
 		&__line {
 			margin-bottom: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
 		}
 
 		&__main-title {

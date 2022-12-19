@@ -129,6 +129,11 @@ function addPromocode() {
 
 	@media screen and (max-width: $mobile--breakpoint) {
 		.form {
+			.file-input {
+				border-width: 0.3rem;
+				height: 18rem;
+			}
+
 			&__label {
 				font-size: 2rem;
 			}

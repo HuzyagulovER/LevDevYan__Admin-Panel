@@ -39,7 +39,7 @@
 			/>
 
 			<label for="promocode" class="form__label">Тип</label>
-			<input
+			<!-- <input
 				id="type"
 				type="text"
 				class="form__input"
@@ -48,7 +48,14 @@
 				:disabled="disabledForm"
 				v-model="newNotification.type"
 				@input="error = clearVariable(error)"
-			/>
+			/> -->
+
+			<div class="form__input">
+				<select name="type" id="type">
+					<option value="notification">Нотификация</option>
+					<option value="in_app">В приложении</option>
+				</select>
+			</div>
 
 			<label for="promocode" class="form__label">Текст</label>
 			<input
@@ -190,6 +197,7 @@ function addNotification(e: Event) {
 			display: flex;
 			justify-content: center;
 			max-height: 190px;
+			box-sizing: content-box;
 
 			&__container {
 				width: 100%;
@@ -203,7 +211,6 @@ function addNotification(e: Event) {
 			&__image {
 				width: 100%;
 				height: 100%;
-				padding: 1rem;
 
 				img {
 					width: 100%;
@@ -265,6 +272,14 @@ function addNotification(e: Event) {
 			&._error {
 				border-color: red;
 			}
+
+			select {
+				border: 0;
+				width: 100%;
+				height: 100%;
+				font-size: inherit;
+				background-color: transparent;
+			}
 		}
 
 		&__button {
@@ -292,6 +307,7 @@ function addNotification(e: Event) {
 			.file-input {
 				border-width: 0.3rem;
 				height: 18rem;
+				min-height: 18rem;
 
 				svg {
 					width: 2.6rem;
@@ -324,7 +340,7 @@ function addNotification(e: Event) {
 				}
 			}
 
-			input + label {
+			&__input + label {
 				margin-top: 1.5rem !important;
 			}
 

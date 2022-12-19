@@ -12,7 +12,12 @@
 		</div>
 
 		<div class="promocodes__empty" v-if="isEmpty">
-			<img src="@images/Courses__Empty-Courses.png" alt="" />
+			<img
+				src="@images/Promocodes__Empty-Promocodes.png"
+				alt=""
+				width="256"
+				height="256"
+			/>
 			<p>Промокодов еще нет...</p>
 		</div>
 		<TransitionGroup tag="div" name="list">
@@ -49,9 +54,9 @@ const promos: Ref<Promocodes> = ref([]);
 let deleteIndex: Ref<number> = ref(0);
 
 watch(
-	() => {}, //! FIX
+	() => promos.value,
 	() => {
-		if (!promocodes.value.length && !loading.value) {
+		if (!promos.value.length && !loading.value) {
 			isEmpty.value = true;
 		}
 	},
@@ -93,6 +98,10 @@ async function confirmDeletingActive(index: number) {
 
 <style scoped lang="scss">
 .promocodes {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+
 	.top-line {
 		display: flex;
 		align-items: center;
@@ -111,6 +120,27 @@ async function confirmDeletingActive(index: number) {
 
 		&__button-create {
 			align-self: stretch;
+		}
+	}
+
+	&__empty {
+		width: 100%;
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+
+		img {
+			width: 20rem;
+			height: auto;
+		}
+
+		p {
+			font: {
+				size: 1.9rem;
+				weight: bold;
+			}
 		}
 	}
 }

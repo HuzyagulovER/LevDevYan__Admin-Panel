@@ -55,6 +55,46 @@ watch(
 			: document.body.classList.remove("no-scroll");
 	}
 );
+
+const isMobile: any = () => {
+	return {
+		Android: function () {
+			return navigator.userAgent.match(/Android/i);
+		},
+		BlackBerry: function () {
+			return navigator.userAgent.match(/BlackBerry/i);
+		},
+		iOS: function () {
+			return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+		},
+		Mac: function () {
+			return navigator.userAgent.match(/Macintosh|Mac OS/i);
+		},
+		Opera: function () {
+			return navigator.userAgent.match(/Opera Mini/i);
+		},
+		Windows: function () {
+			return navigator.userAgent.match(/IEMobile/i);
+		},
+		isApple: function () {
+			return this.iOS() || this.Mac();
+		},
+		any: function () {
+			if (
+				this.Android() ||
+				this.BlackBerry() ||
+				this.iOS() ||
+				this.Mac() ||
+				this.Opera() ||
+				this.Windows()
+			) {
+				return true;
+			}
+			return false;
+		},
+	};
+};
+if (isMobile().isApple()) document.body.classList.add("apple");
 </script>
 
 <style lang="scss">
@@ -126,6 +166,18 @@ watch(
 			&__title {
 				font: {
 					size: 2.5rem;
+				}
+			}
+		}
+	}
+}
+
+@media screen and (max-width: $mobile--breakpoint) {
+	.iPhone {
+		.main {
+			.header {
+				&__title {
+					letter-spacing: -0.1rem;
 				}
 			}
 		}

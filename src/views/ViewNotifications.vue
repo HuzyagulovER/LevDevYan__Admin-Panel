@@ -8,7 +8,12 @@
 			/>
 		</div>
 		<div class="notifications__empty" v-if="isEmpty">
-			<img src="@images/Courses__Empty-Courses.png" alt="" />
+			<img
+				src="@images/Notifications__Empty-Notifications.png"
+				alt=""
+				width="234"
+				height="288"
+			/>
 			<p>Уведомлений еще нет...</p>
 		</div>
 		<TransitionGroup tag="div" name="list">
@@ -109,9 +114,16 @@ async function confirmDeletingActive(index: number) {
 		justify-content: center;
 		flex-direction: column;
 
+		img {
+			width: 20rem;
+			height: auto;
+			transform: translateX(4rem);
+		}
+
 		p {
+			margin-top: -2rem;
 			font: {
-				size: 1.8rem;
+				size: 1.9rem;
 				weight: bold;
 			}
 		}

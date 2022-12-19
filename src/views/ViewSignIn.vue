@@ -123,20 +123,21 @@ async function signIn(e: Event) {
 		}
 
 		&__input_password {
-			color: transparent;
-			caret-color: var(--c__white);
-			background-color: transparent;
-			border: 0;
+			color: transparent !important;
+			caret-color: var(--c__white) !important;
+			background-color: transparent !important;
+			letter-spacing: 0.2rem !important;
+			border: 0 !important;
 			z-index: 1;
 			position: absolute;
 			top: 50%;
 			left: 2rem;
 			right: 2rem;
 			transform: translateY(-50%);
-			letter-spacing: 0.2rem;
+
 			font: {
-				family: monospace;
-				size: 1.5rem;
+				family: monospace !important;
+				size: 1.5rem !important;
 			}
 
 			&::selection {
@@ -212,16 +213,17 @@ async function signIn(e: Event) {
 			&__input_password {
 				height: 1.5rem;
 				width: 100%;
-				color: var(--c__white);
+				color: var(--c__white) !important;
 				position: relative;
 				top: unset;
 				left: unset;
 				right: unset;
 				transform: unset;
 				letter-spacing: unset;
+
 				font: {
-					family: inherit;
-					size: 1.5rem;
+					family: inherit !important;
+					size: 1.5rem !important;
 				}
 
 				&::selection {

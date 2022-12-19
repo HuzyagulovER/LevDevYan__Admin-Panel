@@ -172,7 +172,7 @@ function createNewDay(): void {
 		.top-line {
 			display: flex;
 			flex-wrap: wrap;
-			margin-bottom: 3.5rem;
+			margin-bottom: 2.5rem;
 
 			&__link-about,
 			&__link-program {
@@ -192,7 +192,7 @@ function createNewDay(): void {
 			.button-create {
 				display: flex;
 				justify-content: center;
-				padding: 1.5rem 3rem;
+				padding: 1.4rem 3rem;
 				margin: 1rem auto 0;
 				width: 100%;
 				font-size: 2rem;

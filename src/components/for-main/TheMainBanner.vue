@@ -9,7 +9,13 @@
 				<p class="info__welcome">Привет , администратор!</p>
 				<p class="info__wish">Хорошего дня!</p>
 			</div>
-			<img src="@images/cat.png" alt="" class="banner__image" />
+			<img
+				src="@images/cat.png"
+				alt=""
+				class="banner__image"
+				width="92"
+				height="120"
+			/>
 			<div class="banner__backgroud background">
 				<div class="background__container">
 					<div class="background__bubbles_first"><MainBubblesList /></div>
@@ -92,6 +98,8 @@ let { currentTime } = storeToRefs(store);
 	}
 
 	&__image {
+		height: 100%;
+		width: auto;
 		transform: scale(1.2);
 		transform-origin: center bottom;
 	}
@@ -128,6 +136,17 @@ let { currentTime } = storeToRefs(store);
 	@media screen and (max-width: $mobile--breakpoint) {
 		.background {
 			display: none;
+		}
+
+		.info {
+			&__welcome {
+				font-size: 1.7rem;
+			}
+		}
+
+		&__image {
+			margin-left: auto;
+			transform: scale(1.1);
 		}
 	}
 }

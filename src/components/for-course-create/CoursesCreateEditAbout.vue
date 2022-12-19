@@ -37,7 +37,6 @@
 				:disabled="disabledForm"
 				v-model="data.title"
 				@input="error = clearVariable(error)"
-				placeholder="Название"
 			/>
 
 			<label for="promocode" class="form__label">Срок</label>
@@ -50,7 +49,6 @@
 				:disabled="disabledForm"
 				v-model="data.period"
 				@input="error = clearVariable(error)"
-				placeholder="Сколько дней..."
 			/>
 
 			<label for="promocode" class="form__label" v-if="false">Стоимость</label>
@@ -63,7 +61,6 @@
 				:disabled="disabledForm"
 				v-model="data.price"
 				@input="error = clearVariable(error)"
-				placeholder="Стоимость"
 				v-if="false"
 			/>
 
@@ -77,7 +74,6 @@
 				:disabled="disabledForm"
 				v-model="data.category"
 				@input="error = clearVariable(error)"
-				placeholder="Категория"
 				v-if="false"
 			/>
 
@@ -91,7 +87,6 @@
 				:disabled="disabledForm"
 				v-model="data.description"
 				@input="error = clearVariable(error)"
-				placeholder="Описание"
 			>
 			</textarea>
 
@@ -317,6 +312,11 @@ function saveCourse(e: Event): void {
 
 	@media screen and (max-width: $mobile--breakpoint) {
 		.form {
+			.file-input {
+				border-width: 0.3rem;
+				height: 18rem;
+			}
+
 			&__label {
 				margin-bottom: 0.5rem;
 				font: {

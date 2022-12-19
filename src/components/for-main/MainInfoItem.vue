@@ -33,6 +33,16 @@ defineProps<Props>();
 	height: auto;
 	text-align: center;
 
+	@supports not (aspect-ratio: 1/1) {
+		.item {
+			&__value,
+			&__text {
+				// padding: 2.5rem;
+				margin: 1rem 0;
+			}
+		}
+	}
+
 	&__value {
 		font: {
 			size: 1.8rem;
