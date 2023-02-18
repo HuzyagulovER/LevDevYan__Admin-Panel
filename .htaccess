@@ -1,12 +1,13 @@
-<IfModule mod_negotiation.c>
-  Options -MultiViews
-</IfModule>
-
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
   RewriteBase /
+
+#   RewriteCond %{HTTP:Front-End-Https} !on
+#   RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
   RewriteRule ^index\.html$ - [L]
+  
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . index.html [L]

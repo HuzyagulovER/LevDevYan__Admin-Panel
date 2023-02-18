@@ -16,12 +16,13 @@ export declare type Promocodes = Array<Promocode> | Array<null>
 
 export declare interface Notification {
 	id?: number | string,
+	lang: string,
 	title: string,
+	body?: string,
 	type: string,
 	time: string,
 	date: string,
-	text?: string,
-	application?: string,
+	app?: string,
 	image?: string | File
 }
 export declare type Notifications = Array<Notification> | Array<null>

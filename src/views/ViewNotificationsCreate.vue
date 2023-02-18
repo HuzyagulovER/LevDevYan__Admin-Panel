@@ -4,31 +4,52 @@
 			class="notification-create__form form"
 			@submit.prevent="addNotification($event)"
 		>
-			<div class="form__file-input file-input">
+			<div
+				class="form__file-input file-input"
+				:class="{ _error: isLargeImage }"
+			>
 				<div class="file-input__image" v-if="image">
 					<img :src="image" alt="" />
 				</div>
 				<div class="file-input__container" v-else>
 					<IconImage />
-					<p>
+					<p v-if="isLargeImage">
+						Изображение должно быть
+						<br />не больше {{ maxFileSizeText }}
+					</p>
+					<p v-else>
 						Загрузить<br />
 						изображение
 					</p>
 				</div>
 
 				<input
-					id="image"
+					id="input_image"
 					type="file"
 					accept="image/*"
-					name="image"
+					name="notification_image"
 					:disabled="disabledForm"
 					@change="displayImage($event)"
 				/>
 			</div>
 
-			<label for="promocode" class="form__label">Заголовок</label>
+			<label for="input_lang" class="form__label">Язык</label>
+			<div class="form__input" :class="{ _error: error.includes('lang') }">
+				<select
+					id="input_lang"
+					name="lang"
+					v-model="newNotification.lang"
+					:disabled="disabledForm"
+				>
+					<option value="ru">Русский</option>
+					<option value="eng">Английский</option>
+					<option value="any">Любой</option>
+				</select>
+			</div>
+
+			<label for="input_title" class="form__label">Заголовок</label>
 			<input
-				id="title"
+				id="input_title"
 				type="text"
 				class="form__input"
 				:class="{ _error: error.includes('title') }"
@@ -38,9 +59,9 @@
 				@input="error = clearVariable(error)"
 			/>
 
-			<label for="promocode" class="form__label">Тип</label>
+			<label for="input_type" class="form__label">Тип</label>
 			<!-- <input
-				id="type"
+				id="input_type"
 				type="text"
 				class="form__input"
 				:class="{ _error: error.includes('text') }"
@@ -50,28 +71,33 @@
 				@input="error = clearVariable(error)"
 			/> -->
 
-			<div class="form__input">
-				<select name="type" id="type">
+			<div class="form__input" :class="{ _error: error.includes('type') }">
+				<select
+					id="input_type"
+					name="type"
+					v-model="newNotification.type"
+					:disabled="disabledForm"
+				>
 					<option value="notification">Нотификация</option>
 					<option value="in_app">В приложении</option>
 				</select>
 			</div>
 
-			<label for="promocode" class="form__label">Текст</label>
+			<label for="input_body" class="form__label">Текст</label>
 			<input
-				id="text"
+				id="input_body"
 				type="text"
+				name="body"
 				class="form__input"
-				:class="{ _error: error.includes('text') }"
-				name="text"
+				:class="{ _error: error.includes('body') }"
 				:disabled="disabledForm"
-				v-model="newNotification.text"
+				v-model="newNotification.body"
 				@input="error = clearVariable(error)"
 			/>
 
-			<label for="promocode" class="form__label">Время</label>
+			<label for="input_time" class="form__label">Время</label>
 			<input
-				id="time"
+				id="input_time"
 				type="text"
 				class="form__input"
 				:class="{ _error: error.includes('time') }"
@@ -81,9 +107,9 @@
 				@input="error = clearVariable(error)"
 			/>
 
-			<label for="promocode" class="form__label">Дата</label>
+			<label for="input_date" class="form__label">Дата</label>
 			<input
-				id="date"
+				id="input_date"
 				type="text"
 				class="form__input"
 				:class="{ _error: error.includes('date') }"
@@ -93,21 +119,24 @@
 				@input="error = clearVariable(error)"
 			/>
 
-			<label for="promocode" class="form__label">Приложение</label>
-			<input
-				id="application"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('application') }"
-				name="application"
-				:disabled="disabledForm"
-				v-model="newNotification.application"
-				@input="error = clearVariable(error)"
-			/>
+			<label for="input_app" class="form__label">Приложение</label>
+			<div class="form__input" :class="{ _error: error.includes('app') }">
+				<select
+					id="input_app"
+					name="app"
+					v-model="newNotification.app"
+					:disabled="disabledForm"
+				>
+					<option value="psy">PSY</option>
+					<option value="avocado">Avocado</option>
+					<option value="-psy">Не PSY</option>
+					<option value="-avocado">Не Avocado</option>
+				</select>
+			</div>
 
-			<ButtonGreen type="submit" :disabled="disabledForm"
-				>Отправка уведомления</ButtonGreen
-			>
+			<ButtonGreen type="submit" :disabled="disabledForm">
+				Сохранить уведомление
+			</ButtonGreen>
 		</form>
 	</section>
 </template>
@@ -124,23 +153,34 @@ import router from "../routes";
 const store = <StoreGeneric>inject("Store");
 const { loading } = storeToRefs(store);
 const clearVariable: any = inject("clearVariable");
+const isLargeFile: any = inject("isLargeFile");
+const maxFileSizeText: any = inject("maxFileSizeText");
 
 const newNotification: Ref<Notification> = ref({
-	title: "",
+	lang: "",
 	type: "",
-	text: "",
-	time: "",
+	title: "",
+	body: "",
 	date: "",
-	application: "",
+	time: "",
+	app: "",
 });
 let disabledForm: Ref<boolean> = ref(false);
 let error: Ref<Array<string>> = ref([]);
-const formData: FormData = new FormData();
 let image: Ref<string> = ref("");
+let isLargeImage: Ref<boolean> = ref(false);
 
-function displayImage(e: Event) {
-	image.value = URL.createObjectURL((e as any).target.files[0]);
-	console.log(image.value);
+function displayImage(e: Event): void {
+	if (isLargeFile(e)) {
+		(e as any).currentTarget.value = null;
+		isLargeImage.value = true;
+		setTimeout(() => {
+			isLargeImage.value = false;
+		}, 2000);
+	}
+	image.value = (e as any).currentTarget.files.length
+		? URL.createObjectURL((e as any).currentTarget.files[0])
+		: "";
 }
 
 function addNotification(e: Event) {
@@ -188,6 +228,7 @@ function addNotification(e: Event) {
 		}
 
 		$file-input-color: #dbd4ff;
+		$file-input-error-color: #ff4545;
 		.file-input {
 			aspect-ratio: 47/20;
 			background-color: rgba($color: $file-input-color, $alpha: 0.23);
@@ -244,6 +285,19 @@ function addNotification(e: Event) {
 				height: 100%;
 				cursor: pointer;
 				opacity: 0;
+			}
+
+			&._error {
+				background-color: rgba($color: $file-input-error-color, $alpha: 0.23);
+				border: 0.2rem solid $file-input-error-color;
+
+				p {
+					color: $file-input-error-color;
+				}
+
+				svg {
+					fill: $file-input-error-color;
+				}
 			}
 		}
 

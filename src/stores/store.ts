@@ -1,11 +1,19 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
+import { useCookies, globalCookiesConfig } from 'vue3-cookies';
 import { Course, Courses, CourseProgram, CourseProgramTask, Promocode, Promocodes, Notifications, CourseToPost, UserCredentials } from "../../helpers";
 import { cloneDeep } from 'lodash';
 import { clearVariable } from '../main';
 import { watch } from 'vue';
 
-const url: string = 'http://testing.edproduction.xyz'
+const url: string = ""
+const api_base: string = '/v1/'
+const { cookies } = useCookies();
+
+globalCookiesConfig({
+	expireTimes: "30d",
+	secure: true,
+});
 
 function timer(s: number, callback: VoidFunction = () => { }): Promise<void> {
 	return new Promise((res, rej) => {
@@ -18,6 +26,32 @@ function timer(s: number, callback: VoidFunction = () => { }): Promise<void> {
 async function async(src: string) {
 	const r = await axios(src)
 	return r.data
+}
+
+function getObjectFromFormData(formData: FormData) {
+	let obj: { [key: string | number]: any } = {}
+	for (let [name, value] of formData) {
+		obj[name] = value
+	}
+	return obj
+}
+
+function formRequest(uriName: string, dataObj: FormData): Array<string | FormData> {
+	let newDataObj = copyFormData(dataObj);
+	newDataObj.append("session_token", cookies.get("session_token"))
+	return [
+		api_base + uriName,
+		newDataObj
+	]
+}
+
+function copyFormData(formData: FormData): FormData {
+	let newFormData = new FormData();
+	for (let [name, value] of formData) {
+		newFormData.append(name, value)
+	}
+	// formData.forEach((k, v): void => newFormData.append(k as string, v as FormDataEntryValue))
+	return newFormData;
 }
 
 const monthNames: ReadonlyArray<string> = [
@@ -231,10 +265,15 @@ export const Store = defineStore('Store', {
 		},
 
 		async addNotification(newNotification: FormData): Promise<void> {
-			return timer(2000, () => {
-				const formDataObj: any = {};
-				newNotification.forEach((value, key: any) => formDataObj[key] = value);
-				console.log(formDataObj)
+
+			// return timer(2000, () => {
+			// 	const formDataObj: any = {};
+			// 	newNotification.forEach((value, key: any) => formDataObj[key] = value);
+			// 	console.log(formDataObj)
+			// })
+
+			await axios.post(...formRequest('createAdminNotification', newNotification) as [string, FormData]).then(r => {
+				console.log(r);
 			})
 		},
 
@@ -268,6 +307,7 @@ export const Store = defineStore('Store', {
 			// return new Promise((res, rej) => {
 
 			// })
-		}
+		},
+
 	},
 })

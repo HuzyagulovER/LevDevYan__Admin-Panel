@@ -117,6 +117,13 @@ async function signIn(e: Event) {
 				size: 1.3rem;
 			}
 
+			&:-webkit-autofill,
+			&:-webkit-autofill:hover,
+			&:-webkit-autofill:focus {
+				-webkit-text-fill-color: var(--c__white);
+				-webkit-box-shadow: 0 0 0 5rem rgb(73, 78, 101) inset;
+			}
+
 			&::placeholder {
 				color: rgba(255, 255, 255, 0.741);
 			}
@@ -138,6 +145,12 @@ async function signIn(e: Event) {
 			font: {
 				family: monospace !important;
 				size: 1.5rem !important;
+			}
+
+			&:-webkit-autofill,
+			&:-webkit-autofill:hover,
+			&:-webkit-autofill:focus {
+				-webkit-text-fill-color: transparent !important;
 			}
 
 			&::selection {
