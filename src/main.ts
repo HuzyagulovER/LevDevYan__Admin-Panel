@@ -46,12 +46,43 @@ export function isLargeFile(e: Event & {
 	return (e.currentTarget.files && e.currentTarget.files[0].size > 2097152) ? true : false
 }
 
+export function isAcceptedExtension(e: Event & {
+	currentTarget: HTMLInputElement
+}, exts: Array<string>) {
+	let isAccepted = false
+	exts.forEach(ext => {
+		if (ext.includes('.')) {
+			ext = ext.replace(/\./g, '')
+		}
+
+		if (e.currentTarget.files && e.currentTarget.files[0]) {
+			if (e.currentTarget.files[0].type.match(new RegExp('/' + ext, 'g'))) {
+				isAccepted = true;
+			}
+		}
+	})
+	return isAccepted
+}
+
+export const getSHA256Hash = async (input: any) => {
+	const textAsBuffer = new TextEncoder().encode(input);
+	const hashBuffer = await window.crypto.subtle.digest("SHA-256", textAsBuffer);
+	const hashArray = Array.from(new Uint8Array(hashBuffer));
+	const hash = hashArray
+		.map((item) => item.toString(16).padStart(2, "0"))
+		.join("");
+	return hash;
+};
+
 const app = createApp(App)
-app.use(createPinia())
+app
+	.use(createPinia())
 	.provide('Store', Store())
 	.provide('clearVariable', clearVariable)
+	.provide('getSHA256Hash', getSHA256Hash)
 	.provide('isLargeFile', isLargeFile)
 	.provide('maxFileSize', maxFileSize)
 	.provide('maxFileSizeText', maxFileSizeText)
+	.provide('isAcceptedExtension', isAcceptedExtension)
 	.use(router)
 	.mount('#app')

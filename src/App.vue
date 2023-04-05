@@ -43,10 +43,6 @@ let no_scroll: ComputedRef<boolean> = computed(
 	() => loading.value || popup.value.isActive
 );
 
-// const href: Ref<string> = ref(
-// 	"https://levdevyan.com/images/avatars/avatar__user_default.png"
-// );
-
 watch(
 	() => no_scroll.value,
 	() => {

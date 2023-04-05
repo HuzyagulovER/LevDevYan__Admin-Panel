@@ -6,16 +6,29 @@
 		>
 			<div
 				class="form__file-input file-input"
-				:class="{ _error: isLargeImage }"
+				:class="{
+					_error:
+						isLargeImage ||
+						isInvalidExtension ||
+						imageErrorStatuses.indexOf(currentError) !== -1,
+				}"
 			>
 				<div class="file-input__image" v-if="image">
 					<img :src="image" alt="" />
 				</div>
 				<div class="file-input__container" v-else>
 					<IconImage />
-					<p v-if="isLargeImage">
+					<p v-if="isLargeImage || currentError === 'FILE_SIZE_EXCEEDED'">
 						Изображение должно быть
 						<br />не больше {{ maxFileSizeText }}
+					</p>
+					<p
+						v-else-if="
+							isInvalidExtension || currentError === 'INVALID_FILE_EXTENSION'
+						"
+					>
+						Изображение должно иметь
+						<br />верное расширение ({{ acceptedImageExtensions.join(", ") }})
 					</p>
 					<p v-else>
 						Загрузить<br />
@@ -26,25 +39,40 @@
 				<input
 					id="input_image"
 					type="file"
-					accept="image/*"
+					:accept="acceptedImageExtensions.join(',')"
 					name="notification_image"
 					:disabled="disabledForm"
 					@change="displayImage($event)"
+					ref="formImage"
 				/>
 			</div>
-
-			<label for="input_lang" class="form__label">Язык</label>
-			<div class="form__input" :class="{ _error: error.includes('lang') }">
-				<select
-					id="input_lang"
-					name="lang"
-					v-model="newNotification.lang"
-					:disabled="disabledForm"
-				>
-					<option value="ru">Русский</option>
-					<option value="eng">Английский</option>
-					<option value="any">Любой</option>
-				</select>
+			<div class="form__input-container input-container">
+				<div class="input-container__wrapper">
+					<label for="input_time" class="form__label">Время</label>
+					<input
+						id="input_time"
+						type="time"
+						class="form__input"
+						:class="{ _error: error.includes('time') }"
+						name="time"
+						:disabled="disabledForm"
+						v-model="newNotification.time"
+						@input="error = clearVariable(error)"
+					/>
+				</div>
+				<div class="input-container__wrapper">
+					<label for="input_date" class="form__label">Дата</label>
+					<input
+						id="input_date"
+						type="date"
+						class="form__input"
+						:class="{ _error: error.includes('date') }"
+						name="date"
+						:disabled="disabledForm || newNotification.repeat_times !== 1"
+						v-model="newNotification.date"
+						@input="error = clearVariable(error)"
+					/>
+				</div>
 			</div>
 
 			<label for="input_title" class="form__label">Заголовок</label>
@@ -59,30 +87,6 @@
 				@input="error = clearVariable(error)"
 			/>
 
-			<label for="input_type" class="form__label">Тип</label>
-			<!-- <input
-				id="input_type"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('text') }"
-				name="type"
-				:disabled="disabledForm"
-				v-model="newNotification.type"
-				@input="error = clearVariable(error)"
-			/> -->
-
-			<div class="form__input" :class="{ _error: error.includes('type') }">
-				<select
-					id="input_type"
-					name="type"
-					v-model="newNotification.type"
-					:disabled="disabledForm"
-				>
-					<option value="notification">Нотификация</option>
-					<option value="in_app">В приложении</option>
-				</select>
-			</div>
-
 			<label for="input_body" class="form__label">Текст</label>
 			<input
 				id="input_body"
@@ -95,80 +99,211 @@
 				@input="error = clearVariable(error)"
 			/>
 
-			<label for="input_time" class="form__label">Время</label>
+			<label for="input_repeat-times" class="form__label">
+				Число повторений
+				<span class="form__comment">(0 - неограниченное количество раз)</span>
+			</label>
 			<input
-				id="input_time"
-				type="text"
+				id="input_repeat-times"
+				type="number"
+				name="repeat_times"
 				class="form__input"
-				:class="{ _error: error.includes('time') }"
-				name="time"
+				:class="{ _error: error.includes('repeat_times') }"
 				:disabled="disabledForm"
-				v-model="newNotification.time"
+				v-model="newNotification.repeat_times"
 				@input="error = clearVariable(error)"
-			/>
-
-			<label for="input_date" class="form__label">Дата</label>
-			<input
-				id="input_date"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('date') }"
-				name="date"
-				:disabled="disabledForm"
-				v-model="newNotification.date"
-				@input="error = clearVariable(error)"
+				min="0"
 			/>
 
 			<label for="input_app" class="form__label">Приложение</label>
-			<div class="form__input" :class="{ _error: error.includes('app') }">
+			<div class="select-container">
 				<select
 					id="input_app"
 					name="app"
+					class="form__input"
+					:class="{ _error: error.includes('app') }"
 					v-model="newNotification.app"
 					:disabled="disabledForm"
 				>
 					<option value="psy">PSY</option>
 					<option value="avocado">Avocado</option>
-					<option value="-psy">Не PSY</option>
-					<option value="-avocado">Не Avocado</option>
 				</select>
 			</div>
 
-			<ButtonGreen type="submit" :disabled="disabledForm">
-				Сохранить уведомление
-			</ButtonGreen>
+			<label for="input_premium_app" class="form__label">
+				Подписки в приложении
+			</label>
+			<div class="select-container">
+				<select
+					id="input_premium_app"
+					name="premium_app_type"
+					class="form__input"
+					:class="{ _error: error.includes('premium_app_type') }"
+					v-model="newNotification.premium_app_type"
+					:disabled="disabledForm"
+				>
+					<option
+						v-for="(premiumAppType, j) in premiumAppTypes"
+						:key="j"
+						:value="j"
+					>
+						{{ premiumAppType }}
+					</option>
+				</select>
+			</div>
+
+			<label for="input_type" class="form__label" v-if="false">Тип</label>
+			<input
+				id="input_type"
+				type="text"
+				class="form__input"
+				:class="{ _error: error.includes('text') }"
+				name="type"
+				:disabled="disabledForm"
+				v-model="newNotification.type"
+				@input="error = clearVariable(error)"
+				v-if="false"
+			/>
+
+			<div
+				class="form__input"
+				:class="{ _error: error.includes('type') }"
+				v-if="false"
+			>
+				<select
+					id="input_type"
+					name="type"
+					v-model="newNotification.type"
+					:disabled="disabledForm"
+				>
+					<option value="notification">Нотификация</option>
+					<option value="in_app">В приложении</option>
+				</select>
+			</div>
+
+			<label for="input_lang" class="form__label">Язык</label>
+			<div class="select-container">
+				<select
+					id="input_lang"
+					name="lang"
+					class="form__input"
+					:class="{ _error: error.includes('lang') }"
+					v-model="newNotification.lang"
+					:disabled="disabledForm"
+				>
+					<option v-for="(language, j) in languages" :key="j" :value="j">
+						{{ language }}
+					</option>
+				</select>
+			</div>
+
+			<label for="input_days-without-open-app" class="form__label">
+				Дней не входил в приложение
+			</label>
+			<input
+				id="input_days-without-open-app"
+				type="number"
+				name="days_without_open_app"
+				class="form__input"
+				:class="{ _error: error.includes('days_without_open_app') }"
+				:disabled="disabledForm"
+				v-model="newNotification.days_without_open_app"
+				@input="error = clearVariable(error)"
+				min="0"
+			/>
+
+			<div v-if="newNotification.premium_app_type === 'not'">
+				<label for="input_days-without-sub" class="form__label">
+					Дней без подписки
+				</label>
+				<input
+					id="input_days-without-sub"
+					type="number"
+					name="days_without_subscription"
+					class="form__input"
+					:class="{ _error: error.includes('days_without_subscription') }"
+					:disabled="disabledForm"
+					v-model="newNotification.days_without_subscription"
+					@input="error = clearVariable(error)"
+					min="0"
+				/>
+			</div>
+
+			<div class="form__input-container input-container">
+				<div class="input-container__wrapper">
+					<ButtonColored
+						type="submit"
+						:disabled="disabledForm"
+						class="form__button"
+					></ButtonColored>
+				</div>
+			</div>
 		</form>
 	</section>
 </template>
 
 <script setup lang="ts">
 import { ref, Ref } from "@vue/reactivity";
-import { inject } from "@vue/runtime-core";
+import { inject, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { Notification } from "../../helpers";
-import ButtonGreen from "@add-comps/ButtonGreen.vue";
+import { Notification, ReturnedData, ReturnedError } from "../../helpers";
+import ButtonColored from "@add-comps/ButtonColored.vue";
 import IconImage from "@icons/IconImage.vue";
 import router from "../routes";
 
 const store = <StoreGeneric>inject("Store");
-const { loading } = storeToRefs(store);
-const clearVariable: any = inject("clearVariable");
+const {
+	loading,
+	premiumAppTypes,
+	languages,
+	acceptedImageExtensions,
+	imageErrorStatuses,
+} = storeToRefs(store);
+const clearVariable = <Function>inject("clearVariable");
 const isLargeFile: any = inject("isLargeFile");
 const maxFileSizeText: any = inject("maxFileSizeText");
+const isAcceptedExtension: any = inject("isAcceptedExtension");
+
+const requiredFields: ReadonlyArray<string> = [
+	"lang",
+	"title",
+	"body",
+	"time",
+	"app",
+	"premium_app_type",
+];
 
 const newNotification: Ref<Notification> = ref({
 	lang: "",
-	type: "",
+	// type: "",
 	title: "",
 	body: "",
 	date: "",
 	time: "",
 	app: "",
+	repeat_times: 0,
+	premium_app_type: "",
+	days_without_open_app: 0,
+	days_without_subscription: 0,
 });
+
 let disabledForm: Ref<boolean> = ref(false);
 let error: Ref<Array<string>> = ref([]);
 let image: Ref<string> = ref("");
 let isLargeImage: Ref<boolean> = ref(false);
+let isInvalidExtension: Ref<boolean> = ref(false);
+let currentError: Ref<string> = ref("");
+let formImage: Ref = ref();
+
+watch(
+	() => currentError.value,
+	(): void => {
+		if (currentError.value !== "") {
+			formImage.value = null;
+			image.value = "";
+		}
+	}
+);
 
 function displayImage(e: Event): void {
 	if (isLargeFile(e)) {
@@ -176,8 +311,17 @@ function displayImage(e: Event): void {
 		isLargeImage.value = true;
 		setTimeout(() => {
 			isLargeImage.value = false;
-		}, 2000);
+		}, 3000);
 	}
+
+	if (!isAcceptedExtension(e, acceptedImageExtensions.value)) {
+		(e as any).currentTarget.value = null;
+		isInvalidExtension.value = true;
+		setTimeout(() => {
+			isInvalidExtension.value = false;
+		}, 3000);
+	}
+
 	image.value = (e as any).currentTarget.files.length
 		? URL.createObjectURL((e as any).currentTarget.files[0])
 		: "";
@@ -185,12 +329,18 @@ function displayImage(e: Event): void {
 
 function addNotification(e: Event) {
 	disabledForm.value = true;
+	if (newNotification.value.premium_app_type === "not") {
+		newNotification.value.days_without_subscription = 0;
+	}
 	const fd: FormData = new FormData(e.target as HTMLFormElement);
 
-	for (let key in newNotification.value) {
-		if (newNotification.value[key as keyof Notification] === "")
-			error.value.push(key);
-	}
+	requiredFields.forEach((field) => {
+		if (
+			newNotification.value.hasOwnProperty(field as keyof Notification) &&
+			newNotification.value[field as keyof Notification] === ""
+		)
+			error.value.push(field);
+	});
 
 	if (error.value.length) {
 		disabledForm.value = false;
@@ -199,13 +349,23 @@ function addNotification(e: Event) {
 		}, 2000);
 		return;
 	}
+
 	loading.value = true;
 
-	store.addNotification(fd).then(() => {
+	store.addNotification(fd).then((r: ReturnedData | ReturnedError) => {
 		disabledForm.value = false;
 		loading.value = false;
-		newNotification.value = clearVariable(newNotification.value);
-		router.push({ name: "Notifications" });
+		if (r.success) {
+			newNotification.value = clearVariable(newNotification.value);
+			router.push({ name: "Notifications" });
+		} else {
+			currentError.value = r.error.status;
+			console.log(currentError.value);
+
+			setTimeout(() => {
+				currentError.value = "";
+			}, 2000);
+		}
 	});
 }
 </script>
@@ -213,6 +373,8 @@ function addNotification(e: Event) {
 <style scoped lang="scss">
 @import "../style.scss";
 
+$file-input-color: #dbd4ff;
+$file-input-error-color: #ff4545;
 .notification-create {
 	.form {
 		display: flex;
@@ -223,22 +385,21 @@ function addNotification(e: Event) {
 
 		&__label,
 		&__file-input,
-		&__input {
+		&__input,
+		.input-container {
 			width: 100%;
 		}
 
-		$file-input-color: #dbd4ff;
-		$file-input-error-color: #ff4545;
 		.file-input {
-			aspect-ratio: 47/20;
 			background-color: rgba($color: $file-input-color, $alpha: 0.23);
 			border: 0.2rem solid $file-input-color;
 			border-radius: 1rem;
 			position: relative;
 			display: flex;
 			justify-content: center;
-			max-height: 190px;
 			box-sizing: content-box;
+			width: 25rem;
+			height: 10rem;
 
 			&__container {
 				width: 100%;
@@ -308,9 +469,14 @@ function addNotification(e: Event) {
 				size: 1.6rem;
 			}
 		}
+		&__comment {
+			color: var(--c__grey);
+			font-size: 0.9rem;
+		}
 
 		&__file-input,
-		&__input {
+		label + input,
+		.select-container {
 			margin-bottom: 1.2rem;
 		}
 
@@ -320,11 +486,11 @@ function addNotification(e: Event) {
 			font: {
 				size: 1.25rem;
 			}
-			height: 2.5rem;
+			height: 2.8rem;
 			padding: 0 1rem;
 
 			&._error {
-				border-color: red;
+				border-color: $file-input-error-color;
 			}
 
 			select {
@@ -337,19 +503,24 @@ function addNotification(e: Event) {
 		}
 
 		&__button {
-			background-color: #31ac71;
-			border: 0;
-			color: var(--c__white);
-			font-size: 1.6rem;
-			height: 3.5rem;
-			padding: 0 5rem;
-			border-radius: 1rem;
 			margin-top: 1rem;
-			cursor: pointer;
+		}
 
-			&.disabled {
-				background-color: var(--c__grey);
-				cursor: auto;
+		div {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.input-container {
+			display: flex;
+			flex-direction: row;
+			width: auto;
+
+			&__wrapper {
+				display: flex;
+				flex-direction: column;
+				margin-right: 1.5rem;
 			}
 		}
 	}
@@ -362,6 +533,7 @@ function addNotification(e: Event) {
 				border-width: 0.3rem;
 				height: 18rem;
 				min-height: 18rem;
+				width: 100%;
 
 				svg {
 					width: 2.6rem;
@@ -387,15 +559,6 @@ function addNotification(e: Event) {
 				}
 				padding: 0.5rem 1.2rem;
 				height: unset;
-				margin: 0;
-
-				&._error {
-					border-color: red;
-				}
-			}
-
-			&__input + label {
-				margin-top: 1.5rem !important;
 			}
 
 			button {

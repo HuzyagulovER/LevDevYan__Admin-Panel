@@ -1,28 +1,31 @@
 <template>
 	<div class="course">
 		<div class="course__container">
-			<div class="course__image">
-				<img :src="props.about.image" alt="" />
+			<div class="course__course-image course-image">
+				<img
+					class="course-image__image"
+					:src="about.image"
+					alt=""
+					v-if="about.image"
+				/>
+				<p class="course-image__empty-image" v-else>Без<br />изображения</p>
 			</div>
+
 			<div class="course__info info">
-				<p class="info__title">
-					<span>Название</span>: {{ props.about.title }}
-				</p>
+				<p class="info__title"><span>Название</span>: {{ about.title }}</p>
 				<p class="info__days-amount">
-					<span>Сколько дней</span>: {{ props.about.period }}
+					<span>Сколько дней</span>: {{ about.period }}
 				</p>
-				<p class="info__price">
-					<span>Стоимость</span>: {{ props.about.price }}
-				</p>
+				<p class="info__price"><span>Стоимость</span>: {{ about.price }}</p>
 				<p class="info__category">
-					<span>Категория</span>: {{ props.about.category }}
+					<span>Категория</span>: {{ about.category }}
 				</p>
 			</div>
 			<div class="course__button-container">
 				<IconTrash class="course__delete" @click="confirmDeletingActive" />
 				<RouterLink
 					class="course__button"
-					:to="`/courses/create-edit/${props.index}/about`"
+					:to="`/courses/create-edit/${courseId}/about`"
 				>
 					Редактировать
 				</RouterLink>
@@ -39,11 +42,14 @@ import { useRoute } from "vue-router";
 import { CourseAbout } from "../../../helpers";
 
 const store = <StateTree>inject("Store");
-const props = defineProps<{ about: CourseAbout; index: number }>();
+const props = defineProps<{
+	courseId: string;
+	about: CourseAbout;
+}>();
 const emit = defineEmits(["confirmDeletingActive"]);
 
 function confirmDeletingActive() {
-	emit("confirmDeletingActive", props.index);
+	emit("confirmDeletingActive", props.courseId);
 }
 </script>
 
@@ -66,16 +72,25 @@ function confirmDeletingActive() {
 		height: 100%;
 	}
 
-	&__image {
+	.course-image {
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		aspect-ratio: 26/11;
 		height: 100%;
 		width: auto;
 		overflow: hidden;
 		border-radius: 0.8rem;
 
-		img {
+		&__image {
 			width: 100%;
 			height: 100%;
+			object-fit: contain;
+		}
+
+		&__empty-image {
+			text-align: center;
+			font-size: 2.5rem;
 		}
 	}
 

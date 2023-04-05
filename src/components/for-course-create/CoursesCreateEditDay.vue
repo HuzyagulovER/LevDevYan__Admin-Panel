@@ -1,33 +1,33 @@
 <template>
-	<div class="program">
-		<div class="program__container">
-			<div class="program__line">
-				<p class="program__title">День {{ number + 1 }}</p>
-				<IconTrash class="program__icon" @click="confirmDeletingActive" />
+	<div class="day">
+		<div class="day__container">
+			<div class="day__line">
+				<p class="day__title">День {{ number }}</p>
+				<IconTrash class="day__icon" @click="confirmDeletingActive" />
 			</div>
 			<input
 				type="text"
-				class="program__input"
+				class="day__input"
 				name="title"
-				v-model="program.title"
+				v-model="day.title"
 				placeholder="Название"
 			/>
 			<label for="description">Описание</label>
 			<textarea
 				type="text"
-				class="program__textarea"
+				class="day__textarea"
 				name="description"
-				v-model="program.description"
+				v-model="day.description"
 				placeholder="Описание дня"
 			>
 			</textarea>
-			<div class="program__line" :class="{ opened: opened }">
-				<ButtonGreen class="program__button" @click="addTask($event)">
+			<div class="day__line" :class="{ opened: opened }">
+				<ButtonColored class="day__button" @click="addTask($event)">
 					<span>+</span> Добавить задание
-				</ButtonGreen>
+				</ButtonColored>
 				<div>
 					<p>Задания ({{ tasksNumber }})</p>
-					<IconCorner class="program__corner" @click="toggleTasks" />
+					<IconCorner class="day__corner" @click="toggleTasks" />
 				</div>
 			</div>
 			<div
@@ -47,12 +47,12 @@
 						<p class="empty__text">Заданий еще нет...</p>
 					</div>
 					<TransitionGroup tag="div" name="list" v-else>
-						<CoursesCreateEditProgramTask
-							v-for="(task, i) in program.tasks"
-							:key="task"
+						<CoursesCreateEditTask
+							v-for="(task, j, i) in day.tasks"
+							:key="j"
 							:task="task"
 							:number="i"
-							@delete-task="deleteTask"
+							@delete-task="deleteTask(j)"
 						/>
 					</TransitionGroup>
 				</div>
@@ -62,20 +62,21 @@
 </template>
 
 <script setup lang="ts">
-import ButtonGreen from "@add-comps/ButtonGreen.vue";
+import ButtonColored from "@add-comps/ButtonColored.vue";
 import IconTrash from "@icons/IconTrash.vue";
 import IconCorner from "@icons/IconCorner.vue";
-import CoursesCreateEditProgramTask from "@for-course-create/CoursesCreateEditProgramTask.vue";
+import CoursesCreateEditTask from "@for-course-create/CoursesCreateEditTask.vue";
 import Popup from "@add-comps/Popup.vue";
-import { CourseProgram, CourseProgramTask } from "../../../helpers";
+import { CourseDay, CourseDayTask } from "../../../helpers";
 import { ComputedRef, ref, Ref } from "@vue/reactivity";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { computed, inject, watch } from "@vue/runtime-core";
 import { cloneDeep } from "lodash";
 
-const props = defineProps<{ program: CourseProgram; number: number }>();
+const props = defineProps<{ day: CourseDay; number: number }>();
 const emit = defineEmits(["deleteDay"]);
 
+let getSHA256Hash = <Function>inject("getSHA256Hash");
 const store = <StoreGeneric>inject("Store");
 const { defaultTaskItem } = storeToRefs(store);
 
@@ -84,7 +85,7 @@ let opened: Ref<boolean> = ref(false);
 let container_open: Ref<boolean> = ref(false);
 
 let tasksNumber: ComputedRef<number> = computed(() => {
-	return props.program.tasks.length;
+	return Object.keys(props.day.tasks).length;
 });
 
 let popup: Ref<boolean> = ref(false);
@@ -110,7 +111,7 @@ watch(
 );
 
 let emptyTasks: ComputedRef<boolean> = computed(() => {
-	return props.program.tasks.length === 0 ? true : false;
+	return Object.keys(props.day.tasks).length === 0;
 });
 
 function toggleTasks(): void {
@@ -118,26 +119,28 @@ function toggleTasks(): void {
 }
 
 function getEmptiesFromLastTask(): number {
-	const lastTask = props.program.tasks[props.program.tasks.length - 1];
+	const lastTask =
+		props.day.tasks[
+			Object.keys(props.day.tasks)[Object.keys(props.day.tasks).length - 1]
+		];
 	let empties = 0;
 	for (const key in lastTask) {
-		if (lastTask[key as keyof CourseProgramTask] === "") empties++;
+		if (lastTask[key as keyof CourseDayTask] === "") empties++;
 	}
 	return empties;
 }
 
-function addTask(e: Event): void {
+async function addTask(e: Event): Promise<void> {
 	const taskPropsNumber: number = Object.keys(
 		defaultTaskItem.value as {}
 	).length;
 
 	if (taskPropsNumber > getEmptiesFromLastTask()) {
-		props.program.tasks.push(cloneDeep(defaultTaskItem.value));
+		let hash: string = await getSHA256Hash(Date.now());
+		props.day.tasks[hash] = cloneDeep(defaultTaskItem.value);
 		if (!opened.value) toggleTasks();
 		setTimeout(() => {
-			const tasks = (e.target as any)
-				.closest(".program")
-				.querySelectorAll(".task");
+			const tasks = (e.target as any).closest(".day").querySelectorAll(".task");
 			const lastTask: HTMLElement = tasks[tasks.length - 1];
 			const inputs: NodeList = lastTask.querySelectorAll("input,textarea");
 			setTimeout(() => {
@@ -147,8 +150,8 @@ function addTask(e: Event): void {
 	}
 }
 
-function deleteTask(index: number): void {
-	props.program.tasks.splice(index, 1);
+function deleteTask(index: string | number): void {
+	delete props.day.tasks[index];
 }
 
 async function confirmDeletingActive() {
@@ -165,7 +168,7 @@ async function confirmDeletingActive() {
 <style scoped lang="scss">
 @import "../../style.scss";
 
-.program {
+.day {
 	padding: 2rem 3rem;
 	border-radius: 1.4rem;
 	box-shadow: 0 0 1rem 0 rgba($color: #000000, $alpha: 0.13);
@@ -190,7 +193,7 @@ async function confirmDeletingActive() {
 		}
 
 		&.opened {
-			.program__corner {
+			.day__corner {
 				transform: rotate(0);
 			}
 		}
@@ -231,10 +234,6 @@ async function confirmDeletingActive() {
 		}
 		height: 3rem;
 		padding: 0 1rem;
-
-		&._error {
-			border-color: red;
-		}
 	}
 
 	&__textarea {

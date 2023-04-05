@@ -9,7 +9,14 @@ export default defineConfig({
 	plugins: [vue()],
 	build: {
 		// outDir: 'C:\\Users\\eduar\\Desktop\\Projects\\levdevyan\\test',
-		outDir: "dist"
+		outDir: "dist",
+		rollupOptions: {
+			output: {
+				entryFileNames: `assets/[name].js`,
+				chunkFileNames: `assets/[name].js`,
+				assetFileNames: `assets/[name].[ext]`
+			}
+		}
 	},
 	server: {
 		host: true
@@ -30,4 +37,5 @@ export default defineConfig({
 			'@for-course-create': path.resolve(root_dir, './src/components/for-course-create'),
 		},
 	},
+
 })

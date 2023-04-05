@@ -2,7 +2,7 @@
 	<section class="promocodes">
 		<div class="promocodes__top-line top-line">
 			<p class="top-line__text">
-				Активные {{ activePromosNumber }}/{{ promosNumber }}
+				Отправленные {{ activePromosNumber }}/{{ promosNumber }}
 			</p>
 			<ButtonCreate
 				create_name="Создать промокод"
@@ -23,11 +23,11 @@
 		<TransitionGroup tag="div" name="list">
 			<PromocodesPromocodeItem
 				v-for="(promocode, j) in promos"
-				:key="promocode?.id"
-				:index="j"
+				:key="j"
 				:promocode="promocode"
 				class="promocodes__promocode"
-				@confirm-deleting-active="confirmDeletingActive"
+				@confirm-deleting="confirmDeletingActive"
+				@change-promocode-state="changePromocodeState"
 			/>
 		</TransitionGroup>
 	</section>
@@ -40,7 +40,12 @@ import TheLoader from "@add-comps/TheLoader.vue";
 import Popup from "@add-comps/Popup.vue";
 import { inject, Ref, ref, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { Promocode, Promocodes } from "../../helpers";
+import {
+	Promocode,
+	Promocodes,
+	ReturnedData,
+	ReturnedError,
+} from "../../helpers";
 import { cloneDeep } from "lodash";
 
 const store = <StoreGeneric>inject("Store");
@@ -50,49 +55,70 @@ let isEmpty: Ref<boolean> = ref(false);
 
 let activePromosNumber: Ref<number> = ref(0);
 let promosNumber: Ref<number> = ref(0);
-const promos: Ref<Promocodes> = ref([]);
-let deleteIndex: Ref<number> = ref(0);
+const promos: Ref<Promocodes> = ref({});
+let deletePromocode: Ref<string> = ref("");
 
 watch(
 	() => promos.value,
 	() => {
-		if (!promos.value.length && !loading.value) {
+		if (!Object.keys(promos.value).length && !loading.value) {
 			isEmpty.value = true;
 		}
 	},
 	{ deep: true }
 );
 
-store.getPromocodes().then(() => {
-	promos.value = cloneDeep(promocodes.value);
-});
-
 watch(
 	() => promos.value,
 	() => {
-		let active: number = 0;
-		promos.value.map((promo: Promocode | null): void => {
-			if (promo?.active) {
-				active++;
+		let sended: number = 0;
+		for (const key in promos.value) {
+			const promocode: Promocode = promos.value[key as keyof Promocodes];
+			if (promocode?.sended) {
+				sended++;
 			}
-		});
-		activePromosNumber.value = active;
-
-		promosNumber.value = promos.value.length;
+		}
+		activePromosNumber.value = sended;
+		promosNumber.value = Object.keys(promos.value).length;
 	},
 	{
 		deep: true,
 	}
 );
 
-async function confirmDeletingActive(index: number) {
-	deleteIndex.value = index;
-	await store.callPopup("Удалить этот промокод?").then((r: boolean) => {
-		if (r) {
-			promos.value.splice(deleteIndex.value, 1);
-			deleteIndex.value = 0;
-		}
+getPromocodes();
+
+function getPromocodes(): void {
+	store.getPromocodes().then(() => {
+		promos.value = cloneDeep(promocodes.value);
 	});
+}
+
+async function confirmDeletingActive(index: string) {
+	deletePromocode.value = index;
+	await store.callPopup("Удалить этот промокод?").then((r: boolean) => {
+		store
+			.deletePromocode(deletePromocode.value)
+			.then((r: ReturnedData | ReturnedError) => {
+				if (r.success && r.data.is_deleted) {
+					getPromocodes();
+				}
+				deletePromocode.value = "";
+			});
+	});
+}
+
+async function changePromocodeState(
+	promocode: string,
+	newPromocodeState: boolean
+) {
+	store
+		.updatePromocode(promocode, { sended: newPromocodeState ? 1 : 0 })
+		.then((r: ReturnedData | ReturnedError) => {
+			if (r.success && r.data.is_changed) {
+				// getPromocodes();
+			}
+		});
 }
 </script>
 

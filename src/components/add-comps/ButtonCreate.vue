@@ -30,6 +30,11 @@ defineProps<{ create_name: string; to?: string }>();
 	cursor: pointer;
 	font-size: 1.5rem;
 
+	p {
+		text-align: center;
+		width: 100%;
+	}
+
 	span {
 		margin-right: 0.8rem;
 	}

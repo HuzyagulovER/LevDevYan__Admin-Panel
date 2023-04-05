@@ -9,10 +9,22 @@
 					type="email"
 					name="email"
 					class="form__input"
+					:class="{
+						_error:
+							returnedErrorStatus === 'INVALID_EMAIL' ||
+							error.includes('email'),
+					}"
 					placeholder="Логин"
 					v-model="userCreds.email"
 				/>
-				<div class="form__wrapper">
+				<div
+					class="form__wrapper"
+					:class="{
+						_error:
+							returnedErrorStatus === 'INVALID_PASSWORD' ||
+							error.includes('password'),
+					}"
+				>
 					<input
 						:type="inputType"
 						name="password"
@@ -35,11 +47,14 @@ import { ComputedRef, ref, Ref } from "@vue/reactivity";
 import { computed, inject, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
-import { UserCredentials } from "../../helpers";
+import { useCookies } from "vue3-cookies";
+import { UserCredentials, ReturnedData, ReturnedError } from "../../helpers";
 
 const store = <StoreGeneric>inject("Store");
 const { loading } = storeToRefs(store);
 const router = useRouter();
+const clearVariable = <Function>inject("clearVariable");
+const { cookies } = useCookies();
 
 const userCreds: Ref<UserCredentials> = ref({
 	email: "",
@@ -50,14 +65,36 @@ const pass_mask: ComputedRef<string> = computed((): string => {
 	return "*".repeat(userCreds.value.password.length);
 });
 const inputType: string = window.screen.width > 800 ? "text" : "password";
+let returnedErrorStatus: Ref<string> = ref("");
+let error: Ref<Array<string>> = ref([]);
 
 async function signIn(e: Event) {
+	for (let key in userCreds.value) {
+		if (userCreds.value[key as keyof UserCredentials] === "")
+			error.value.push(key);
+	}
+
+	if (error.value.length) {
+		setTimeout(() => {
+			error.value = clearVariable(error.value);
+		}, 2000);
+		return;
+	}
+
 	const credentials: FormData = new FormData(e.target as HTMLFormElement);
 	loading.value = true;
-	await store.signIn(credentials).then((r: boolean) => {
+	await store.signIn(credentials).then((r: ReturnedData | ReturnedError) => {
 		loading.value = false;
 
-		if (r) router.push("/");
+		if (!r.success) {
+			returnedErrorStatus.value = r.error.status;
+			setTimeout(() => {
+				returnedErrorStatus.value = "";
+			}, 2000);
+			return;
+		}
+		cookies.set("session_token", r.data.session_token);
+		router.push("/");
 	});
 }
 </script>

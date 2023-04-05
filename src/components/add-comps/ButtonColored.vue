@@ -1,5 +1,9 @@
 <template>
-	<button class="form-button" :class="{ disabled: disabled }">
+	<button
+		class="form-button"
+		:class="{ disabled: disabled }"
+		:style="{ 'background-color': color }"
+	>
 		<slot>Сохранить</slot>
 	</button>
 </template>
@@ -7,10 +11,11 @@
 <script setup lang="ts">
 const props = defineProps<{
 	disabled?: boolean;
+	color?: string;
 }>();
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "../../style.scss";
 
 .form-button {

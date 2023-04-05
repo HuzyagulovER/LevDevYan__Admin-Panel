@@ -8,13 +8,18 @@ import ViewPromocodesCreate from "../views/ViewPromocodesCreate.vue";
 import ViewNotifications from "../views/ViewNotifications.vue";
 import ViewNotificationsCreate from "../views/ViewNotificationsCreate.vue";
 import CoursesCreateEditAbout from "@for-course-create/CoursesCreateEditAbout.vue";
-import CoursesCreateEditProgram from "@for-course-create/CoursesCreateEditProgram.vue";
+import CoursesCreateEditDays from "@for-course-create/CoursesCreateEditDays.vue";
 
 import IconHome from "../components/add-comps/icons/IconHome.vue";
 import IconCourses from "../components/add-comps/icons/IconCourses.vue";
 import IconPromocodes from "../components/add-comps/icons/IconPromocodes.vue";
 import IconNotifications from "../components/add-comps/icons/IconNotifications.vue";
 import { Component } from 'vue';
+import { Store } from '../stores/store';
+import { ReturnedError, ReturnedData } from '../../helpers';
+import { useCookies } from 'vue3-cookies';
+
+const { cookies } = useCookies();
 
 const default_title: string = 'Личный кабинет'
 
@@ -50,7 +55,7 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		},
 	},
 	{
-		path: '/courses/create-edit/:id',
+		path: '/courses/create-edit/:courseId',
 		component: ViewCoursesCreateEdit,
 		children: [
 			{
@@ -59,9 +64,9 @@ const routes: Array<RouteRecordRawWithMeta> = [
 				component: CoursesCreateEditAbout,
 			},
 			{
-				path: 'program',
-				name: "CoursesCourseProgram",
-				component: CoursesCreateEditProgram,
+				path: 'days',
+				name: "CoursesCourseDays",
+				component: CoursesCreateEditDays,
 			},
 		]
 	},
@@ -106,6 +111,13 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		name: "SignIn",
 		component: ViewSignIn,
 	},
+	// {
+	// 	path: "/:pathMatch(.*)*",
+	// 	name: "NotFound",
+	// 	redirect: {
+	// 		name: "Main",
+	// 	},
+	// },
 ]
 
 const router = createRouter({
@@ -122,10 +134,44 @@ const router = createRouter({
 	routes
 })
 
-router.beforeEach((to, from, next) => {
-	let title = <HTMLElement>document.querySelector('head title')
-	title.innerText = <string>(to.meta.title || default_title)
-	next()
+router.beforeEach(async (to, from, next) => {
+	try {
+		const store = Store()
+
+		if (!cookies.get("session_token")) {
+			if (to.path !== '/sign-in') {
+				next({ path: '/sign-in' })
+				return
+			}
+			next()
+		}
+
+		if (cookies.get("session_token")) {
+			await store.checkSessionToken().then(
+				(r: ReturnedError | ReturnedData) => {
+					let title = <HTMLElement>document.querySelector('head title')
+					title.innerText = <string>(to.meta.title || default_title)
+
+					if (!r.success) {
+						throw new Error(r.error.status);
+					}
+					if (!r.data.is_valid) {
+						cookies.remove("session_token")
+						next({ path: '/sign-in' })
+						return
+					}
+					if (to.path === '/sign-in') {
+						next({ path: '/' })
+					} else {
+						next()
+					}
+				}
+			)
+		}
+	} catch (error) {
+		console.log(error);
+		// next({ path: '/sign-in' })
+	}
 })
 
 export default router

@@ -1,7 +1,7 @@
 <template>
-	<div class="programs">
-		<div class="programs__container">
-			<div class="programs__empty empty" v-if="isEmpty">
+	<div class="days">
+		<div class="days__container">
+			<div class="days__empty empty" v-if="isEmpty">
 				<div class="empty__wrapper">
 					<img
 						src="@images/Courses__Empty_Days_Guy.png"
@@ -19,13 +19,13 @@
 				<p>Программа курса еще пуста...</p>
 			</div>
 			<TransitionGroup tag="div" name="list" v-else>
-				<CoursesCreateEditProgramItem
-					class="programs__program"
-					v-for="(program, i) in data"
-					:key="program?.id || program"
-					:program="program"
-					:number="i"
-					@delete-day="deleteDay"
+				<CoursesCreateEditDay
+					class="days__day"
+					v-for="(j, i) in Object.keys(data).reverse()"
+					:key="j"
+					:day="data[j]"
+					:number="Object.keys(data).length - i"
+					@delete-day="deleteDay(j)"
 				/>
 			</TransitionGroup>
 		</div>
@@ -34,28 +34,30 @@
 
 <script setup lang="ts">
 import IconImage from "@icons/IconImage.vue";
-import CoursesCreateEditProgramItem from "@for-course-create/CoursesCreateEditProgramItem.vue";
+import CoursesCreateEditDay from "@for-course-create/CoursesCreateEditDay.vue";
 import { ComputedRef, ref, Ref } from "@vue/reactivity";
 import { computed, inject } from "@vue/runtime-core";
 import { StoreGeneric } from "pinia";
-import { CourseProgram } from "../../../helpers";
+import { CourseDays } from "../../../helpers";
 
-const props = defineProps<{ data: Array<CourseProgram> }>();
+const props = defineProps<{ data: CourseDays }>();
 
 const store = <StoreGeneric>inject("Store");
-const clearVariable: any = inject("clearVariable");
+const clearVariable = <Function>inject("clearVariable");
 
 let disabledForm: Ref<boolean> = ref(false);
 let error: Ref<Array<string>> = ref([]);
-let isEmpty: ComputedRef<boolean> = computed(() => !props.data.length);
+let isEmpty: ComputedRef<boolean> = computed(
+	() => !Object.keys(props.data).length || props.data === null
+);
 
-function deleteDay(index: number): void {
-	props.data.splice(index, 1);
+function deleteDay(index: string | number): void {
+	delete props.data[index];
 }
 </script>
 
 <style lang="scss" scoped>
-.programs {
+.days {
 	height: 100%;
 
 	&__container {

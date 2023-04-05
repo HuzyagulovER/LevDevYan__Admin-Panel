@@ -1,22 +1,26 @@
 <template>
-	<div class="promocode" :class="{ 'js-active': props.promocode.active }">
+	<div class="promocode">
 		<div class="promocode__container">
 			<p class="promocode__promocode">
 				{{ promocode.promocode }}
 			</p>
 			<div class="promocode__wrapper">
-				<div class="promocode__value">
+				<div class="promocode__value" v-if="promocode.value">
 					<p>{{ promocode.value }}</p>
 				</div>
-				<div class="promocode__type">
+				<div class="promocode__type" v-if="promocode.type">
 					<p>{{ promocode.type }}</p>
 				</div>
 			</div>
-			<div class="promocode__active active">
+			<div
+				class="promocode__active active"
+				:class="{ _active: props.promocode.sended }"
+			>
 				<input
 					type="checkbox"
-					v-model="props.promocode.active"
+					v-model="props.promocode.sended"
 					class="active__input"
+					@change.prevent="changePromocodeState"
 				/>
 				<div class="active__background"></div>
 				<svg
@@ -32,7 +36,7 @@
 				</svg>
 			</div>
 			<div class="promocode__delete">
-				<IconTrash @click="confirmDeletingActive" />
+				<IconTrash @click="confirmDeleting" />
 			</div>
 		</div>
 	</div>
@@ -45,13 +49,21 @@ import { Promocode } from "../../../helpers";
 import IconTrash from "../add-comps/icons/IconTrash.vue";
 
 const store = <StateTree>inject("Store");
-const props = defineProps<{ promocode: Promocode; index: number }>();
-const emit = defineEmits(["confirmDeletingActive"]);
+const props = defineProps<{ promocode: Promocode }>();
+const emit = defineEmits(["confirmDeleting", "changePromocodeState"]);
 
 const promo: Ref<Promocode> = ref({ ...props.promocode });
 
-function confirmDeletingActive() {
-	emit("confirmDeletingActive", props.index);
+function confirmDeleting() {
+	emit("confirmDeleting", props.promocode.promocode);
+}
+
+function changePromocodeState() {
+	emit(
+		"changePromocodeState",
+		props.promocode.promocode,
+		props.promocode.sended ? 1 : 0
+	);
 }
 </script>
 
@@ -120,23 +132,6 @@ function confirmDeletingActive() {
 		}
 	}
 
-	&.js-active {
-		.active {
-			border-width: 0;
-
-			&__background {
-			}
-
-			&__input ~ svg {
-				transform: scale(1);
-			}
-
-			&__input ~ .active__background {
-				transform: scale(1);
-			}
-		}
-	}
-
 	.active {
 		margin-left: auto;
 		width: 2rem;
@@ -178,6 +173,18 @@ function confirmDeletingActive() {
 		svg {
 			transform: scale(0);
 			transition: all 0.3s ease-in;
+		}
+	}
+
+	._active.active {
+		border-width: 0;
+
+		svg {
+			transform: scale(1);
+		}
+
+		.active__background {
+			transform: scale(1);
 		}
 	}
 

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
 import { useCookies, globalCookiesConfig } from 'vue3-cookies';
-import { Course, Courses, CourseProgram, CourseProgramTask, Promocode, Promocodes, Notifications, CourseToPost, UserCredentials } from "../../helpers";
+import { Course, Courses, CourseDay, CourseDayTask, Promocode, Promocodes, Notifications, CourseToPost, UserCredentials } from "../../helpers";
 import { cloneDeep } from 'lodash';
 import { clearVariable } from '../main';
 import { watch } from 'vue';
@@ -23,11 +23,6 @@ function timer(s: number, callback: VoidFunction = () => { }): Promise<void> {
 	})
 }
 
-async function async(src: string) {
-	const r = await axios(src)
-	return r.data
-}
-
 function getObjectFromFormData(formData: FormData) {
 	let obj: { [key: string | number]: any } = {}
 	for (let [name, value] of formData) {
@@ -36,7 +31,10 @@ function getObjectFromFormData(formData: FormData) {
 	return obj
 }
 
-function formRequest(uriName: string, dataObj: FormData): Array<string | FormData> {
+function formRequest(uriName: string, dataObj?: FormData): Array<string | FormData> {
+	if (!dataObj) {
+		dataObj = new FormData();
+	}
 	let newDataObj = copyFormData(dataObj);
 	newDataObj.append("session_token", cookies.get("session_token"))
 	return [
@@ -52,6 +50,15 @@ function copyFormData(formData: FormData): FormData {
 	}
 	// formData.forEach((k, v): void => newFormData.append(k as string, v as FormDataEntryValue))
 	return newFormData;
+}
+
+function object_reverse(object: { [key: string]: {} }): { [key: string]: {} } {
+	let objectKeys: Array<string> = Object.keys(object).reverse()
+	let newObject: typeof object = {};
+	objectKeys.forEach((key) => {
+		newObject[key] = cloneDeep(object[key])
+	});
+	return newObject;
 }
 
 const monthNames: ReadonlyArray<string> = [
@@ -84,8 +91,11 @@ type State = {
 	notifications: Notifications,
 	loadedFile: File | null,
 	defaultCourse: Course,
-	defaultProgramItem: CourseProgram,
-	defaultTaskItem: CourseProgramTask
+	defaultDayItem: CourseDay,
+	defaultTaskItem: CourseDayTask,
+	languages: Object,
+	acceptedImageExtensions: Array<string>
+	defaultLang: string
 }
 
 export const Store = defineStore('Store', {
@@ -99,39 +109,10 @@ export const Store = defineStore('Store', {
 				answer: false,
 			},
 			mainTitle: '',
-			courses: [
-				{
-					"id": 7,
-					"about": {
-						"title": "Название_3",
-						"period": "3 дня",
-						"description": "3",
-						"whom": "3",
-						"results": "3",
-						"image": "/images/courses/Courses__Course-Image.png",
-						"price": "По договоренности",
-						"category": "Медицина"
-					},
-					"program": [
-						{
-							"id": 3,
-							"title": "",
-							"description": "",
-							"tasks": [
-								{
-									"title": "",
-									"type": "",
-									"description": ""
-								}
-							]
-						}
-					]
-				}
-			],
+			courses: {},
 			currentTime: '',
-			promocodes: [],
+			promocodes: {},
 			notifications: [],
-
 			loadedFile: null,
 
 			defaultCourse: {
@@ -139,61 +120,148 @@ export const Store = defineStore('Store', {
 				about: {
 					id: 0,
 					title: "",
+					lang: "",
 					period: "",
 					description: "",
-					whom: "",
+					for_whom: "",
 					results: "",
 					image: "",
-					price: "",
+					price: 0,
 					category: ""
 				},
-				program: []
+				days: {}
 			},
-			defaultProgramItem: {
+			defaultDayItem: {
 				id: 0,
 				title: "",
 				description: "",
-				tasks: []
+				tasks: {}
 			},
 			defaultTaskItem: {
 				title: "",
 				type: "",
 				description: ""
-			}
+			},
+
+			appNames: {
+				'psy': 'PSY',
+				'avocado': 'Avocado'
+			},
+			languages: {
+				'ru': 'Русский',
+				'en': 'Английский',
+			},
+			premiumAppTypes: {
+				is: 'Есть подписка',
+				not: 'Нет подписки',
+				all: 'Для всех',
+			},
+
+			acceptedImageExtensions: [
+				".jpeg",
+				".jpg",
+				".bmp",
+				".gif",
+				".png",
+				".ico",
+				".webp",
+			],
+			imageErrorStatuses: [
+				'FILE_SIZE_EXCEEDED',
+				'INVALID_FILE_EXTENSION'
+			],
+
+			defaultLang: ''
 		}
 	),
 
 	actions: {
-		async getCourses(): Promise<void> {
+		async getCourses(lang: string | undefined): Promise<void> {
 			this.loading = true
-			return await axios(url + "/json/data.json")
+			const langFD = new FormData()
+			if (lang) {
+				langFD.append('lang', lang)
+			}
+
+			return await axios.post(...formRequest('Courses/getCourses', langFD) as [string])
 				.then(r => {
-					const d = r.data;
-					if (typeof d === 'string') { throw new Error("There is error in courses getting."); }
-					return d;
-				})
-				.then((e: Courses): void => {
-					this.$patch({
-						courses: <Courses>e,
-					})
-				})
-				.then((): void => {
+					this.courses = r.data.data
 					this.loading = false
+					return
 				})
 				.catch(e => {
 					console.error(`${e.name}: ${e.message}`);
 				})
 		},
 
-		async saveCourse(course: Course): Promise<void> {
-			const c: CourseToPost = cloneDeep(course)
+		async getCourse(courseId: string): Promise<void> {
+			this.loading = true
+			const courseIdFD = new FormData()
+			courseIdFD.append('courses_ids', JSON.stringify([courseId]))
+
+			return await axios.post(...formRequest('Courses/getCourses', courseIdFD) as [string])
+				.then(r => {
+					this.loading = false
+					return r.data.data
+				})
+				.catch(e => {
+					console.error(`${e.name}: ${e.message}`);
+				})
+		},
+
+		async addCourse(course: Course): Promise<void> {
+			const newCourse: CourseToPost = cloneDeep(course)
+			const fd = new FormData();
+			fd.append('about', JSON.stringify(newCourse['about']));
+			fd.append('days', JSON.stringify(newCourse['days']));
 			if (this.loadedFile) {
-				c['loadedFile'] = this.loadedFile
+				fd.append('course_images', this.loadedFile);
 			}
-			return timer(2000, () => {
-				console.log(c)
-				this.loadedFile = null
-			})
+
+			return await axios.post(...formRequest('Courses/createCourse', fd) as [string, FormData]).then(
+				r => {
+					this.loadedFile = null
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+
+		async updateCourse(course: Course): Promise<void> {
+			const updateCourse: CourseToPost = cloneDeep(course)
+			const fd = new FormData();
+			fd.append('course_id', updateCourse['course_id']);
+			fd.append('about', JSON.stringify(updateCourse['about']));
+			fd.append('days', JSON.stringify(updateCourse['days']));
+			if (this.loadedFile) {
+				fd.append('course_images', this.loadedFile);
+			}
+
+			return await axios.post(...formRequest('Courses/updateCourse', fd) as [string, FormData]).then(
+				r => {
+					this.loadedFile = null
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+
+		async deleteCourse(courses_ids: Array<string>): Promise<void> {
+			const fd = new FormData();
+			fd.append('courses_ids', JSON.stringify(courses_ids));
+
+			return await axios.post(...formRequest('Courses/deleteCourses', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
 		},
 
 		async updateTime() {
@@ -218,20 +286,18 @@ export const Store = defineStore('Store', {
 		},
 
 		async getPromocodes(): Promise<void> {
-			this.loading = true
-			return await axios(url + "/json/promocodes.json")
+			const fd = new FormData()
+			return await axios.post(...formRequest('Promocodes/getPromocodes', fd) as [string])
 				.then(r => {
-					const d = r.data;
-					if (typeof d === 'string') { throw new Error("There is error in promocodes getting."); }
-					return d;
+					const promocodes: Promocodes = cloneDeep(r.data.data.promocodes)
+					for (const key in promocodes) {
+						const promocode: Promocode = promocodes[key as keyof Promocodes];
+						promocode.sended = !!promocode.sended;
+					}
+					return promocodes;
 				})
 				.then((e: Promocodes): void => {
-					this.loading = false
-					this.$patch({
-						promocodes: <Promocodes>e,
-					})
-				})
-				.then((): void => {
+					this.promocodes = e
 					this.loading = false
 				})
 				.catch(e => {
@@ -239,25 +305,65 @@ export const Store = defineStore('Store', {
 				});
 		},
 
-		async addPromocode(newPromocode: Promocode): Promise<void> {
-			return timer(2000, () => console.log(newPromocode))
+		async deletePromocode(promocode: string): Promise<void> {
+			const fd = new FormData()
+			fd.append('promocode', promocode);
+			return await axios.post(...formRequest('Promocodes/deletePromocode', fd) as [string])
+				.then(r => {
+					return r.data;
+				})
+				.catch(e => {
+					console.error(`${e.name}: ${e.message}`);
+				});
 		},
 
-		async getNotifications(): Promise<void> {
+		async addPromocode(newPromocode: {}): Promise<void> {
+			const fd = new FormData()
+			fd.append('promocode_data', JSON.stringify(newPromocode))
+			return await axios.post(...formRequest('Promocodes/createPromocode', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+
+		async updatePromocode(promocode: string, newPromocodeData: {}): Promise<void> {
+			const fd = new FormData()
+			fd.append('promocode', promocode)
+			fd.append('promocode_new_data', JSON.stringify(newPromocodeData))
+			return await axios.post(...formRequest('Promocodes/updatePromocode', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+
+		async getNotifications(app: string, lang: string): Promise<void> {
 			this.loading = true
-			return await axios(url + "/json/notifications.json")
-				.then(r => {
-					const d = r.data;
-					if (typeof d === 'string') { throw new Error("There is error in notifications getting."); }
-					return d;
-				})
+			const fd = new FormData()
+			fd.append('app', app)
+			fd.append('lang', lang)
+
+			return await axios.post(...formRequest('Notifications/getAdminNotifications', fd) as [string])
+				.then(
+					r => {
+						return r.data.data;
+					},
+					e => {
+						console.log(e);
+						if (!e.response.data.success) throw new Error("There is error in notifications getting.")
+					})
 				.then((e: Notifications): void => {
 					this.loading = false
 					this.$patch({
 						notifications: <Notifications>e,
 					})
-				}).then((): void => {
-					this.loading = false
 				})
 				.catch(e => {
 					console.error(`${e.name}: ${e.message}`);
@@ -265,27 +371,49 @@ export const Store = defineStore('Store', {
 		},
 
 		async addNotification(newNotification: FormData): Promise<void> {
+			return await axios.post(...formRequest('Notifications/createAdminNotification', newNotification) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
 
-			// return timer(2000, () => {
-			// 	const formDataObj: any = {};
-			// 	newNotification.forEach((value, key: any) => formDataObj[key] = value);
-			// 	console.log(formDataObj)
-			// })
+		async deleteNotification(deleteNotification: FormData): Promise<void> {
+			return await axios.post(...formRequest('Notifications/deleteAdminNotification', deleteNotification) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
 
-			await axios.post(...formRequest('createAdminNotification', newNotification) as [string, FormData]).then(r => {
-				console.log(r);
-			})
+		async updateNotification(updateNotification: FormData): Promise<void> {
+			return await axios.post(...formRequest('Notifications/updateAdminNotification', updateNotification) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
 		},
 
 		async signIn(creadentials: FormData): Promise<void> {
-			return timer(2000, () => {
-				const formDataObj: any = {};
-				creadentials.forEach((value, key): void => {
-					formDataObj[key] = value
-				})
-				console.log(formDataObj)
-				return true
-			})
+			return await axios.post(api_base + "signIn", creadentials).then(
+				r => {
+					console.log(r);
+					return r.data
+				},
+				e => {
+					console.log(e);
+					return e.response.data
+				}
+			)
 		},
 
 		clearPopup() {
@@ -307,6 +435,36 @@ export const Store = defineStore('Store', {
 			// return new Promise((res, rej) => {
 
 			// })
+		},
+
+		async checkSessionToken() {
+			return await axios.post(...formRequest('checkSessionToken') as [string]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					console.log(e);
+					return e.response.data
+				}
+			)
+		},
+
+		async getUsersData(): Promise<void> {
+			return await axios.post(...formRequest('getUsersInfo', new FormData()) as [string, FormData])
+				.then(
+					r => {
+						return r.data.data;
+					},
+					e => {
+						console.log(e);
+						if (!e.response.data.success) throw new Error("There is error in notifications getting.")
+					})
+				.then(r => {
+					return r
+				})
+				.catch(e => {
+					console.error(`${e.name}: ${e.message}`);
+				});
 		},
 
 	},

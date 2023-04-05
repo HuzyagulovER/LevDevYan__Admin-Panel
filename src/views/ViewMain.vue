@@ -14,7 +14,7 @@
 					<div class="info__container">
 						<div class="info__wrapper">
 							<MainInfoItem
-								value="2000"
+								:value="usersData.registered"
 								text="Зарегестрировано"
 								color_from="#E9F7FB"
 								color_to="#CAE6FF"
@@ -22,7 +22,7 @@
 						</div>
 						<div class="info__wrapper">
 							<MainInfoItem
-								value="2000"
+								:value="usersData.psy"
 								text="Подписки PSY"
 								color_from="rgba(219, 213, 255, 0.52)"
 								color_to="rgba(149, 152, 244, 0.52)"
@@ -30,7 +30,7 @@
 						</div>
 						<div class="info__wrapper">
 							<MainInfoItem
-								value="2000"
+								:value="usersData.avocado"
 								text="Подписки Авокадо"
 								color_from="#D5F8D6"
 								color_to="#9CEA9E"
@@ -49,7 +49,7 @@
 					<div class="info__container">
 						<div class="info__wrapper">
 							<MainInfoItem
-								value="2000"
+								:value="usersData.active_courses"
 								text="Проходят сейчас"
 								color_from="#E9F7FB"
 								color_to="#CAE6FF"
@@ -57,7 +57,7 @@
 						</div>
 						<div class="info__wrapper">
 							<MainInfoItem
-								value="2000"
+								:value="usersData.completed_courses"
 								text="Пройдено курсов"
 								color_from="#D5F8D6"
 								color_to="#9CEA9E"
@@ -65,7 +65,7 @@
 						</div>
 						<div class="info__wrapper">
 							<MainInfoItem
-								value="2000"
+								:value="usersData.rejected_courses"
 								text="Отказались"
 								color_from="#FCEBEB"
 								color_to="#F3C9C9"
@@ -79,10 +79,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import IconFilter from "@icons/IconFilter.vue";
 import MainInfoItem from "@for-main/MainInfoItem.vue";
 import TheMainBanner from "@for-main/TheMainBanner.vue";
+import { inject, Ref, ref } from "vue";
+import { StoreGeneric, storeToRefs } from "pinia";
+
+const store = <StoreGeneric>inject("Store");
+const { loading } = storeToRefs(store);
+const usersData: Ref<{ [key: string]: any }> = ref({});
+
+getUsersData();
+
+function getUsersData(): void {
+	loading.value = true;
+	store.getUsersData().then((r: Object) => {
+		usersData.value = r;
+		loading.value = false;
+	});
+}
 </script>
 
 <style lang="scss" scoped>

@@ -3,14 +3,14 @@
 		class="item"
 		:style="`background: linear-gradient(180deg, ${color_from} 0%, ${color_to} 100%);`"
 	>
-		<p class="item__value">{{ value }}</p>
+		<p class="item__value">{{ value || 0 }}</p>
 		<p class="item__text">{{ text }}</p>
 	</div>
 </template>
 
 <script setup lang="ts">
 interface Props {
-	value: number | string;
+	value: any;
 	text: string;
 	color_from: string;
 	color_to: string;

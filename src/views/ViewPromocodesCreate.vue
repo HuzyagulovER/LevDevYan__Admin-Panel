@@ -35,7 +35,7 @@
 				@input="error = clearVariable(error)"
 			/>
 
-			<ButtonGreen type="submit" :disabled="disabledForm"></ButtonGreen>
+			<ButtonColored type="submit" :disabled="disabledForm"></ButtonColored>
 		</form>
 	</section>
 </template>
@@ -44,13 +44,13 @@
 import { ref, Ref } from "@vue/reactivity";
 import { inject } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { Promocode } from "../../helpers";
-import ButtonGreen from "@add-comps/ButtonGreen.vue";
+import { Promocode, ReturnedData, ReturnedError } from "../../helpers";
+import ButtonColored from "@add-comps/ButtonColored.vue";
 import router from "../routes";
 
 const store = <StoreGeneric>inject("Store");
 const { loading } = storeToRefs(store);
-const clearVariable: any = inject("clearVariable");
+const clearVariable = <Function>inject("clearVariable");
 
 const newPromocode: Ref<Promocode> = ref({
 	promocode: "",
@@ -60,7 +60,7 @@ const newPromocode: Ref<Promocode> = ref({
 let disabledForm: Ref<boolean> = ref(false);
 let error: Ref<Array<string>> = ref([]);
 
-function addPromocode() {
+function addPromocode(): void {
 	disabledForm.value = true;
 
 	for (let key in newPromocode.value) {
@@ -77,13 +77,16 @@ function addPromocode() {
 	}
 	loading.value = true;
 
-	store.addPromocode(newPromocode.value).then(() => {
-		disabledForm.value = false;
-		loading.value = false;
-
-		newPromocode.value = clearVariable(newPromocode.value);
-		router.push({ name: "Promocodes" });
-	});
+	store
+		.addPromocode(newPromocode.value)
+		.then((r: ReturnedData | ReturnedError) => {
+			disabledForm.value = false;
+			loading.value = false;
+			if (r.success && r.data.is_created) {
+				newPromocode.value = clearVariable(newPromocode.value);
+				router.push({ name: "Promocodes" });
+			}
+		});
 }
 </script>
 
@@ -120,10 +123,6 @@ function addPromocode() {
 			}
 			height: 2.5rem;
 			padding: 0 1rem;
-
-			&._error {
-				border-color: red;
-			}
 		}
 	}
 

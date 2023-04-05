@@ -70,9 +70,11 @@ import {
 	ref,
 } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
+import { useCookies } from "vue3-cookies";
 
 const router = useRouter();
 const route = useRoute();
+const { cookies } = useCookies();
 
 const store = <StoreGeneric>inject("Store");
 const { popup } = storeToRefs(store);
@@ -109,8 +111,11 @@ let activeNavPage: ComputedRef<string> = computed(() => {
 });
 
 async function confirmSignOut() {
-	await store.callPopup("Вы уверены что хотите выйти?").then((r: boolean) => {
-		if (r) router.push("/sign-in");
+	await store.callPopup("Вы уверены, что хотите выйти?").then((r: boolean) => {
+		if (r) {
+			cookies.remove("session_token");
+			router.push("/sign-in");
+		}
 	});
 }
 
@@ -318,7 +323,7 @@ watch(
 		position: fixed;
 		top: 0;
 		left: 0;
-		z-index: 3;
+		z-index: 5;
 		max-width: unset;
 		width: 100%;
 		border-radius: 0;

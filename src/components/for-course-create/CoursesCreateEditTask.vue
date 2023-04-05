@@ -45,12 +45,12 @@
 <script setup lang="ts">
 import IconTrash from "@icons/IconTrash.vue";
 import Popup from "@add-comps/Popup.vue";
-import { CourseProgramTask } from "../../../helpers";
+import { CourseDayTask } from "../../../helpers";
 import { ref, Ref } from "@vue/reactivity";
 import { inject } from "@vue/runtime-core";
 import { StoreGeneric } from "pinia";
 
-const props = defineProps<{ task: CourseProgramTask; number: number }>();
+const props = defineProps<{ task: CourseDayTask; number: number }>();
 const emit = defineEmits(["deleteTask"]);
 const store = <StoreGeneric>inject("Store");
 
