@@ -8,7 +8,6 @@ const root_dir = __dirname;
 export default defineConfig({
 	plugins: [vue()],
 	build: {
-		// outDir: 'C:\\Users\\eduar\\Desktop\\Projects\\levdevyan\\test',
 		outDir: "dist",
 		rollupOptions: {
 			output: {
