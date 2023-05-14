@@ -1,26 +1,14 @@
 <template>
 	<section class="notifications">
 		<div class="notifications__top-line top-line">
-			<RouterLink
-				class="top-line__link-psy"
-				:to="{ query: { app: 'psy' } }"
-				:class="{ js_active: route.query.app === 'psy' || !route.query.app }"
-			>
-				PSY
-			</RouterLink>
-			<RouterLink
-				class="top-line__link-avocado"
-				:to="{ query: { app: 'avocado' } }"
-				:class="{ js_active: route.query.app === 'avocado' }"
-			>
-				Avocado
-			</RouterLink>
+			<ButtonsPages class="top-line__buttons-pages" />
 
 			<ButtonCreate
-				create_name="Создать уведомление"
-				to="/notifications/create"
+				to="/notifications/create-edit/new"
 				class="top-line__button-create"
-			/>
+			>
+				Создать уведомление
+			</ButtonCreate>
 		</div>
 		<LanguageChoice @return-lang="changeLang" :isCookie="true" />
 		<div class="notifications__empty" v-if="isEmpty">
@@ -45,10 +33,9 @@
 </template>
 
 <script setup lang="ts">
-import ButtonCreate from "@/components/add-comps/ButtonCreate.vue";
+import ButtonCreate from "@add-comps/ButtonCreate.vue";
+import ButtonsPages from "@add-comps/ButtonsPages.vue";
 import NoificationsNotificationItem from "@for-nots/NoificationsNotificationItem.vue";
-import TheLoader from "@add-comps/TheLoader.vue";
-import Popup from "@add-comps/Popup.vue";
 import LanguageChoice from "@add-comps/LanguageChoice.vue";
 import { inject, Ref, ref, toRef, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
@@ -96,25 +83,21 @@ watch(
 	() => {
 		transitionName.value = "disabled-list";
 		nots.value = [];
-		getNotitifications(
+		getNotifications(
 			(route.query.app ? route.query.app : "psy") as string,
 			language()
 		);
 	}
 );
 
-getNotitifications(
+getNotifications(
 	(route.query.app ? route.query.app : "psy") as string,
 	language()
 );
 
-function getNotitifications(app: string, lang: string): void {
+function getNotifications(app: string, lang: string): void {
 	store.getNotifications(app, lang).then(() => {
 		nots.value = cloneDeep(notifications.value);
-		// transitionName.value = "list";
-		// nots.value = getAppNotifications(
-		// 	route.query.app as string | undefined
-		// ).reverse();
 	});
 }
 
@@ -130,18 +113,6 @@ function getAppNotifications(app: string | undefined) {
 	return appNotifications;
 }
 
-// function deleteNotification(index: number) {
-// 	nots.value.splice(index, 1);
-// }
-
-// function deleteTarget(ans: boolean) {
-// 	if (ans) {
-// 		nots.value.splice(deleteNotificationId.value, 1);
-// 		deleteNotificationId.value = 0;
-// 	}
-// 	popup.value = false;
-// }
-
 async function deleteNotification(notification_id: string) {
 	await store.callPopup("Удалить это уведомление?").then((r: boolean) => {
 		if (r) {
@@ -149,7 +120,7 @@ async function deleteNotification(notification_id: string) {
 			fd.append("notification_id", notification_id);
 			store.deleteNotification(fd).then((r: ReturnedData | ReturnedError) => {
 				if (r.success && r.data.is_deleted) {
-					getNotitifications(
+					getNotifications(
 						(route.query.app ? route.query.app : "psy") as string,
 						language()
 					);
@@ -160,14 +131,11 @@ async function deleteNotification(notification_id: string) {
 }
 
 function changeLang(lang: string): void {
-	getNotitifications(
-		(route.query.app ? route.query.app : "psy") as string,
-		lang
-	);
+	getNotifications((route.query.app ? route.query.app : "psy") as string, lang);
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @import "../style.scss";
 
 .notifications {
@@ -187,30 +155,6 @@ function changeLang(lang: string): void {
 
 		&__button-create {
 			margin-left: auto;
-		}
-
-		&__link-psy,
-		&__link-avocado {
-			border-radius: 0.7rem;
-			border: 0.2rem solid var(--c__violet);
-			font-size: 1.5rem;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-
-			&.js_active {
-				background-color: var(--c__violet);
-				color: var(--c__white);
-			}
-		}
-
-		&__link-psy {
-			padding: 0.7rem 3.5rem;
-			margin-right: 2rem;
-		}
-
-		&__link-avocado {
-			padding: 0.7rem 3rem;
 		}
 	}
 
@@ -244,17 +188,15 @@ function changeLang(lang: string): void {
 			gap: 1.5rem 2.5rem;
 			height: auto;
 
-			&__link-psy,
-			&__link-avocado {
-				margin: 0;
-			}
+			.buttons-pages {
+				grid-column: 1/7;
+				display: grid;
+				grid-template: 1fr / 1fr 1fr;
+				column-gap: 2.5rem;
 
-			&__link-psy {
-				grid-column: 1/4;
-			}
-
-			&__link-avocado {
-				grid-column: 4/7;
+				& > * {
+					margin: 0;
+				}
 			}
 
 			&__button-create {

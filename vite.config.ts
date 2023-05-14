@@ -24,7 +24,9 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			'@': path.resolve(root_dir, './src'),
-			'@helpers': path.resolve(root_dir, './helpers'),
+			'@views': path.resolve(root_dir, './src/views'),
+			'@stores': path.resolve(root_dir, './src/stores'),
+			'@helpers': path.resolve(root_dir, './src/helpers'),
 			'@comps': path.resolve(root_dir, './src/components'),
 			'@add-comps': path.resolve(root_dir, './src/components/add-comps'),
 			'@icons': path.resolve(root_dir, './src/components/add-comps/icons'),
@@ -34,6 +36,8 @@ export default defineConfig({
 			'@for-promo': path.resolve(root_dir, './src/components/for-promo'),
 			'@for-nots': path.resolve(root_dir, './src/components/for-nots'),
 			'@for-course-create': path.resolve(root_dir, './src/components/for-course-create'),
+			'@for-content': path.resolve(root_dir, './src/components/for-content'),
+			'@for-subscriptions': path.resolve(root_dir, './src/components/for-subscriptions'),
 		},
 	},
 

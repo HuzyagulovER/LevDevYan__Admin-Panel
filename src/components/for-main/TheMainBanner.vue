@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { inject, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
-import IconCalendar from "../add-comps/icons/IconCalendar.vue";
+import IconCalendar from "@add-comps/icons/IconCalendar.vue";
 import MainBubblesList from "./MainBubblesList.vue";
 
 const store = <StoreGeneric>inject("Store");

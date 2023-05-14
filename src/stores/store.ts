@@ -1,12 +1,11 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
 import { useCookies, globalCookiesConfig } from 'vue3-cookies';
-import { Course, Courses, CourseDay, CourseDayTask, Promocode, Promocodes, Notifications, CourseToPost, UserCredentials } from "../../helpers";
+import { Course, Courses, CourseDay, CourseDayTask, Promocode, Promocodes, Notifications, CourseToPost, UsersInfo, Content, ContentList } from "../../helpers";
 import { cloneDeep } from 'lodash';
 import { clearVariable } from '../main';
 import { watch } from 'vue';
 
-const url: string = ""
 const api_base: string = '/v1/'
 const { cookies } = useCookies();
 
@@ -77,6 +76,7 @@ const monthNames: ReadonlyArray<string> = [
 ];
 
 type State = {
+	apps: string[],
 	loading: boolean,
 	popup: {
 		text: string,
@@ -89,18 +89,24 @@ type State = {
 	currentTime: string,
 	promocodes: Promocodes,
 	notifications: Notifications,
-	loadedFile: File | null,
+	loadedFiles: { [key: string]: File },
 	defaultCourse: Course,
 	defaultDayItem: CourseDay,
 	defaultTaskItem: CourseDayTask,
 	languages: Object,
+	premiumAppTypes: { [key: string]: string }
 	acceptedImageExtensions: Array<string>
-	defaultLang: string
+	imageErrorStatuses: string[]
+	defaultLang: string,
+	commonInfo: UsersInfo
+	defaultContent: Content
+	contentList: ContentList
 }
 
 export const Store = defineStore('Store', {
-	state: () => (
-		<State>{
+	state: (): State => (
+		{
+			apps: ['PSY', 'Avocado'],
 			loading: false,
 			popup: {
 				text: '',
@@ -113,7 +119,7 @@ export const Store = defineStore('Store', {
 			currentTime: '',
 			promocodes: {},
 			notifications: [],
-			loadedFile: null,
+			loadedFiles: {},
 
 			defaultCourse: {
 				id: 0,
@@ -129,6 +135,7 @@ export const Store = defineStore('Store', {
 					price: 0,
 					category: ""
 				},
+				production: 0,
 				days: {}
 			},
 			defaultDayItem: {
@@ -143,10 +150,6 @@ export const Store = defineStore('Store', {
 				description: ""
 			},
 
-			appNames: {
-				'psy': 'PSY',
-				'avocado': 'Avocado'
-			},
 			languages: {
 				'ru': 'Русский',
 				'en': 'Английский',
@@ -171,7 +174,36 @@ export const Store = defineStore('Store', {
 				'INVALID_FILE_EXTENSION'
 			],
 
-			defaultLang: ''
+			defaultLang: '',
+
+			commonInfo: {
+				courses: {
+					active_courses: 0,
+					completed_courses: 0,
+					rejected_courses: 0,
+				},
+				subs: {
+					all_subs: 0,
+					psy: 0,
+					avocado: 0,
+				},
+				users: {
+					all_users: 0,
+					psy: 0,
+					avocado: 0,
+				},
+			},
+
+			contentList: {},
+			defaultContent: {
+				id: "",
+				title: "",
+				image: '',
+				app: "",
+				type: "",
+				lang: "",
+				texts: {}
+			}
 		}
 	),
 
@@ -193,7 +225,6 @@ export const Store = defineStore('Store', {
 					console.error(`${e.name}: ${e.message}`);
 				})
 		},
-
 		async getCourse(courseId: string): Promise<void> {
 			this.loading = true
 			const courseIdFD = new FormData()
@@ -208,19 +239,23 @@ export const Store = defineStore('Store', {
 					console.error(`${e.name}: ${e.message}`);
 				})
 		},
-
 		async addCourse(course: Course): Promise<void> {
 			const newCourse: CourseToPost = cloneDeep(course)
 			const fd = new FormData();
 			fd.append('about', JSON.stringify(newCourse['about']));
 			fd.append('days', JSON.stringify(newCourse['days']));
-			if (this.loadedFile) {
-				fd.append('course_images', this.loadedFile);
+
+			if (Object.keys(this.loadedFiles).length) {
+				for (const key in this.loadedFiles) {
+					fd.append(key, this.loadedFiles[key]);
+				}
 			}
 
 			return await axios.post(...formRequest('Courses/createCourse', fd) as [string, FormData]).then(
 				r => {
-					this.loadedFile = null
+					this.loadedFiles = {}
+					console.log(r);
+
 					return r.data
 				},
 				e => {
@@ -228,20 +263,22 @@ export const Store = defineStore('Store', {
 				}
 			)
 		},
-
 		async updateCourse(course: Course): Promise<void> {
 			const updateCourse: CourseToPost = cloneDeep(course)
 			const fd = new FormData();
 			fd.append('course_id', updateCourse['course_id']);
 			fd.append('about', JSON.stringify(updateCourse['about']));
 			fd.append('days', JSON.stringify(updateCourse['days']));
-			if (this.loadedFile) {
-				fd.append('course_images', this.loadedFile);
+
+			if (Object.keys(this.loadedFiles).length) {
+				for (const key in this.loadedFiles) {
+					fd.append(key, this.loadedFiles[key]);
+				}
 			}
 
 			return await axios.post(...formRequest('Courses/updateCourse', fd) as [string, FormData]).then(
 				r => {
-					this.loadedFile = null
+					this.loadedFiles = {}
 					return r.data
 				},
 				e => {
@@ -249,7 +286,20 @@ export const Store = defineStore('Store', {
 				}
 			)
 		},
+		async updateCourseProduction(course_id: string, productionState: boolean): Promise<void> {
+			const fd = new FormData();
+			fd.append('course_id', course_id);
+			fd.append('production', (+productionState).toString());
 
+			return await axios.post(...formRequest('Courses/updateCourse', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
 		async deleteCourse(courses_ids: Array<string>): Promise<void> {
 			const fd = new FormData();
 			fd.append('courses_ids', JSON.stringify(courses_ids));
@@ -304,7 +354,6 @@ export const Store = defineStore('Store', {
 					console.error(`${e.name}: ${e.message}`);
 				});
 		},
-
 		async deletePromocode(promocode: string): Promise<void> {
 			const fd = new FormData()
 			fd.append('promocode', promocode);
@@ -316,7 +365,6 @@ export const Store = defineStore('Store', {
 					console.error(`${e.name}: ${e.message}`);
 				});
 		},
-
 		async addPromocode(newPromocode: {}): Promise<void> {
 			const fd = new FormData()
 			fd.append('promocode_data', JSON.stringify(newPromocode))
@@ -329,7 +377,6 @@ export const Store = defineStore('Store', {
 				}
 			)
 		},
-
 		async updatePromocode(promocode: string, newPromocodeData: {}): Promise<void> {
 			const fd = new FormData()
 			fd.append('promocode', promocode)
@@ -369,7 +416,23 @@ export const Store = defineStore('Store', {
 					console.error(`${e.name}: ${e.message}`);
 				});
 		},
+		async getNotification(notificationId: string): Promise<void> {
+			const fd = new FormData()
+			fd.append('notification_id', notificationId)
 
+			return await axios.post(...formRequest('Notifications/getAdminNotification', fd) as [string, FormData])
+				.then(
+					r => {
+						return r.data.data;
+					},
+					e => {
+						console.log(e);
+						if (!e.response.data.success) throw new Error("There is error in notifications getting.")
+					})
+				.catch(e => {
+					console.error(`${e.name}: ${e.message}`);
+				});
+		},
 		async addNotification(newNotification: FormData): Promise<void> {
 			return await axios.post(...formRequest('Notifications/createAdminNotification', newNotification) as [string, FormData]).then(
 				r => {
@@ -380,7 +443,6 @@ export const Store = defineStore('Store', {
 				}
 			)
 		},
-
 		async deleteNotification(deleteNotification: FormData): Promise<void> {
 			return await axios.post(...formRequest('Notifications/deleteAdminNotification', deleteNotification) as [string, FormData]).then(
 				r => {
@@ -391,7 +453,6 @@ export const Store = defineStore('Store', {
 				}
 			)
 		},
-
 		async updateNotification(updateNotification: FormData): Promise<void> {
 			return await axios.post(...formRequest('Notifications/updateAdminNotification', updateNotification) as [string, FormData]).then(
 				r => {
@@ -449,23 +510,166 @@ export const Store = defineStore('Store', {
 			)
 		},
 
-		async getUsersData(): Promise<void> {
-			return await axios.post(...formRequest('getUsersInfo', new FormData()) as [string, FormData])
+		async getUsersData(filters: { [key: string]: string }): Promise<void> {
+			let filtersFormData = new FormData();
+			for (const filter in filters) {
+				filtersFormData.append(filter, filters[filter])
+			}
+			return await axios.post(...formRequest('getUsersInfo', filtersFormData) as [string, FormData])
 				.then(
 					r => {
-						return r.data.data;
+						this.commonInfo = r.data.data
+						return;
 					},
 					e => {
 						console.log(e);
 						if (!e.response.data.success) throw new Error("There is error in notifications getting.")
 					})
-				.then(r => {
-					return r
-				})
 				.catch(e => {
 					console.error(`${e.name}: ${e.message}`);
 				});
 		},
 
+		async getContent(pageName: string, lang: string, contentId: string | null): Promise<void> {
+			this.loading = true
+			const contentIdFD = new FormData()
+			if (pageName) {
+				contentIdFD.append('app', pageName)
+			}
+			if (lang) {
+				contentIdFD.append('lang', lang)
+			}
+			if (contentId) {
+				contentIdFD.append('content_ids', JSON.stringify([contentId]))
+			}
+
+			return await axios.post(...formRequest('Content/getContent', contentIdFD) as [string])
+				.then(r => {
+					this.loading = false
+					this.contentList = r.data.data
+					return r.data.data
+				})
+				.catch(e => {
+					console.error(`${e.name}: ${e.message}`);
+				})
+		},
+		async addContent(content: Content): Promise<void> {
+			const newContent: Content = cloneDeep(content)
+			const fd = new FormData();
+
+			for (const key in newContent) {
+				fd.append(key, JSON.stringify(newContent[key as keyof Content]))
+			}
+
+			if (Object.keys(this.loadedFiles).length) {
+				for (const key in this.loadedFiles) {
+					fd.append(key, this.loadedFiles[key]);
+				}
+			}
+
+			return await axios.post(...formRequest('Content/createContent', fd) as [string, FormData]).then(
+				r => {
+					this.loadedFiles = {}
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+		async updateContent(content: Content): Promise<void> {
+			const updateContent: Content = cloneDeep(content)
+			const fd = new FormData();
+
+			for (const key in updateContent) {
+				fd.append(key, JSON.stringify(updateContent[key as keyof Content]))
+			}
+
+			if (Object.keys(this.loadedFiles).length) {
+				for (const key in this.loadedFiles) {
+					fd.append(key, this.loadedFiles[key]);
+				}
+			}
+
+			return await axios.post(...formRequest('Content/updateContent', fd) as [string, FormData]).then(
+				r => {
+					this.loadedFiles = {}
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+		async deleteContent(contentIds: Array<string>): Promise<void> {
+			const fd = new FormData()
+			fd.append('content_ids', JSON.stringify(contentIds));
+			return await axios.post(...formRequest('Content/deleteContent', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+
+		async getPrices(app: string, priceId?: string): Promise<void> {
+			const fd = new FormData()
+			fd.append('app', app);
+			if (priceId) {
+				fd.append('price_id', JSON.stringify(priceId));
+			}
+
+			return await axios.post(...formRequest('Prices/getPrices', fd) as [string, FormData]).then(
+				r => {
+					return r.data.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+		async updatePrice(app: string, priceId: string): Promise<void> {
+			const fd = new FormData()
+			fd.append('app', app);
+			fd.append('price_id', JSON.stringify(priceId));
+
+			return await axios.post(...formRequest('Prices/updatePrice', fd) as [string, FormData]).then(
+				r => {
+					return r.data.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+
+		async getActiveSubscriptions(app: string): Promise<void> {
+			const fd = new FormData()
+			fd.append('app', app)
+
+			return await axios.post(...formRequest('Subscritions/getActiveSubscriptions', fd) as [string, FormData]).then(
+				r => {
+					return r.data.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+		async getScheduleSubscriptions(app: string): Promise<void> {
+			const fd = new FormData()
+			fd.append('app', app);
+
+			return await axios.post(...formRequest('Subscritions/getScheduleSubscriptions', fd) as [string, FormData]).then(
+				r => {
+					return r.data.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
 	},
 })

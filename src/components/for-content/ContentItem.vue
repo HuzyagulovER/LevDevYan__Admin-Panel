@@ -1,46 +1,35 @@
 <template>
-	<div class="course">
-		<div class="course__container">
-			<div class="course__course-image course-image">
+	<div class="content-item">
+		<div class="content-item__container">
+			<div class="content-item__content-image content-image">
 				<img
-					class="course-image__image"
-					:src="about.image"
+					class="content-image__image"
+					:src="content.image"
 					alt=""
-					v-if="about.image"
+					v-if="content.image"
 				/>
-				<p class="course-image__empty-image" v-else>Без<br />изображения</p>
+				<p class="content-image__empty-image" v-else>Без<br />изображения</p>
 			</div>
 
-			<div class="course__info info">
-				<p class="info__title"><span>Название</span>: {{ about.title }}</p>
-				<p class="info__days-amount">
-					<span>Сколько дней</span>: {{ about.period }}
-				</p>
-				<p class="info__price"><span>Стоимость</span>: {{ about.price }}</p>
-				<p class="info__category">
-					<span>Категория</span>: {{ about.category }}
+			<div class="content-item__info info">
+				<p class="info__title"><span>Название</span>: {{ content.title }}</p>
+				<p class="info__type"><span>Тип</span>: {{ content.type }}</p>
+				<p class="info__text">
+					<span>Текст</span>: {{ Object.keys(content.texts).length }}
 				</p>
 			</div>
-			<div class="course__buttons buttons">
+			<div class="content-item__buttons buttons">
 				<div class="buttons__wrapper">
 					<IconTrash
 						class="buttons__delete icon-trash"
-						@click="confirmDeletingActive"
+						@click="confirmDeleteContent"
 					/>
 					<RouterLink
 						class="buttons__button"
-						:to="`/courses/create-edit/${courseId}/about`"
+						:to="`/content/create-edit/${contentId}`"
 					>
 						Редактировать
 					</RouterLink>
-				</div>
-				<div class="buttons__wrapper">
-					<p>Доступность в МП</p>
-					<Checkbox
-						:defaultChecked="props.production ? true : false"
-						class="promocode__active"
-						@change-state="changeCourseProduction"
-					/>
 				</div>
 			</div>
 		</div>
@@ -49,33 +38,27 @@
 
 <script setup lang="ts">
 import IconTrash from "@icons/IconTrash.vue";
-import Checkbox from "@add-comps/Checkbox.vue";
 import { inject, ref, Ref } from "@vue/runtime-core";
 import { StateTree } from "pinia";
 import { useRoute } from "vue-router";
-import { CourseAbout } from "../../../helpers";
+import { Content } from "../../../helpers";
 
 const store = <StateTree>inject("Store");
 const props = defineProps<{
-	courseId: string;
-	about: CourseAbout;
-	production: number;
+	contentId: string;
+	content: Content;
 }>();
-const emit = defineEmits(["confirmDeletingActive", "changeCourseProduction"]);
+const emit = defineEmits(["confirmDeleteContent"]);
 
-function confirmDeletingActive() {
-	emit("confirmDeletingActive", props.courseId);
-}
-
-function changeCourseProduction(state: boolean) {
-	emit("changeCourseProduction", props.courseId, state);
+function confirmDeleteContent() {
+	emit("confirmDeleteContent", props.contentId);
 }
 </script>
 
 <style lang="scss" scoped>
 @import "../../style.scss";
 
-.course {
+.content-item {
 	padding: 2.3rem;
 	border: 0.25rem solid var(--c__light-violet);
 	border-radius: 1.8rem;
@@ -91,7 +74,7 @@ function changeCourseProduction(state: boolean) {
 		height: 100%;
 	}
 
-	.course-image {
+	.content-image {
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -118,12 +101,12 @@ function changeCourseProduction(state: boolean) {
 		margin: 0 2rem;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
 
 		& > * {
 			font-size: 1.4rem;
 			white-space: break-spaces;
 			word-break: break-all;
+			margin-bottom: 1rem;
 
 			span {
 				font-family: var(--f__mazzard-sb);

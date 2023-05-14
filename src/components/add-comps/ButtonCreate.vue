@@ -2,19 +2,19 @@
 	<RouterLink :to="to" class="button-create" v-if="to">
 		<p>
 			<span>+</span>
-			{{ create_name }}
+			<slot></slot>
 		</p>
 	</RouterLink>
 	<button :to="to" class="button-create" v-else>
 		<p>
 			<span>+</span>
-			{{ create_name }}
+			<slot></slot>
 		</p>
 	</button>
 </template>
 
 <script setup lang="ts">
-defineProps<{ create_name: string; to?: string }>();
+defineProps<{ to?: string }>();
 </script>
 
 <style lang="scss" scoped>

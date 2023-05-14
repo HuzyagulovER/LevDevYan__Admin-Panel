@@ -3,7 +3,10 @@
 		<div class="task__container">
 			<div class="task__line">
 				<p class="task__header">Задание {{ number + 1 }}</p>
-				<IconTrash class="task__icon" @click="confirmDeletingActive" />
+				<IconTrash
+					class="task__icon icon-trash"
+					@click="confirmDeletingActive"
+				/>
 			</div>
 
 			<form class="task__form form">
@@ -44,7 +47,6 @@
 
 <script setup lang="ts">
 import IconTrash from "@icons/IconTrash.vue";
-import Popup from "@add-comps/Popup.vue";
 import { CourseDayTask } from "../../../helpers";
 import { ref, Ref } from "@vue/reactivity";
 import { inject } from "@vue/runtime-core";
@@ -100,10 +102,8 @@ async function confirmDeletingActive() {
 	}
 
 	&__icon {
-		fill: var(--c__red);
 		height: 100%;
 		margin-left: auto;
-		cursor: pointer;
 		width: auto;
 	}
 

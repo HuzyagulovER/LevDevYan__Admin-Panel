@@ -2,11 +2,12 @@
 	<div class="search">
 		<InputSearch class="search__input-search" />
 		<ButtonCreate
-			create_name="Создать курс"
 			:to="`/courses/create-edit/new/about`"
 			class="search__button-create"
 			@click="createNewCourse"
-		/>
+		>
+			Создать курс
+		</ButtonCreate>
 	</div>
 </template>
 
@@ -34,6 +35,7 @@ function createNewCourse() {
 
 	&__input-search {
 		flex: 1;
+		fill: var(--c__grey);
 	}
 
 	&__button-create {

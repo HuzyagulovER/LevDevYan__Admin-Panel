@@ -17,7 +17,9 @@
 				:key="course.course_id"
 				:courseId="course.course_id"
 				:about="course.about"
+				:production="course.production"
 				@confirm-deleting-active="confirmDeletingActive"
+				@change-course-production="changeCourseProduction"
 			/>
 		</TransitionGroup>
 	</section>
@@ -27,8 +29,6 @@
 import CoursesCourseItem from "@for-courses/CoursesCourseItem.vue";
 import CoursesSearch from "@for-courses/CoursesSearch.vue";
 import LanguageChoice from "@add-comps/LanguageChoice.vue";
-import Popup from "@add-comps/Popup.vue";
-import TheLoader from "@add-comps/TheLoader.vue";
 import {
 	computed,
 	ComputedRef,
@@ -55,6 +55,7 @@ let popup: Ref<boolean> = ref(false);
 let deleteIndex: Ref<number> = ref(0);
 let pageName: Ref = toRef(route, "name");
 let lang = cookies.get(`${pageName.value}Lang`);
+
 const language = function (): string {
 	return !lang || !languages.value[lang]
 		? Object.keys(languages.value)[0]
@@ -63,7 +64,7 @@ const language = function (): string {
 
 store.getCourses(language());
 
-async function confirmDeletingActive(index: number) {
+async function confirmDeletingActive(index: number): Promise<void> {
 	deleteIndex.value = index;
 	await store.callPopup("Удалить этот курс?").then((r: boolean) => {
 		if (r) {
@@ -77,6 +78,13 @@ async function confirmDeletingActive(index: number) {
 
 function changeLang(lang: string) {
 	store.getCourses(lang);
+}
+
+function changeCourseProduction(course_id: string, productionState: boolean) {
+	loading.value = true;
+	store.updateCourseProduction(course_id, productionState).then(() => {
+		loading.value = false;
+	});
 }
 </script>
 

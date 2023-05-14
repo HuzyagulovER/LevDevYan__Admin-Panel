@@ -12,8 +12,11 @@
 	--c__light-blue: #F6F4FF;
 	--c__grey: #999999;
 	--c__light-violet: #DBD5FF;
+	--c__blue: #4476F6;
 
+	--f__mazzard-r: "Mazzard", sans-serif;
 	--f__mazzard-sb: "Mazzard SemiBold", sans-serif;
+	--f__mazzard-b: "Mazzard Bold", sans-serif;
 	--f__montserrat-sb: "Montserrat", sans-serif;
 	--transition-03: all .3s ease;
 }
@@ -27,6 +30,12 @@
 @font-face {
 	font-family: "Mazzard SemiBold";
 	src: url("./assets/fonts/Mazzard-SemiBold.woff");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Mazzard Bold";
+	src: url("./assets/fonts/Mazzard-Bold.woff");
 	font-display: swap;
 }
 
@@ -168,6 +177,10 @@ body.apple p {
 	line-height: 1.25em;
 }
 
-._error {
-	border-color: red !important;
+.justify-end {
+	justify-content: flex-end;
+}
+
+.justify-space-between {
+	justify-content: space-between;
 }

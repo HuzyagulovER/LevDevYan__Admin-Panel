@@ -12,7 +12,12 @@
 					<p>{{ promocode.type }}</p>
 				</div>
 			</div>
-			<div
+			<Checkbox
+				:defaultChecked="props.promocode.sended"
+				class="promocode__active"
+				@change-state="changePromocodeState"
+			/>
+			<!-- <div
 				class="promocode__active active"
 				:class="{ _active: props.promocode.sended }"
 			>
@@ -34,9 +39,9 @@
 						d="M5.47875 10.4498L0.776245 5.7473L1.95187 4.57167L5.47875 8.09855L13.0481 0.529175L14.2237 1.7048L5.47875 10.4498Z"
 					/>
 				</svg>
-			</div>
+			</div> -->
 			<div class="promocode__delete">
-				<IconTrash @click="confirmDeleting" />
+				<IconTrash @click="confirmDeleting" class="icon-trash" />
 			</div>
 		</div>
 	</div>
@@ -46,7 +51,8 @@
 import { computed, inject, ref, Ref, toRef, watch } from "@vue/runtime-core";
 import { StateTree } from "pinia";
 import { Promocode } from "../../../helpers";
-import IconTrash from "../add-comps/icons/IconTrash.vue";
+import Checkbox from "@add-comps/Checkbox.vue";
+import IconTrash from "@add-comps/icons/IconTrash.vue";
 
 const store = <StateTree>inject("Store");
 const props = defineProps<{ promocode: Promocode }>();
@@ -58,12 +64,8 @@ function confirmDeleting() {
 	emit("confirmDeleting", props.promocode.promocode);
 }
 
-function changePromocodeState() {
-	emit(
-		"changePromocodeState",
-		props.promocode.promocode,
-		props.promocode.sended ? 1 : 0
-	);
+function changePromocodeState(state: boolean): void {
+	emit("changePromocodeState", props.promocode.promocode, state);
 }
 </script>
 
@@ -132,73 +134,15 @@ function changePromocodeState() {
 		}
 	}
 
-	.active {
-		margin-left: auto;
-		width: 2rem;
-		height: 2rem;
-		border-radius: 50%;
-		overflow: hidden;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		position: relative;
-		border: 0.2rem solid #929292;
-		transition: var(--transition-03);
-
-		&__background {
-			position: absolute;
-			background-color: #04d370;
-			width: 100%;
-			height: 100%;
-			border-radius: 50%;
-			z-index: 2;
-		}
-
-		&__input {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			opacity: 0;
-			z-index: 4;
-		}
-
-		svg {
-			fill: #fff;
-			width: 60%;
-			height: 60%;
-			z-index: 3;
-		}
-
-		&__background,
-		svg {
-			transform: scale(0);
-			transition: all 0.3s ease-in;
-		}
-	}
-
-	._active.active {
-		border-width: 0;
-
-		svg {
-			transform: scale(1);
-		}
-
-		.active__background {
-			transform: scale(1);
-		}
-	}
-
 	&__delete {
 		width: auto;
 		height: 100%;
-		cursor: pointer;
-		margin-left: 2rem;
+		margin-left: auto;
 
 		svg {
 			width: 100%;
 			height: 100%;
 			object-fit: cover;
-			fill: var(--c__red);
 		}
 	}
 
@@ -244,15 +188,7 @@ function changePromocodeState() {
 			text-align: left;
 		}
 
-		&__delete,
-		.active {
-			width: 2.3rem;
-			height: 2.3rem;
-		}
-
 		&__delete {
-			width: 2.3rem;
-			height: 2.3rem;
 			order: 3;
 		}
 

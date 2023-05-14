@@ -16,11 +16,12 @@
 				Программа курса
 			</RouterLink>
 			<ButtonCreate
-				create_name="Добавить день"
 				class="top-line__button-create"
 				v-if="route.path.includes('days')"
 				@click="createNewDay"
-			/>
+			>
+				Добавить день
+			</ButtonCreate>
 			<LanguageChoice
 				:isCookie="false"
 				:defaultLang="activeData.lang"
@@ -49,7 +50,6 @@
 
 <script setup lang="ts">
 import ButtonCreate from "@/components/add-comps/ButtonCreate.vue";
-import TheLoader from "@add-comps/TheLoader.vue";
 import LanguageChoice from "@add-comps/LanguageChoice.vue";
 import { useRoute, useRouter } from "vue-router";
 import {
@@ -76,14 +76,8 @@ import { cloneDeep } from "lodash";
 const store = <StoreGeneric>inject("Store");
 let clearVariable = <Function>inject("clearVariable");
 let getSHA256Hash = <Function>inject("getSHA256Hash");
-const {
-	courses,
-	defaultCourse,
-	defaultDayItem,
-	loading,
-	mainTitle,
-	languages,
-} = storeToRefs(store);
+const { defaultCourse, defaultDayItem, loading, mainTitle, languages } =
+	storeToRefs(store);
 const route = useRoute();
 const router = useRouter();
 
@@ -137,6 +131,7 @@ watch(
 function saveCourse(): void {
 	disabledForm.value = true;
 	loading.value = true;
+
 	store
 		.addCourse(activeCourse.value)
 		.then((r: ReturnedData | ReturnedError) => {
@@ -178,7 +173,6 @@ async function createNewDay(): Promise<void> {
 	(activeCourse.value.days as CourseDays)[hash] = cloneDeep(
 		defaultDayItem.value
 	);
-	// (activeCourse.value.days as CourseDays).push(cloneDeep(defaultDayItem.value));
 }
 
 function changeLang(lang: string) {
@@ -238,8 +232,9 @@ function changeLang(lang: string) {
 
 	@media screen and (max-width: $mobile--breakpoint) {
 		.top-line {
-			display: flex;
-			flex-wrap: wrap;
+			display: grid;
+			grid-template: auto / auto auto;
+			row-gap: 1rem;
 			margin-bottom: 2.5rem;
 
 			&__link-about,
@@ -257,7 +252,12 @@ function changeLang(lang: string) {
 				flex: 2;
 			}
 
+			&__lang-choice {
+				grid-column: 2/3;
+			}
+
 			.button-create {
+				grid-column: 1/3;
 				display: flex;
 				justify-content: center;
 				padding: 1.4rem 3rem;

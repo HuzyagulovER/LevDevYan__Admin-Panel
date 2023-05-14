@@ -2,50 +2,17 @@
 	<section class="notification-create">
 		<form
 			class="notification-create__form form"
-			@submit.prevent="addNotification($event)"
+			@submit.prevent="notificationChangeHandler($event)"
 		>
-			<div
-				class="form__file-input file-input"
-				:class="{
-					_error:
-						isLargeImage ||
-						isInvalidExtension ||
-						imageErrorStatuses.indexOf(currentError) !== -1,
-				}"
-			>
-				<div class="file-input__image" v-if="image">
-					<img :src="image" alt="" />
-				</div>
-				<div class="file-input__container" v-else>
-					<IconImage />
-					<p v-if="isLargeImage || currentError === 'FILE_SIZE_EXCEEDED'">
-						Изображение должно быть
-						<br />не больше {{ maxFileSizeText }}
-					</p>
-					<p
-						v-else-if="
-							isInvalidExtension || currentError === 'INVALID_FILE_EXTENSION'
-						"
-					>
-						Изображение должно иметь
-						<br />верное расширение ({{ acceptedImageExtensions.join(", ") }})
-					</p>
-					<p v-else>
-						Загрузить<br />
-						изображение
-					</p>
-				</div>
+			<InputImage
+				class="form__file-input"
+				:image="image"
+				:name="'notification_image'"
+				:currentError="currentError"
+				:disabled="disabledForm"
+				@display-image="displayImage($event)"
+			/>
 
-				<input
-					id="input_image"
-					type="file"
-					:accept="acceptedImageExtensions.join(',')"
-					name="notification_image"
-					:disabled="disabledForm"
-					@change="displayImage($event)"
-					ref="formImage"
-				/>
-			</div>
 			<div class="form__input-container input-container">
 				<div class="input-container__wrapper">
 					<label for="input_time" class="form__label">Время</label>
@@ -56,7 +23,7 @@
 						:class="{ _error: error.includes('time') }"
 						name="time"
 						:disabled="disabledForm"
-						v-model="newNotification.time"
+						v-model="notification.time"
 						@input="error = clearVariable(error)"
 					/>
 				</div>
@@ -68,8 +35,8 @@
 						class="form__input"
 						:class="{ _error: error.includes('date') }"
 						name="date"
-						:disabled="disabledForm || newNotification.repeat_times !== 1"
-						v-model="newNotification.date"
+						:disabled="disabledForm || notification.repeat_times !== 1"
+						v-model="notification.date"
 						@input="error = clearVariable(error)"
 					/>
 				</div>
@@ -83,7 +50,7 @@
 				:class="{ _error: error.includes('title') }"
 				name="title"
 				:disabled="disabledForm"
-				v-model="newNotification.title"
+				v-model="notification.title"
 				@input="error = clearVariable(error)"
 			/>
 
@@ -95,7 +62,7 @@
 				class="form__input"
 				:class="{ _error: error.includes('body') }"
 				:disabled="disabledForm"
-				v-model="newNotification.body"
+				v-model="notification.body"
 				@input="error = clearVariable(error)"
 			/>
 
@@ -110,9 +77,9 @@
 				class="form__input"
 				:class="{ _error: error.includes('repeat_times') }"
 				:disabled="disabledForm"
-				v-model="newNotification.repeat_times"
+				v-model="notification.repeat_times"
 				@input="error = clearVariable(error)"
-				min="0"
+				min="-1"
 			/>
 
 			<label for="input_app" class="form__label">Приложение</label>
@@ -122,11 +89,12 @@
 					name="app"
 					class="form__input"
 					:class="{ _error: error.includes('app') }"
-					v-model="newNotification.app"
+					v-model="notification.app"
 					:disabled="disabledForm"
 				>
-					<option value="psy">PSY</option>
-					<option value="avocado">Avocado</option>
+					<option v-for="app in apps" :key="app" :value="app.toLowerCase()">
+						{{ app }}
+					</option>
 				</select>
 			</div>
 
@@ -139,7 +107,7 @@
 					name="premium_app_type"
 					class="form__input"
 					:class="{ _error: error.includes('premium_app_type') }"
-					v-model="newNotification.premium_app_type"
+					v-model="notification.premium_app_type"
 					:disabled="disabledForm"
 				>
 					<option
@@ -160,7 +128,7 @@
 				:class="{ _error: error.includes('text') }"
 				name="type"
 				:disabled="disabledForm"
-				v-model="newNotification.type"
+				v-model="notification.type"
 				@input="error = clearVariable(error)"
 				v-if="false"
 			/>
@@ -173,7 +141,7 @@
 				<select
 					id="input_type"
 					name="type"
-					v-model="newNotification.type"
+					v-model="notification.type"
 					:disabled="disabledForm"
 				>
 					<option value="notification">Нотификация</option>
@@ -188,7 +156,7 @@
 					name="lang"
 					class="form__input"
 					:class="{ _error: error.includes('lang') }"
-					v-model="newNotification.lang"
+					v-model="notification.lang"
 					:disabled="disabledForm"
 				>
 					<option v-for="(language, j) in languages" :key="j" :value="j">
@@ -207,12 +175,12 @@
 				class="form__input"
 				:class="{ _error: error.includes('days_without_open_app') }"
 				:disabled="disabledForm"
-				v-model="newNotification.days_without_open_app"
+				v-model="notification.days_without_open_app"
 				@input="error = clearVariable(error)"
 				min="0"
 			/>
 
-			<div v-if="newNotification.premium_app_type === 'not'">
+			<div v-if="notification.premium_app_type === 'not'">
 				<label for="input_days-without-sub" class="form__label">
 					Дней без подписки
 				</label>
@@ -223,11 +191,25 @@
 					class="form__input"
 					:class="{ _error: error.includes('days_without_subscription') }"
 					:disabled="disabledForm"
-					v-model="newNotification.days_without_subscription"
+					v-model="notification.days_without_subscription"
 					@input="error = clearVariable(error)"
 					min="0"
 				/>
 			</div>
+
+			<label for="input_info" class="form__label"
+				>Дополнительная информация</label
+			>
+			<input
+				id="input_info"
+				type="text"
+				name="info"
+				class="form__input"
+				:class="{ _error: error.includes('info') }"
+				:disabled="disabledForm"
+				v-model="notification.info"
+				@input="error = clearVariable(error)"
+			/>
 
 			<div class="form__input-container input-container">
 				<div class="input-container__wrapper">
@@ -244,12 +226,18 @@
 
 <script setup lang="ts">
 import { ref, Ref } from "@vue/reactivity";
-import { inject, watch } from "@vue/runtime-core";
+import { inject, watch, onMounted } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { Notification, ReturnedData, ReturnedError } from "../../helpers";
+import {
+	Notification,
+	Notifications,
+	ReturnedData,
+	ReturnedError,
+} from "../../helpers";
 import ButtonColored from "@add-comps/ButtonColored.vue";
-import IconImage from "@icons/IconImage.vue";
-import router from "../routes";
+import InputImage from "@add-comps/InputImage.vue";
+import { useRoute, useRouter } from "vue-router";
+import { cloneDeep } from "lodash";
 
 const store = <StoreGeneric>inject("Store");
 const {
@@ -258,11 +246,11 @@ const {
 	languages,
 	acceptedImageExtensions,
 	imageErrorStatuses,
+	apps,
 } = storeToRefs(store);
 const clearVariable = <Function>inject("clearVariable");
-const isLargeFile: any = inject("isLargeFile");
-const maxFileSizeText: any = inject("maxFileSizeText");
-const isAcceptedExtension: any = inject("isAcceptedExtension");
+const route = useRoute();
+const router = useRouter();
 
 const requiredFields: ReadonlyArray<string> = [
 	"lang",
@@ -273,9 +261,8 @@ const requiredFields: ReadonlyArray<string> = [
 	"premium_app_type",
 ];
 
-const newNotification: Ref<Notification> = ref({
+const notification: Ref<Notification> = ref({
 	lang: "",
-	// type: "",
 	title: "",
 	body: "",
 	date: "",
@@ -285,59 +272,121 @@ const newNotification: Ref<Notification> = ref({
 	premium_app_type: "",
 	days_without_open_app: 0,
 	days_without_subscription: 0,
+	info: "",
 });
 
-let disabledForm: Ref<boolean> = ref(false);
-let error: Ref<Array<string>> = ref([]);
-let image: Ref<string> = ref("");
-let isLargeImage: Ref<boolean> = ref(false);
-let isInvalidExtension: Ref<boolean> = ref(false);
-let currentError: Ref<string> = ref("");
-let formImage: Ref = ref();
+const disabledForm: Ref<boolean> = ref(false);
+const error: Ref<Array<string>> = ref([]);
+const image: Ref<string> = ref("");
+const currentError: Ref<string> = ref("");
+const isNew: Ref<boolean> = ref(true);
+const isImageLoaded: Ref<boolean> = ref(false);
+
+if (route.params.notificationId !== "new") {
+	loading.value = true;
+	isNew.value = false;
+
+	store
+		.getNotification(route.params.notificationId)
+		.then((r: Notifications) => {
+			loading.value = false;
+			if (Array.isArray(r)) {
+				router.replace({ path: "/notifications" });
+			}
+			notification.value = cloneDeep(
+				<Notification>(
+					(r as Notifications)[
+						route.params.notificationId as keyof Notifications
+					]
+				)
+			);
+			image.value = <string>notification.value.image;
+		});
+}
 
 watch(
-	() => currentError.value,
-	(): void => {
-		if (currentError.value !== "") {
-			formImage.value = null;
-			image.value = "";
-		}
+	() => notification.value.repeat_times,
+	() => {
+		if (notification.value.repeat_times !== 1) notification.value.date = "";
 	}
 );
 
-function displayImage(e: Event): void {
-	if (isLargeFile(e)) {
-		(e as any).currentTarget.value = null;
-		isLargeImage.value = true;
-		setTimeout(() => {
-			isLargeImage.value = false;
-		}, 3000);
+function displayImage(isImage: boolean): void {
+	isImageLoaded.value = isImage;
+	if (!isImage) {
+		image.value = "";
 	}
-
-	if (!isAcceptedExtension(e, acceptedImageExtensions.value)) {
-		(e as any).currentTarget.value = null;
-		isInvalidExtension.value = true;
-		setTimeout(() => {
-			isInvalidExtension.value = false;
-		}, 3000);
-	}
-
-	image.value = (e as any).currentTarget.files.length
-		? URL.createObjectURL((e as any).currentTarget.files[0])
-		: "";
 }
 
-function addNotification(e: Event) {
+function notificationChangeHandler(e: Event): void {
 	disabledForm.value = true;
-	if (newNotification.value.premium_app_type === "not") {
-		newNotification.value.days_without_subscription = 0;
+	if (notification.value.premium_app_type === "not") {
+		notification.value.days_without_subscription = 0;
 	}
 	const fd: FormData = new FormData(e.target as HTMLFormElement);
 
 	requiredFields.forEach((field) => {
 		if (
-			newNotification.value.hasOwnProperty(field as keyof Notification) &&
-			newNotification.value[field as keyof Notification] === ""
+			notification.value.hasOwnProperty(field as keyof Notification) &&
+			notification.value[field as keyof Notification] === ""
+		)
+			error.value.push(field);
+	});
+
+	if (error.value.length) {
+		disabledForm.value = false;
+		setTimeout(() => {
+			error.value = clearVariable(error.value);
+		}, 2000);
+		return;
+	}
+
+	if (!isImageLoaded.value) {
+		fd.delete("notification_image");
+		fd.append("image", image.value);
+	}
+
+	loading.value = true;
+
+	if (isNew.value) {
+		store
+			.addNotification(fd)
+			.then((r: ReturnedData | ReturnedError) => returnHandler(r));
+	} else {
+		fd.append("notification_id", <string>notification.value.notification_id);
+		store
+			.updateNotification(fd)
+			.then((r: ReturnedData | ReturnedError) => returnHandler(r));
+	}
+}
+
+function returnHandler(r: ReturnedData | ReturnedError) {
+	disabledForm.value = false;
+	loading.value = false;
+
+	if (r.success) {
+		notification.value = clearVariable(notification.value);
+		router.push({ name: "Notifications" });
+	} else {
+		currentError.value = r.error.status;
+
+		setTimeout(() => {
+			currentError.value = "";
+		}, 2000);
+	}
+}
+
+function addNotification(e: Event) {
+	disabledForm.value = true;
+	if (notification.value.premium_app_type === "not") {
+		notification.value.days_without_subscription = 0;
+	}
+	const fd: FormData = new FormData(e.target as HTMLFormElement);
+
+	requiredFields.forEach((field) => {
+		if (
+			notification.value.hasOwnProperty(field as keyof Notification) &&
+			notification.value[field as keyof Notification] === ""
 		)
 			error.value.push(field);
 	});
@@ -355,12 +404,12 @@ function addNotification(e: Event) {
 	store.addNotification(fd).then((r: ReturnedData | ReturnedError) => {
 		disabledForm.value = false;
 		loading.value = false;
+
 		if (r.success) {
-			newNotification.value = clearVariable(newNotification.value);
+			notification.value = clearVariable(notification.value);
 			router.push({ name: "Notifications" });
 		} else {
 			currentError.value = r.error.status;
-			console.log(currentError.value);
 
 			setTimeout(() => {
 				currentError.value = "";
@@ -373,143 +422,13 @@ function addNotification(e: Event) {
 <style scoped lang="scss">
 @import "../style.scss";
 
-$file-input-color: #dbd4ff;
-$file-input-error-color: #ff4545;
 .notification-create {
 	.form {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
 		max-width: 450px;
-		width: 100%;
 
-		&__label,
-		&__file-input,
-		&__input,
-		.input-container {
-			width: 100%;
-		}
-
-		.file-input {
-			background-color: rgba($color: $file-input-color, $alpha: 0.23);
-			border: 0.2rem solid $file-input-color;
-			border-radius: 1rem;
-			position: relative;
-			display: flex;
-			justify-content: center;
-			box-sizing: content-box;
-			width: 25rem;
-			height: 10rem;
-
-			&__container {
-				width: 100%;
-				height: 100%;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				flex-direction: column;
-			}
-
-			&__image {
-				width: 100%;
-				height: 100%;
-
-				img {
-					width: 100%;
-					height: 100%;
-					object-fit: contain;
-				}
-			}
-
-			svg {
-				width: 2rem;
-				height: 2rem;
-				fill: #7b61ff;
-				margin-bottom: 0.5rem;
-			}
-
-			p {
-				text-align: center;
-				color: #7b61ff;
-				line-height: 1.5rem;
-				font: {
-					size: 1.5rem;
-					family: var(--f__mazzard-sb);
-				}
-			}
-
-			input {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				cursor: pointer;
-				opacity: 0;
-			}
-
-			&._error {
-				background-color: rgba($color: $file-input-error-color, $alpha: 0.23);
-				border: 0.2rem solid $file-input-error-color;
-
-				p {
-					color: $file-input-error-color;
-				}
-
-				svg {
-					fill: $file-input-error-color;
-				}
-			}
-		}
-
-		&__label {
-			margin-bottom: 0.5rem;
-			font: {
-				family: "Mazzard SemiBold";
-				size: 1.6rem;
-			}
-		}
 		&__comment {
 			color: var(--c__grey);
 			font-size: 0.9rem;
-		}
-
-		&__file-input,
-		label + input,
-		.select-container {
-			margin-bottom: 1.2rem;
-		}
-
-		&__input {
-			border: 0.1rem solid var(--c__grey);
-			border-radius: 0.6rem;
-			font: {
-				size: 1.25rem;
-			}
-			height: 2.8rem;
-			padding: 0 1rem;
-
-			&._error {
-				border-color: $file-input-error-color;
-			}
-
-			select {
-				border: 0;
-				width: 100%;
-				height: 100%;
-				font-size: inherit;
-				background-color: transparent;
-			}
-		}
-
-		&__button {
-			margin-top: 1rem;
-		}
-
-		div {
-			width: 100%;
-			display: flex;
-			flex-direction: column;
 		}
 
 		.input-container {
@@ -528,24 +447,6 @@ $file-input-error-color: #ff4545;
 	@media screen and (max-width: $mobile--breakpoint) {
 		.form {
 			max-width: unset;
-
-			.file-input {
-				border-width: 0.3rem;
-				height: 18rem;
-				min-height: 18rem;
-				width: 100%;
-
-				svg {
-					width: 2.6rem;
-					height: 2.6rem;
-				}
-
-				p {
-					font: {
-						size: 1.7rem;
-					}
-				}
-			}
 
 			&__label {
 				font: {

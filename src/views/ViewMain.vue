@@ -8,30 +8,81 @@
 						<p class="info__title">Пользователи</p>
 						<div class="info__filter">
 							<IconFilter />
-							<p>Фильтр</p>
+							<select v-model="filters.users">
+								<option
+									v-for="selection in selections"
+									:key="selection.value"
+									:value="selection.value"
+								>
+									{{ selection.text }}
+								</option>
+							</select>
 						</div>
 					</div>
 					<div class="info__container">
 						<div class="info__wrapper">
 							<MainInfoItem
-								:value="usersData.registered"
-								text="Зарегестрировано"
+								:value="commonInfo.users.all_users"
+								text="Все пользователи"
 								color_from="#E9F7FB"
 								color_to="#CAE6FF"
 							/>
 						</div>
 						<div class="info__wrapper">
 							<MainInfoItem
-								:value="usersData.psy"
-								text="Подписки PSY"
+								:value="commonInfo.users.psy"
+								text="PSY"
 								color_from="rgba(219, 213, 255, 0.52)"
 								color_to="rgba(149, 152, 244, 0.52)"
 							/>
 						</div>
 						<div class="info__wrapper">
 							<MainInfoItem
-								:value="usersData.avocado"
-								text="Подписки Авокадо"
+								:value="commonInfo.users.avocado"
+								text="Авокадо"
+								color_from="#D5F8D6"
+								color_to="#9CEA9E"
+							/>
+						</div>
+					</div>
+				</div>
+				<div class="info__subscriptions">
+					<div class="info__container">
+						<p class="info__title">Подписки</p>
+						<div class="info__filter">
+							<IconFilter />
+							<select v-model="filters.subs">
+								<option
+									v-for="selection in selections"
+									:key="selection.value"
+									:value="selection.value"
+								>
+									{{ selection.text }}
+								</option>
+							</select>
+						</div>
+					</div>
+					<div class="info__container">
+						<div class="info__wrapper">
+							<MainInfoItem
+								:value="commonInfo.subs.all_subs"
+								text="Все подписки"
+								color_from="#E9F7FB"
+								color_to="#CAE6FF"
+							/>
+						</div>
+						<div class="info__wrapper">
+							<MainInfoItem
+								:value="commonInfo.subs.psy"
+								text="PSY"
+								color_from="rgba(219, 213, 255, 0.52)"
+								color_to="rgba(149, 152, 244, 0.52)"
+							/>
+						</div>
+						<div class="info__wrapper">
+							<MainInfoItem
+								:value="commonInfo.subs.avocado"
+								text="Авокадо"
 								color_from="#D5F8D6"
 								color_to="#9CEA9E"
 							/>
@@ -41,23 +92,19 @@
 				<div class="info__courses">
 					<div class="info__container">
 						<p class="info__title">Курсы</p>
-						<div class="info__filter">
-							<IconFilter />
-							<p>Фильтр</p>
-						</div>
 					</div>
 					<div class="info__container">
 						<div class="info__wrapper">
 							<MainInfoItem
-								:value="usersData.active_courses"
+								:value="commonInfo.courses.active_courses"
 								text="Проходят сейчас"
-								color_from="#E9F7FB"
-								color_to="#CAE6FF"
+								color_from="#D7FFF0"
+								color_to="#98F2D2"
 							/>
 						</div>
 						<div class="info__wrapper">
 							<MainInfoItem
-								:value="usersData.completed_courses"
+								:value="commonInfo.courses.completed_courses"
 								text="Пройдено курсов"
 								color_from="#D5F8D6"
 								color_to="#9CEA9E"
@@ -65,7 +112,7 @@
 						</div>
 						<div class="info__wrapper">
 							<MainInfoItem
-								:value="usersData.rejected_courses"
+								:value="commonInfo.courses.rejected_courses"
 								text="Отказались"
 								color_from="#FCEBEB"
 								color_to="#F3C9C9"
@@ -82,19 +129,50 @@
 import IconFilter from "@icons/IconFilter.vue";
 import MainInfoItem from "@for-main/MainInfoItem.vue";
 import TheMainBanner from "@for-main/TheMainBanner.vue";
-import { inject, Ref, ref } from "vue";
+import { inject, Ref, ref, watch } from "vue";
 import { StoreGeneric, storeToRefs } from "pinia";
 
 const store = <StoreGeneric>inject("Store");
-const { loading } = storeToRefs(store);
-const usersData: Ref<{ [key: string]: any }> = ref({});
+const { loading, commonInfo } = storeToRefs(store);
+
+const selections: Array<{ [key: string]: string }> = [
+	{
+		text: "Все",
+		value: "all",
+	},
+	{
+		text: "Android",
+		value: "android",
+	},
+	{
+		text: "Apple",
+		value: "apple",
+	},
+];
+const filters: Ref<{ [key: string]: string }> = ref({
+	users: "all",
+	subs: "all",
+});
+
+setTimeout(() => {
+	console.log(filters.value);
+}, 3000);
 
 getUsersData();
 
+watch(
+	() => filters.value,
+	() => {
+		console.log(filters.value);
+		getUsersData();
+	},
+	{
+		deep: true,
+	}
+);
 function getUsersData(): void {
 	loading.value = true;
-	store.getUsersData().then((r: Object) => {
-		usersData.value = r;
+	store.getUsersData(filters.value).then((): void => {
 		loading.value = false;
 	});
 }
@@ -121,8 +199,7 @@ function getUsersData(): void {
 			margin-top: 2.75rem;
 		}
 
-		&__users,
-		&__courses {
+		& > * {
 			display: flex;
 			flex-direction: column;
 			box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.13);
@@ -160,19 +237,28 @@ function getUsersData(): void {
 			display: flex;
 			align-items: center;
 			background: rgba(219, 213, 255, 0.52);
-			padding: 0.6rem 1.2rem;
 			border-radius: 0.71rem;
-			cursor: pointer;
+			position: relative;
 
 			svg {
-				margin-right: 0.5rem;
+				position: absolute;
+				top: 50%;
+				left: 1rem;
+				transform: translateY(-50%);
 				width: 2rem;
 				height: 2rem;
 				fill: var(--c__violet);
+				pointer-events: none;
 			}
 
-			p {
+			select {
+				width: 100%;
+				height: 100%;
+				padding: 1rem 1.2rem 1rem 3.8rem;
 				font-weight: 600;
+				background: transparent;
+				border: 0;
+				cursor: pointer;
 			}
 		}
 	}

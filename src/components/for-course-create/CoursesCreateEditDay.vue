@@ -3,7 +3,10 @@
 		<div class="day__container">
 			<div class="day__line">
 				<p class="day__title">День {{ number }}</p>
-				<IconTrash class="day__icon" @click="confirmDeletingActive" />
+				<IconTrash
+					class="day__icon icon-trash"
+					@click="confirmDeletingActive"
+				/>
 			</div>
 			<input
 				type="text"
@@ -30,11 +33,8 @@
 					<IconCorner class="day__corner" @click="toggleTasks" />
 				</div>
 			</div>
-			<div
-				class="progran__tasks tasks"
-				ref="tasks"
-				:class="{ open: container_open }"
-			>
+
+			<OpeningList class="progran__tasks tasks" :isOpen="opened">
 				<div class="tasks__container">
 					<div class="tasks__empty empty" v-if="emptyTasks">
 						<img
@@ -56,17 +56,17 @@
 						/>
 					</TransitionGroup>
 				</div>
-			</div>
+			</OpeningList>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import OpeningList from "@add-comps/OpeningList.vue";
 import ButtonColored from "@add-comps/ButtonColored.vue";
 import IconTrash from "@icons/IconTrash.vue";
 import IconCorner from "@icons/IconCorner.vue";
 import CoursesCreateEditTask from "@for-course-create/CoursesCreateEditTask.vue";
-import Popup from "@add-comps/Popup.vue";
 import { CourseDay, CourseDayTask } from "../../../helpers";
 import { ComputedRef, ref, Ref } from "@vue/reactivity";
 import { StoreGeneric, storeToRefs } from "pinia";
@@ -82,7 +82,6 @@ const { defaultTaskItem } = storeToRefs(store);
 
 const tasks: any = ref(null);
 let opened: Ref<boolean> = ref(false);
-let container_open: Ref<boolean> = ref(false);
 
 let tasksNumber: ComputedRef<number> = computed(() => {
 	return Object.keys(props.day.tasks).length;
@@ -90,25 +89,6 @@ let tasksNumber: ComputedRef<number> = computed(() => {
 
 let popup: Ref<boolean> = ref(false);
 let deleteIndex: Ref<number> = ref(0);
-
-watch(
-	() => opened.value,
-	() => {
-		if (!tasks.value?.classList.contains("open")) {
-			tasks.value.style.height = tasks.value.scrollHeight + "px";
-			setTimeout(() => {
-				tasks.value.style = "";
-				container_open.value = true;
-			}, 300);
-		} else {
-			tasks.value.style.height = tasks.value.scrollHeight + "px";
-			container_open.value = false;
-			setTimeout(() => {
-				tasks.value.style = "";
-			}, 0);
-		}
-	}
-);
 
 let emptyTasks: ComputedRef<boolean> = computed(() => {
 	return Object.keys(props.day.tasks).length === 0;
@@ -187,11 +167,6 @@ async function confirmDeletingActive() {
 		align-items: center;
 		margin-bottom: 1.5rem;
 
-		svg {
-			height: 2.3rem;
-			width: 2.3rem;
-		}
-
 		&.opened {
 			.day__corner {
 				transform: rotate(0);
@@ -245,8 +220,6 @@ async function confirmDeletingActive() {
 
 	&__icon {
 		margin-left: auto;
-		cursor: pointer;
-		fill: var(--c__red);
 	}
 
 	&__button {
@@ -271,16 +244,6 @@ async function confirmDeletingActive() {
 		opacity: 1;
 		visibility: visible;
 		cursor: pointer;
-	}
-
-	.tasks {
-		height: 0;
-		overflow: hidden;
-		transition: var(--transition-03);
-
-		&.open {
-			height: auto;
-		}
 	}
 
 	.empty {

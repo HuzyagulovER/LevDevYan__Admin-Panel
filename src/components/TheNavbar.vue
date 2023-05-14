@@ -87,7 +87,7 @@ interface Link {
 }
 const links: ReadonlyArray<Link> = router.options.routes
 	.filter((r) => {
-		return r.meta?.nav_title;
+		return r.meta?.isNav;
 	})
 	.map((r) => {
 		return {
@@ -239,6 +239,10 @@ watch(
 			display: flex;
 			justify-content: center;
 			align-items: center;
+
+			& * {
+				fill: var(--c__white) !important;
+			}
 
 			&.sign-out {
 				transform: scale(0.9);

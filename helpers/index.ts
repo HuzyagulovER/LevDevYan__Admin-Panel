@@ -1,6 +1,7 @@
 export declare type Course = {
 	id?: number,
 	course_id?: any,
+	production: number,
 	about: CourseAbout | {},
 	days: CourseDays | {}
 }
@@ -31,6 +32,7 @@ export declare interface Notification {
 	days_without_subscription?: number,
 	days_without_open_app?: number,
 	image?: string
+	info?: string
 }
 export declare type Notifications = Array<Notification> | Array<null>
 
@@ -65,7 +67,7 @@ export declare type CourseDays = {
 };
 
 export declare type CourseToPost = Course & {
-	loadedFile?: File
+	loadedFiles?: File[]
 }
 
 export declare type UserCredentials = {
@@ -85,3 +87,64 @@ export declare type ReturnedError = {
 	},
 	success: false
 }
+
+export declare type UsersInfo = {
+	courses: {
+		active_courses: number,
+		completed_courses: number,
+		rejected_courses: number,
+	},
+	subs: {
+		all_subs: number,
+		psy: number,
+		avocado: number,
+	},
+	users: {
+		all_users: number,
+		psy: number,
+		avocado: number,
+	},
+}
+
+export declare type Content = {
+	id: string
+	title: string
+	image: string
+	app: string
+	lang: string
+	type: string
+	texts: { [key: string]: ContentText }
+}
+export declare type ContentText = {
+	text: string
+	image: string
+}
+export declare type ContentList = { [key: string]: Content } | {}
+
+export declare type Price = {
+	id: string
+	name: string
+	price: number
+	second_price: number
+	text_1: string
+	text_2: string
+	duration_timestamp: string
+	strikethrough: number | boolean
+	second_price_per_month: number | boolean
+	price_divison: number
+}
+export declare type Prices = { [key: string]: Price } | {}
+
+export declare type ActiveSubscription = {
+	id: string
+	count: number
+}
+export declare type ActiveSubscriptions = { [key: string]: ActiveSubscription } | {}
+
+export declare type ScheduleSubscription = {
+	id: string
+	price: number
+	email: string
+	user_id: number
+}
+export declare type ScheduleSubscriptions = { [key: string]: ScheduleSubscription } | {}

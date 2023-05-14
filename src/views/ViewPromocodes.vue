@@ -4,11 +4,9 @@
 			<p class="top-line__text">
 				Отправленные {{ activePromosNumber }}/{{ promosNumber }}
 			</p>
-			<ButtonCreate
-				create_name="Создать промокод"
-				to="/promocodes/create"
-				class="top-line__button-create"
-			/>
+			<ButtonCreate to="/promocodes/create" class="top-line__button-create">
+				Создать промокод
+			</ButtonCreate>
 		</div>
 
 		<div class="promocodes__empty" v-if="isEmpty">
@@ -36,8 +34,6 @@
 <script setup lang="ts">
 import ButtonCreate from "@/components/add-comps/ButtonCreate.vue";
 import PromocodesPromocodeItem from "@for-promo/PromocodesPromocodeItem.vue";
-import TheLoader from "@add-comps/TheLoader.vue";
-import Popup from "@add-comps/Popup.vue";
 import { inject, Ref, ref, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import {
@@ -89,8 +85,10 @@ watch(
 getPromocodes();
 
 function getPromocodes(): void {
+	loading.value = true;
 	store.getPromocodes().then(() => {
 		promos.value = cloneDeep(promocodes.value);
+		loading.value = false;
 	});
 }
 
@@ -115,8 +113,8 @@ async function changePromocodeState(
 	store
 		.updatePromocode(promocode, { sended: newPromocodeState ? 1 : 0 })
 		.then((r: ReturnedData | ReturnedError) => {
-			if (r.success && r.data.is_changed) {
-				// getPromocodes();
+			if (r.success && r.data.is_updated) {
+				getPromocodes();
 			}
 		});
 }

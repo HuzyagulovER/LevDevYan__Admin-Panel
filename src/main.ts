@@ -5,7 +5,6 @@ import { createPinia } from "pinia";
 import router from './routes';
 import { Store } from './stores/store';
 
-
 export function clearVariable(variable: any): any {
 	switch (typeof variable) {
 		case 'string':

@@ -85,12 +85,22 @@
 				</svg>
 			</div>
 			<div class="notification__delete">
-				<IconTrash @click="confirmDeletingActive" />
+				<IconTrash @click="confirmDeletingActive" class="icon-trash" />
 			</div>
 		</div>
 		<div class="notification__container">
-			<p class="notification__title">{{ notification.title }}</p>
-			<p class="notification__body">{{ notification.body }}</p>
+			<div class="notification__texts">
+				<p class="notification__title">{{ notification.title }}</p>
+				<p class="notification__body">{{ notification.body }}</p>
+			</div>
+			<div class="notification__edit">
+				<RouterLink
+					class="buttons__button"
+					:to="`/notifications/create-edit/${props.notification.notification_id}/`"
+				>
+					Редактировать
+				</RouterLink>
+			</div>
 		</div>
 	</div>
 </template>
@@ -99,7 +109,7 @@
 import { computed, inject, ref, Ref, toRef, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { Notification, ReturnedData } from "../../../helpers";
-import IconTrash from "../add-comps/icons/IconTrash.vue";
+import IconTrash from "@add-comps/icons/IconTrash.vue";
 
 const props = defineProps<{
 	index: number;
@@ -108,8 +118,7 @@ const props = defineProps<{
 const emit = defineEmits(["confirmDeletingActive"]);
 
 const store = <StoreGeneric>inject("Store");
-const { notifications, languages, appNames, premiumAppTypes } =
-	storeToRefs(store);
+const { notifications, languages, premiumAppTypes } = storeToRefs(store);
 
 function confirmDeletingActive() {
 	emit("confirmDeletingActive", props.notification.notification_id);
@@ -150,12 +159,14 @@ function updateNotificationState(state: string) {
 
 		& > * {
 			height: 2.3rem;
-			align-items: center;
 		}
 
 		& + & {
-			display: block;
-			height: unset;
+			margin-top: 1rem;
+
+			& > * {
+				height: unset;
+			}
 		}
 	}
 
@@ -273,9 +284,54 @@ function updateNotificationState(state: string) {
 		}
 	}
 
-	&__delete {
-		svg {
-			fill: var(--c__red);
+	&__texts {
+		flex: 1;
+	}
+
+	&__edit {
+		display: flex;
+	}
+
+	.buttons {
+		height: unset;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: flex-end;
+
+		&__delete {
+			margin-right: 1.5rem;
+			opacity: 0;
+			transition: var(--transition-03);
+		}
+
+		&__button {
+			cursor: pointer;
+			padding: 0.8rem 1.6rem;
+			border-radius: 0.8rem;
+			font-size: 1.4rem;
+			line-height: 1.4rem;
+			border: 0.2rem solid var(--c__light-violet);
+			transition: var(--transition-03);
+			text-align: center;
+
+			&:hover {
+				color: var(--c__white);
+				background-color: var(--c__violet);
+				border-color: var(--c__violet);
+			}
+		}
+
+		&__wrapper {
+			display: flex;
+			align-items: center;
+
+			&:last-child {
+				p {
+					font-size: 1.4rem;
+					margin-right: 1rem;
+				}
+			}
 		}
 	}
 
@@ -337,12 +393,6 @@ function updateNotificationState(state: string) {
 		&__play {
 			order: 2;
 		}
-
-		// &__type {
-		// 	grid-column: 1/3;
-		// 	word-break: break-all;
-		// 	white-space: break-spaces;
-		// }
 
 		&__notification {
 			order: 1;

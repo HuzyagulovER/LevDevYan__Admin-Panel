@@ -1,32 +1,42 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import ViewSignIn from "../views/ViewSignIn.vue";
-import ViewMain from "../views/ViewMain.vue";
-import ViewCourses from "../views/ViewCourses.vue";
-import ViewCoursesCreateEdit from "../views/ViewCoursesCreateEdit.vue";
-import ViewPromocodes from "../views/ViewPromocodes.vue";
-import ViewPromocodesCreate from "../views/ViewPromocodesCreate.vue";
-import ViewNotifications from "../views/ViewNotifications.vue";
-import ViewNotificationsCreate from "../views/ViewNotificationsCreate.vue";
+import ViewSignIn from "@views/ViewSignIn.vue";
+import ViewMain from "@views/ViewMain.vue";
+import ViewCourses from "@views/ViewCourses.vue";
+import ViewCoursesCreateEdit from "@views/ViewCoursesCreateEdit.vue";
+import ViewPromocodes from "@views/ViewPromocodes.vue";
+import ViewPromocodesCreate from "@views/ViewPromocodesCreate.vue";
+import ViewNotifications from "@views/ViewNotifications.vue";
+import ViewTextContent from "@views/ViewTextContent.vue";
+import ViewSubscriptions from "@views/ViewSubscriptions.vue";
+
+import ViewNotificationsCreateEdit from "@views/ViewNotificationsCreateEdit.vue";
 import CoursesCreateEditAbout from "@for-course-create/CoursesCreateEditAbout.vue";
 import CoursesCreateEditDays from "@for-course-create/CoursesCreateEditDays.vue";
+import ViewTextContentCreateEdit from "@views/ViewTextContentCreateEdit.vue";
+import ViewSuscriptionEdit from "@views/ViewSuscriptionEdit.vue";
 
-import IconHome from "../components/add-comps/icons/IconHome.vue";
-import IconCourses from "../components/add-comps/icons/IconCourses.vue";
-import IconPromocodes from "../components/add-comps/icons/IconPromocodes.vue";
-import IconNotifications from "../components/add-comps/icons/IconNotifications.vue";
+import IconHome from "@add-comps/icons/IconHome.vue";
+import IconCourses from "@add-comps/icons/IconCourses.vue";
+import IconPromocodes from "@add-comps/icons/IconPromocodes.vue";
+import IconNotifications from "@add-comps/icons/IconNotifications.vue";
+import IconText from "@add-comps/icons/IconText.vue";
+import IconSubscription from "@add-comps/icons/IconSubscription.vue";
+
 import { Component } from 'vue';
 import { Store } from '../stores/store';
 import { ReturnedError, ReturnedData } from '../../helpers';
 import { useCookies } from 'vue3-cookies';
 
 const { cookies } = useCookies();
+const IS_DEV = ["development", "dev"].includes(import.meta.env.MODE);
 
 const default_title: string = 'Личный кабинет'
 
 interface Meta {
 	title: string,
 	nav_icon?: Component,
-	nav_title?: string
+	nav_title?: string,
+	isNav?: boolean,
 }
 
 type RouteRecordRawWithMeta = RouteRecordRaw | RouteRecordRaw & {
@@ -41,7 +51,8 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		meta: {
 			title: "Главная",
 			nav_icon: IconHome,
-			nav_title: 'Главная'
+			nav_title: 'Главная',
+			isNav: true
 		}
 	},
 	{
@@ -51,7 +62,8 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		meta: {
 			title: "Все курсы",
 			nav_icon: IconCourses,
-			nav_title: 'Курсы'
+			nav_title: 'Курсы',
+			isNav: true
 		},
 	},
 	{
@@ -68,7 +80,10 @@ const routes: Array<RouteRecordRawWithMeta> = [
 				name: "CoursesCourseDays",
 				component: CoursesCreateEditDays,
 			},
-		]
+		],
+		meta: {
+			title: "Курс",
+		},
 	},
 	{
 		path: "/promocodes",
@@ -77,7 +92,8 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		meta: {
 			title: "Все промокоды",
 			nav_icon: IconPromocodes,
-			nav_title: 'Промокоды'
+			nav_title: 'Промокоды',
+			isNav: true
 		}
 	},
 	{
@@ -85,7 +101,7 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		name: "PromocodesCreate",
 		component: ViewPromocodesCreate,
 		meta: {
-			title: "Создание промокода"
+			title: "Промокод"
 		},
 	},
 	{
@@ -95,29 +111,68 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		meta: {
 			title: "Все уведомления",
 			nav_icon: IconNotifications,
-			nav_title: 'Уведомления'
+			nav_title: 'Уведомления',
+			isNav: true
 		},
 	},
 	{
-		path: '/notifications/create',
-		name: "NotificationsCreate",
-		component: ViewNotificationsCreate,
+		path: '/notifications/create-edit/:notificationId',
+		name: "NotificationsCreateEdit",
+		component: ViewNotificationsCreateEdit,
 		meta: {
-			title: "Создание уведомления"
+			title: "Уведомление"
 		},
 	},
 	{
 		path: '/sign-in',
 		name: "SignIn",
 		component: ViewSignIn,
+		meta: {
+			title: "Вход",
+		},
 	},
-	// {
-	// 	path: "/:pathMatch(.*)*",
-	// 	name: "NotFound",
-	// 	redirect: {
-	// 		name: "Main",
-	// 	},
-	// },
+	{
+		path: '/content',
+		name: "Content",
+		component: ViewTextContent,
+		meta: {
+			title: "Контент",
+			nav_icon: IconText,
+			nav_title: "Контент",
+			isNav: true
+		},
+	},
+	{
+		path: '/content/create-edit/:contentId',
+		name: "ContentCreateEdit",
+		component: ViewTextContentCreateEdit
+	},
+	{
+		path: '/subscriptions',
+		name: "Subscriptions",
+		component: ViewSubscriptions,
+		meta: {
+			title: "Подписки",
+			nav_icon: IconSubscription,
+			nav_title: "Подписки",
+			isNav: true
+		},
+	},
+	{
+		path: '/subscription-edit/:app/:subscriptionId',
+		name: "SubscriptionsEdit",
+		component: ViewSuscriptionEdit,
+		meta: {
+			title: "Редактирование подписки",
+		},
+	},
+	{
+		path: "/:pathMatch(.*)*",
+		name: "NotFound",
+		redirect: {
+			name: "Main",
+		},
+	},
 ]
 
 const router = createRouter({
@@ -137,6 +192,11 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
 	try {
 		const store = Store()
+
+		if (IS_DEV) {
+			next();
+			return
+		}
 
 		if (!cookies.get("session_token")) {
 			if (to.path !== '/sign-in') {

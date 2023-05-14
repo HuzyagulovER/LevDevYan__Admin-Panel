@@ -37,23 +37,27 @@ defineProps<Props>();
 		.item {
 			&__value,
 			&__text {
-				// padding: 2.5rem;
 				margin: 1rem 0;
 			}
 		}
 	}
 
+	&__value,
+	&__text {
+		font: {
+			weight: bold;
+		}
+	}
+
 	&__value {
 		font: {
-			size: 1.8rem;
-			weight: bold;
+			size: 2.4rem;
 		}
 	}
 
 	&__text {
 		font: {
-			size: 1.6rem;
-			weight: bold;
+			size: 2rem;
 		}
 	}
 }
