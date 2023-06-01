@@ -160,6 +160,7 @@ watch(
 	border-radius: 0 3.125rem 3.125rem 0;
 	max-width: 400px;
 	width: 18%;
+	min-width: 18%;
 	padding: 4rem 2.375rem;
 	overflow: hidden;
 

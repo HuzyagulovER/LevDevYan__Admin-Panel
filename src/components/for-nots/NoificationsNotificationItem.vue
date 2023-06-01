@@ -286,10 +286,12 @@ function updateNotificationState(state: string) {
 
 	&__texts {
 		flex: 1;
+		margin-right: 2rem;
 	}
 
 	&__edit {
 		display: flex;
+		align-items: flex-start;
 	}
 
 	.buttons {

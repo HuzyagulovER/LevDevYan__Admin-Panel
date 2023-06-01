@@ -96,7 +96,7 @@ select {
 .select-container::after {
 	content: "";
 	position: absolute;
-	right: 0.5rem;
+	right: 1rem;
 	top: 50%;
 	height: 1rem;
 	width: 1rem;
@@ -164,7 +164,6 @@ select {
 
 	* ::-webkit-scrollbar {
 		width: 0;
-		width: none;
 	}
 
 	* ::-webkit-scrollbar-track {

@@ -6,7 +6,7 @@
 					<IconCalendar />
 					<p>{{ currentTime }}</p>
 				</div>
-				<p class="info__welcome">Привет , администратор!</p>
+				<p class="info__welcome">Привет, администратор!</p>
 				<p class="info__wish">Хорошего дня!</p>
 			</div>
 			<img

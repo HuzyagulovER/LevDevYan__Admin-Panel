@@ -189,6 +189,8 @@ function changePromocodeState(state: boolean): void {
 		}
 
 		&__delete {
+			width: 2.3rem;
+			height: 2.3rem;
 			order: 3;
 		}
 

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
 import { useCookies, globalCookiesConfig } from 'vue3-cookies';
-import { Course, Courses, CourseDay, CourseDayTask, Promocode, Promocodes, Notifications, CourseToPost, UsersInfo, Content, ContentList } from "../../helpers";
+import { Course, Courses, CourseDay, CourseDayTask, Promocode, Promocodes, Notifications, CourseToPost, UsersInfo, Content, ContentList, Price } from "../../helpers";
 import { cloneDeep } from 'lodash';
 import { clearVariable } from '../main';
 import { watch } from 'vue';
@@ -467,7 +467,6 @@ export const Store = defineStore('Store', {
 		async signIn(creadentials: FormData): Promise<void> {
 			return await axios.post(api_base + "signIn", creadentials).then(
 				r => {
-					console.log(r);
 					return r.data
 				},
 				e => {
@@ -618,7 +617,7 @@ export const Store = defineStore('Store', {
 			const fd = new FormData()
 			fd.append('app', app);
 			if (priceId) {
-				fd.append('price_id', JSON.stringify(priceId));
+				fd.append('id', priceId);
 			}
 
 			return await axios.post(...formRequest('Prices/getPrices', fd) as [string, FormData]).then(
@@ -630,14 +629,14 @@ export const Store = defineStore('Store', {
 				}
 			)
 		},
-		async updatePrice(app: string, priceId: string): Promise<void> {
+		async updatePrice(app: string, price: Price): Promise<void> {
 			const fd = new FormData()
 			fd.append('app', app);
-			fd.append('price_id', JSON.stringify(priceId));
+			fd.append('price', JSON.stringify(price));
 
 			return await axios.post(...formRequest('Prices/updatePrice', fd) as [string, FormData]).then(
 				r => {
-					return r.data.data
+					return r.data
 				},
 				e => {
 					return e.response.data
@@ -649,7 +648,7 @@ export const Store = defineStore('Store', {
 			const fd = new FormData()
 			fd.append('app', app)
 
-			return await axios.post(...formRequest('Subscritions/getActiveSubscriptions', fd) as [string, FormData]).then(
+			return await axios.post(...formRequest('Subscriptions/getActiveSubscriptions', fd) as [string, FormData]).then(
 				r => {
 					return r.data.data
 				},
@@ -658,11 +657,12 @@ export const Store = defineStore('Store', {
 				}
 			)
 		},
-		async getScheduleSubscriptions(app: string): Promise<void> {
+		async getScheduleSubscriptions(app: string, data: string): Promise<void> {
 			const fd = new FormData()
 			fd.append('app', app);
+			fd.append('data', data);
 
-			return await axios.post(...formRequest('Subscritions/getScheduleSubscriptions', fd) as [string, FormData]).then(
+			return await axios.post(...formRequest('Subscriptions/getScheduleSubscriptions', fd) as [string, FormData]).then(
 				r => {
 					return r.data.data
 				},

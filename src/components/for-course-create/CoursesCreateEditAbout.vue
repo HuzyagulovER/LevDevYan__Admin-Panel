@@ -52,7 +52,7 @@
 				v-if="false"
 			/>
 
-			<label for="category" class="form__label" v-if="false">Категория</label>
+			<label for="category" class="form__label">Категория</label>
 			<input
 				id="category"
 				type="text"
@@ -62,7 +62,6 @@
 				:disabled="disabledForm"
 				v-model="data.category"
 				@input="error = clearVariable(error)"
-				v-if="false"
 			/>
 
 			<label for="description" class="form__label">Описание</label>

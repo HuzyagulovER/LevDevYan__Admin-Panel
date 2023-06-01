@@ -196,3 +196,11 @@ $input-error-color: #ff4545;
 	width: 2.3rem;
 	cursor: pointer;
 }
+
+.subtitle {
+	margin-bottom: 1rem;
+	font: {
+		size: 2rem;
+		family: var(--f__mazzard-sb);
+	}
+}

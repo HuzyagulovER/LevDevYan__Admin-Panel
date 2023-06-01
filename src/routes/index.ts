@@ -13,7 +13,7 @@ import ViewNotificationsCreateEdit from "@views/ViewNotificationsCreateEdit.vue"
 import CoursesCreateEditAbout from "@for-course-create/CoursesCreateEditAbout.vue";
 import CoursesCreateEditDays from "@for-course-create/CoursesCreateEditDays.vue";
 import ViewTextContentCreateEdit from "@views/ViewTextContentCreateEdit.vue";
-import ViewSuscriptionEdit from "@views/ViewSuscriptionEdit.vue";
+import ViewSubscriptionEdit from "@views/ViewSubscriptionEdit.vue";
 
 import IconHome from "@add-comps/icons/IconHome.vue";
 import IconCourses from "@add-comps/icons/IconCourses.vue";
@@ -161,13 +161,13 @@ const routes: Array<RouteRecordRawWithMeta> = [
 	{
 		path: '/subscription-edit/:app/:subscriptionId',
 		name: "SubscriptionsEdit",
-		component: ViewSuscriptionEdit,
+		component: ViewSubscriptionEdit,
 		meta: {
 			title: "Редактирование подписки",
 		},
 	},
 	{
-		path: "/:pathMatch(.*)*",
+		path: "/:catchAll(.*)*",
 		name: "NotFound",
 		redirect: {
 			name: "Main",
@@ -202,8 +202,10 @@ router.beforeEach(async (to, from, next) => {
 			if (to.path !== '/sign-in') {
 				next({ path: '/sign-in' })
 				return
+			} else {
+				next()
 			}
-			next()
+
 		}
 
 		if (cookies.get("session_token")) {

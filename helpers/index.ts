@@ -126,9 +126,11 @@ export declare type Price = {
 	name: string
 	price: number
 	second_price: number
+	second_price_visibility: number
 	text_1: string
+	text_1_visibility: number
 	text_2: string
-	duration_timestamp: string
+	text_2_visibility: number
 	strikethrough: number | boolean
 	second_price_per_month: number | boolean
 	price_divison: number
@@ -137,14 +139,18 @@ export declare type Prices = { [key: string]: Price } | {}
 
 export declare type ActiveSubscription = {
 	id: string
+	name: string
 	count: number
 }
 export declare type ActiveSubscriptions = { [key: string]: ActiveSubscription } | {}
 
-export declare type ScheduleSubscription = {
+export declare type ScheduleSubscriptionType = {
 	id: string
 	price: number
-	email: string
-	user_id: number
+	name: string
+	users: {
+		email: string
+		id: number
+	}[]
 }
-export declare type ScheduleSubscriptions = { [key: string]: ScheduleSubscription } | {}
+export declare type ScheduleSubscriptionTypes = { [key: string]: ScheduleSubscriptionType } | {}

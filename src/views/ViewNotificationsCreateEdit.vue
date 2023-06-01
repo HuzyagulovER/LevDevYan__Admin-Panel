@@ -237,7 +237,7 @@ import {
 import ButtonColored from "@add-comps/ButtonColored.vue";
 import InputImage from "@add-comps/InputImage.vue";
 import { useRoute, useRouter } from "vue-router";
-import { cloneDeep } from "lodash";
+import { cloneDeep, merge } from "lodash";
 
 const store = <StoreGeneric>inject("Store");
 const {
@@ -288,17 +288,15 @@ if (route.params.notificationId !== "new") {
 
 	store
 		.getNotification(route.params.notificationId)
-		.then((r: Notifications) => {
+		.then((r: any) => {
 			loading.value = false;
 			if (Array.isArray(r)) {
 				router.replace({ path: "/notifications" });
 			}
 			notification.value = cloneDeep(
-				<Notification>(
-					(r as Notifications)[
+					<Notification>(r as Notifications)[
 						route.params.notificationId as keyof Notifications
 					]
-				)
 			);
 			image.value = <string>notification.value.image;
 		});
@@ -320,9 +318,11 @@ function displayImage(isImage: boolean): void {
 
 function notificationChangeHandler(e: Event): void {
 	disabledForm.value = true;
+	
 	if (notification.value.premium_app_type === "not") {
 		notification.value.days_without_subscription = 0;
 	}
+
 	const fd: FormData = new FormData(e.target as HTMLFormElement);
 
 	requiredFields.forEach((field) => {

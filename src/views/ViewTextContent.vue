@@ -85,7 +85,7 @@ async function confirmDeleteContent(contentId: string): Promise<void> {
 	await store.callPopup("Удалить этот контент?").then((r: boolean) => {
 		if (r) {
 			store.deleteContent([contentId]).then(() => {
-				store.getContent(lang.value);
+				store.getContent(app.value, lang.value);
 			});
 		}
 	});

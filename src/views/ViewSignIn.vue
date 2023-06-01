@@ -149,6 +149,7 @@ async function signIn(e: Event) {
 		}
 
 		input {
+			height: auto !important;
 			font: {
 				family: var(--f__montserrat-sb);
 				size: 1.3rem;
@@ -232,6 +233,7 @@ async function signIn(e: Event) {
 			border-radius: 1.2rem;
 			padding: 1.2rem;
 			cursor: pointer;
+			margin-left: 0;
 			font: {
 				family: var(--f__montserrat-sb);
 				size: 1.6rem;
