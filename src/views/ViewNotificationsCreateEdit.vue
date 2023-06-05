@@ -286,20 +286,18 @@ if (route.params.notificationId !== "new") {
 	loading.value = true;
 	isNew.value = false;
 
-	store
-		.getNotification(route.params.notificationId)
-		.then((r: any) => {
-			loading.value = false;
-			if (Array.isArray(r)) {
-				router.replace({ path: "/notifications" });
-			}
-			notification.value = cloneDeep(
-					<Notification>(r as Notifications)[
-						route.params.notificationId as keyof Notifications
-					]
-			);
-			image.value = <string>notification.value.image;
-		});
+	store.getNotification(route.params.notificationId).then((r: any) => {
+		loading.value = false;
+		if (Array.isArray(r)) {
+			router.replace({ path: "/notifications" });
+		}
+		notification.value = cloneDeep(
+			<Notification>(
+				(r as Notifications)[route.params.notificationId as keyof Notifications]
+			)
+		);
+		image.value = <string>notification.value.image;
+	});
 }
 
 watch(
@@ -318,7 +316,7 @@ function displayImage(isImage: boolean): void {
 
 function notificationChangeHandler(e: Event): void {
 	disabledForm.value = true;
-	
+
 	if (notification.value.premium_app_type === "not") {
 		notification.value.days_without_subscription = 0;
 	}
@@ -375,7 +373,7 @@ function returnHandler(r: ReturnedData | ReturnedError) {
 		}, 2000);
 	}
 }
-
+/*
 function addNotification(e: Event) {
 	disabledForm.value = true;
 	if (notification.value.premium_app_type === "not") {
@@ -417,6 +415,7 @@ function addNotification(e: Event) {
 		}
 	});
 }
+*/
 </script>
 
 <style scoped lang="scss">
