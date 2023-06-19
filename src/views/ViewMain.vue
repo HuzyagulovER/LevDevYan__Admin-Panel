@@ -121,16 +121,22 @@
 					</div>
 				</div>
 			</div>
+			<button class="home__user-delete" @click="confirmDeletingUser">
+				<IconTrash class="icon-trash" />
+				<p>Удалить пользователя</p>
+			</button>
 		</div>
 	</section>
 </template>
 
 <script setup lang="ts">
 import IconFilter from "@icons/IconFilter.vue";
+import IconTrash from "@icons/IconTrash.vue";
 import MainInfoItem from "@for-main/MainInfoItem.vue";
 import TheMainBanner from "@for-main/TheMainBanner.vue";
 import { inject, Ref, ref, watch } from "vue";
 import { StoreGeneric, storeToRefs } from "pinia";
+import { PopupAdditionFields } from "../../helpers";
 
 const store = <StoreGeneric>inject("Store");
 const { loading, commonInfo } = storeToRefs(store);
@@ -154,10 +160,6 @@ const filters: Ref<{ [key: string]: string }> = ref({
 	subs: "all",
 });
 
-setTimeout(() => {
-	console.log(filters.value);
-}, 3000);
-
 getUsersData();
 
 watch(
@@ -176,6 +178,18 @@ function getUsersData(): void {
 		loading.value = false;
 	});
 }
+
+async function confirmDeletingUser(): Promise<void> {
+	await store
+		.callPopupWithData("", { type: "user_delete" })
+		.then((r: PopupAdditionFields) => {
+			console.log(r);
+
+			if (r) {
+				// store.deleteUser(user_id).then(() => {});
+			}
+		});
+}
 </script>
 
 <style lang="scss" scoped>
@@ -189,6 +203,10 @@ function getUsersData(): void {
 		display: flex;
 		flex-direction: column;
 		width: 100%;
+
+		& > * + * {
+			margin-top: 2.75rem;
+		}
 	}
 
 	.info {
@@ -260,6 +278,24 @@ function getUsersData(): void {
 				border: 0;
 				cursor: pointer;
 			}
+		}
+	}
+
+	&__user-delete {
+		display: flex;
+		align-self: flex-start;
+		align-items: center;
+		width: auto;
+		height: auto;
+		padding: 0.8rem 2rem;
+		border: 0.1rem solid #000;
+		border-radius: 1.2rem;
+		background-color: #fff;
+		cursor: pointer;
+
+		p {
+			margin-left: 1rem;
+			font-size: 2rem;
 		}
 	}
 

@@ -38,6 +38,7 @@
 					<option v-for="app in apps" :key="app" :value="app.toLowerCase()">
 						{{ app }}
 					</option>
+					<option value="other">Другое</option>
 				</select>
 			</div>
 

@@ -1,7 +1,15 @@
 <template>
 	<section class="content">
 		<div class="content__top-line top-line">
-			<ButtonsPages />
+			<ButtonsPages :additionLinksNumber="1">
+				<RouterLink
+					class="buttons-pages__link-other"
+					:to="{ query: { app: 'other' } }"
+					:class="{ js_active: route.query.app === 'other' }"
+				>
+					Другое
+				</RouterLink>
+			</ButtonsPages>
 
 			<ButtonCreate
 				to="/content/create-edit/new"
@@ -47,7 +55,6 @@ import {
 	computed,
 } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { Content, ContentList } from "../../helpers";
 import { cloneDeep } from "lodash";
 import { useRoute } from "vue-router";
 import { useCookies } from "vue3-cookies";
@@ -141,24 +148,15 @@ async function confirmDeleteContent(contentId: string): Promise<void> {
 	@media screen and (max-width: $mobile--breakpoint) {
 		.top-line {
 			display: grid;
-			grid-template: 1fr 1fr / repeat(6, 1fr);
+			grid-template: 1fr auto / repeat(6, 1fr);
 			gap: 1.5rem 2.5rem;
 			height: auto;
-
-			.buttons-pages {
-				grid-column: 1/7;
-				display: grid;
-				grid-template: 1fr / 1fr 1fr;
-				column-gap: 2.5rem;
-
-				& > * {
-					margin: 0;
-				}
-			}
 
 			&__button-create {
 				width: 100%;
 				grid-column: 2/6;
+				padding-top: 1rem;
+				padding-bottom: 1rem;
 			}
 		}
 

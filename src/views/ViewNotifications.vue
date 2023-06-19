@@ -188,17 +188,6 @@ function changeLang(lang: string): void {
 			gap: 1.5rem 2.5rem;
 			height: auto;
 
-			.buttons-pages {
-				grid-column: 1/7;
-				display: grid;
-				grid-template: 1fr / 1fr 1fr;
-				column-gap: 2.5rem;
-
-				& > * {
-					margin: 0;
-				}
-			}
-
 			&__button-create {
 				width: 100%;
 				grid-column: 2/6;

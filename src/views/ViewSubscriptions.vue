@@ -91,7 +91,7 @@
 				</div>
 			</div>
 			<div class="subscriptions__wrapper empty" v-else>
-				<p>Оплат на сегодня не намечается :(</p>
+				<p>Оплат на сегодня не намечается &#128564;</p>
 			</div>
 		</div>
 	</section>

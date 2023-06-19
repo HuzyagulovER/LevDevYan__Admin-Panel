@@ -49,7 +49,7 @@
 				class="form__input"
 				:class="{ _error: error.includes('title') }"
 				name="title"
-				:disabled="disabledForm"
+				:disabled="disabledForm || isAndroid"
 				v-model="notification.title"
 				@input="error = clearVariable(error)"
 			/>
@@ -61,7 +61,7 @@
 				name="body"
 				class="form__input"
 				:class="{ _error: error.includes('body') }"
-				:disabled="disabledForm"
+				:disabled="disabledForm || isAndroid"
 				v-model="notification.body"
 				@input="error = clearVariable(error)"
 			/>
@@ -197,10 +197,28 @@
 				/>
 			</div>
 
-			<label for="input_info" class="form__label"
-				>Дополнительная информация</label
-			>
+			<label for="input_os" class="form__label">ОС для доп информации</label>
+			<div class="select-container">
+				<select
+					id="input_os"
+					name="os"
+					class="form__input"
+					v-model="notification.os"
+					:disabled="disabledForm"
+					@input="osChange"
+				>
+					<option value="">Нет выбора</option>
+					<option v-for="(os, key) in OS" :key="key" :value="key">
+						{{ os }}
+					</option>
+				</select>
+			</div>
+
+			<label for="input_info" class="form__label" v-if="notification.os">
+				Дополнительная информация
+			</label>
 			<input
+				v-if="notification.os"
 				id="input_info"
 				type="text"
 				name="info"
@@ -225,8 +243,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from "@vue/reactivity";
-import { inject, watch, onMounted } from "@vue/runtime-core";
+import { ComputedRef, ref, Ref } from "@vue/reactivity";
+import { inject, watch, onMounted, computed } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import {
 	Notification,
@@ -247,6 +265,7 @@ const {
 	acceptedImageExtensions,
 	imageErrorStatuses,
 	apps,
+	OS,
 } = storeToRefs(store);
 const clearVariable = <Function>inject("clearVariable");
 const route = useRoute();
@@ -254,8 +273,6 @@ const router = useRouter();
 
 const requiredFields: ReadonlyArray<string> = [
 	"lang",
-	"title",
-	"body",
 	"time",
 	"app",
 	"premium_app_type",
@@ -272,6 +289,7 @@ const notification: Ref<Notification> = ref({
 	premium_app_type: "",
 	days_without_open_app: 0,
 	days_without_subscription: 0,
+	os: "",
 	info: "",
 });
 
@@ -281,6 +299,12 @@ const image: Ref<string> = ref("");
 const currentError: Ref<string> = ref("");
 const isNew: Ref<boolean> = ref(true);
 const isImageLoaded: Ref<boolean> = ref(false);
+
+const isAndroid: ComputedRef<boolean> = computed((): boolean => {
+	notification.value.title = "";
+	notification.value.body = "";
+	return notification.value.os === "android";
+});
 
 if (route.params.notificationId !== "new") {
 	loading.value = true;
@@ -373,6 +397,12 @@ function returnHandler(r: ReturnedData | ReturnedError) {
 		}, 2000);
 	}
 }
+
+function osChange(): void {
+	if (notification.value.os === "android") {
+	}
+}
+
 /*
 function addNotification(e: Event) {
 	disabledForm.value = true;

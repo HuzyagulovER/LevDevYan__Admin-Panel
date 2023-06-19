@@ -48,7 +48,6 @@ let { currentTime } = storeToRefs(store);
 	);
 	padding: 0.75rem;
 	border-radius: 3rem;
-	margin-bottom: 2.75rem;
 
 	&__container {
 		display: flex;

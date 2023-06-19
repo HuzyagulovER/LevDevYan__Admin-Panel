@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
 import { useCookies, globalCookiesConfig } from 'vue3-cookies';
-import { Course, Courses, CourseDay, CourseDayTask, Promocode, Promocodes, Notifications, CourseToPost, UsersInfo, Content, ContentList, Price } from "../../helpers";
+import { Course, Promocode, Promocodes, Notifications, CourseToPost, Content, Price, State } from "../../helpers";
 import { cloneDeep } from 'lodash';
 import { clearVariable } from '../main';
 import { watch } from 'vue';
@@ -75,44 +75,24 @@ const monthNames: ReadonlyArray<string> = [
 	"декабря",
 ];
 
-type State = {
-	apps: string[],
-	loading: boolean,
-	popup: {
-		text: string,
-		isActive: boolean,
-		isReturned: boolean,
-		answer: boolean,
-	},
-	mainTitle: string,
-	courses: Courses,
-	currentTime: string,
-	promocodes: Promocodes,
-	notifications: Notifications,
-	loadedFiles: { [key: string]: File },
-	defaultCourse: Course,
-	defaultDayItem: CourseDay,
-	defaultTaskItem: CourseDayTask,
-	languages: Object,
-	premiumAppTypes: { [key: string]: string }
-	acceptedImageExtensions: Array<string>
-	imageErrorStatuses: string[]
-	defaultLang: string,
-	commonInfo: UsersInfo
-	defaultContent: Content
-	contentList: ContentList
-}
+
 
 export const Store = defineStore('Store', {
 	state: (): State => (
 		{
 			apps: ['PSY', 'Avocado'],
+			OS: {
+				android: "Android",
+				iOS: "iOS",
+			},
 			loading: false,
 			popup: {
 				text: '',
 				isActive: false,
 				isReturned: false,
 				answer: false,
+				additionFields: [],
+				type: ''
 			},
 			mainTitle: '',
 			courses: {},
@@ -480,9 +460,11 @@ export const Store = defineStore('Store', {
 			this.popup = cloneDeep(clearVariable(this.popup))
 		},
 
-		async callPopup(text: string): Promise<boolean> {
+		async callPopup(text: string, additionFields?: { [key: string]: string }): Promise<boolean> {
 			this.popup.text = text
 			this.popup.isActive = true
+			this.popup.additionFields = additionFields && Object.keys(additionFields).length > 0 ? additionFields : {}
+			this.popup.type = additionFields && Object.keys(additionFields).length > 0 && additionFields.type ? additionFields.type : ''
 			return new Promise((res, rej) => {
 				watch(
 					() => this.popup.isReturned,
@@ -491,10 +473,15 @@ export const Store = defineStore('Store', {
 					}
 				)
 			})
+		},
 
-			// return new Promise((res, rej) => {
+		async callPopupWithData(text: string, additionFields: { [key: string]: string }): Promise<{ [key: string]: string }> {
+			return this.callPopup(text, additionFields).then((r: boolean): Promise<{ [key: string]: string }> => {
+				return new Promise((res, rej) => {
+					if (r) res(additionFields)
+				})
+			})
 
-			// })
 		},
 
 		async checkSessionToken() {

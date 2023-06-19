@@ -32,6 +32,7 @@ export declare interface Notification {
 	days_without_subscription?: number,
 	days_without_open_app?: number,
 	image?: string
+	os?: string
 	info?: string
 }
 export declare type Notifications = Array<Notification> | Array<null>
@@ -154,3 +155,38 @@ export declare type ScheduleSubscriptionType = {
 	}[]
 }
 export declare type ScheduleSubscriptionTypes = { [key: string]: ScheduleSubscriptionType } | {}
+
+export declare type State = {
+	apps: string[],
+	OS: { [key: string]: string },
+	loading: boolean,
+	popup: {
+		text: string,
+		isActive: boolean,
+		isReturned: boolean,
+		answer: boolean,
+		additionFields: PopupAdditionFields,
+		type: string
+	},
+	mainTitle: string,
+	courses: Courses,
+	currentTime: string,
+	promocodes: Promocodes,
+	notifications: Notifications,
+	loadedFiles: { [key: string]: File },
+	defaultCourse: Course,
+	defaultDayItem: CourseDay,
+	defaultTaskItem: CourseDayTask,
+	languages: Object,
+	premiumAppTypes: { [key: string]: string }
+	acceptedImageExtensions: Array<string>
+	imageErrorStatuses: string[]
+	defaultLang: string,
+	commonInfo: UsersInfo
+	defaultContent: Content
+	contentList: ContentList
+}
+
+export declare type PopupAdditionFields = {
+	[key: string]: string
+} | {}
