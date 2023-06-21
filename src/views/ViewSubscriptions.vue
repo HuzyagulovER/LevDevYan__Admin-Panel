@@ -2,6 +2,10 @@
 	<section class="subscriptions">
 		<div class="subscriptions__top-line top-line">
 			<ButtonsPages class="top-line__buttons-pages" />
+
+			<ButtonCreate @click="addSubscription()" class="top-line__button-create">
+				Включить подписку
+			</ButtonCreate>
 		</div>
 		<div class="subscriptions__block active">
 			<p class="subscriptions__subtitle subtitle">Активные</p>
@@ -98,6 +102,7 @@
 </template>
 
 <script setup lang="ts">
+import ButtonCreate from "@add-comps/ButtonCreate.vue";
 import ButtonsPages from "@add-comps/ButtonsPages.vue";
 import IconPencil from "@icons/IconPencil.vue";
 import SubscriptionsItem from "@for-subscriptions/SubscriptionsItem.vue";
@@ -110,11 +115,12 @@ import {
 	Price,
 	ActiveSubscriptions,
 	ScheduleSubscriptionTypes,
+	PopupAdditionFields,
 } from "../../helpers";
 
 const route = useRoute();
 const store = <StoreGeneric>inject("Store");
-const { loading } = storeToRefs(store);
+const { loading, popup } = storeToRefs(store);
 
 const prices: Ref<Prices> = ref({});
 const activeSubscriptions: Ref<ActiveSubscriptions> = ref({});
@@ -123,7 +129,7 @@ const date: Ref<string> = ref(dateForm());
 const app: ComputedRef<string> = computed(() =>
 	route.query.app ? <string>route.query.app : "psy"
 );
-
+const subscriptionId: Ref<string> = ref(<string>route.params.subscriptionId);
 loadData();
 
 watch(
@@ -138,7 +144,6 @@ async function loadData(): Promise<void> {
 	await getScheduleSubscriptions(date.value);
 	loading.value = false;
 }
-
 async function getPrices(): Promise<void> {
 	await store.getPrices(app.value).then((r: Prices) => {
 		prices.value = r;
@@ -172,6 +177,60 @@ function selectDate() {
 	loading.value = true;
 	getScheduleSubscriptions(date.value).then(() => (loading.value = false));
 }
+
+// async function addSubscription(addition_data?: {
+// 	[key: string]: string;
+// }): Promise<void> {
+// 	await store
+// 		.callPopupWithData("", {
+// 			type: "add_subscription",
+// 			prices,
+// 			...addition_data,
+// 		})
+// 		.then(async (r: PopupAdditionFields): Promise<void> => {
+// 			if (Object.hasOwn(r, "user_creds")) {
+// 				await store
+// 					.addSubscription(r["user_creds" as keyof PopupAdditionFields])
+// 					.then(
+// 						(r: boolean): void => {
+// 							store.clearPopup();
+// 							console.log(r);
+// 						},
+// 						(e: any) => {
+// 							console.log(e);
+// 							addSubscription({ error: e.response.data });
+// 						}
+// 					);
+// 			}
+// 		});
+// }
+
+async function addSubscription(addition_data?: {
+	[key: string]: string;
+}): Promise<void> {
+	const prices: Prices = await store.getPrices("both");
+	await store
+		.callPopupWithData("", {
+			type: "add_subscription",
+			prices,
+			...addition_data,
+		})
+		.then((r: PopupAdditionFields): void => {
+			if (Object.hasOwn(r, "user_creds")) {
+				store.addSubscription().then(
+					(r: boolean): void => {
+						console.log(r);
+						store.clearPopup();
+					},
+					async (e: any) => {
+						console.log(e.response.data);
+						await store.clearPopup();
+						addSubscription({ error: e.response.data.error.status });
+					}
+				);
+			}
+		});
+}
 </script>
 
 <style lang="scss" scoped>
@@ -181,7 +240,13 @@ function selectDate() {
 	padding-right: 20rem;
 
 	.top-line {
+		display: flex;
+		align-items: center;
 		margin-bottom: 2rem;
+
+		&__button-create {
+			margin-left: auto;
+		}
 	}
 
 	&__block + &__block {

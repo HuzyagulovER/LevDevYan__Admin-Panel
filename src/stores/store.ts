@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
 import { useCookies, globalCookiesConfig } from 'vue3-cookies';
-import { Course, Promocode, Promocodes, Notifications, CourseToPost, Content, Price, State } from "../../helpers";
+import { Course, Promocode, Promocodes, Notifications, CourseToPost, Content, Price, State, PopupAdditionFields } from "../../helpers";
 import { cloneDeep } from 'lodash';
 import { clearVariable } from '../main';
 import { watch } from 'vue';
@@ -465,6 +465,11 @@ export const Store = defineStore('Store', {
 			this.popup.isActive = true
 			this.popup.additionFields = additionFields && Object.keys(additionFields).length > 0 ? additionFields : {}
 			this.popup.type = additionFields && Object.keys(additionFields).length > 0 && additionFields.type ? additionFields.type : ''
+			if (this.popup.additionFields['error' as keyof PopupAdditionFields])
+				setTimeout(() => {
+					delete this.popup.additionFields['error' as keyof PopupAdditionFields]
+				}, 2000);
+
 			return new Promise((res, rej) => {
 				watch(
 					() => this.popup.isReturned,
@@ -515,6 +520,33 @@ export const Store = defineStore('Store', {
 					console.error(`${e.name}: ${e.message}`);
 				});
 		},
+		async deleteUser(user_creds: string | number): Promise<void> {
+			const fd = new FormData()
+			fd.append('user_creds', user_creds as string);
+			return await axios.post(...formRequest('Users/deleteUser', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					throw e
+				}
+			)
+		},
+		async addSubscription(): Promise<void> {
+			const fd = new FormData()
+			fd.append('user_creds', this.popup.additionFields['user_creds' as keyof PopupAdditionFields] as string);
+			fd.append('sub_app', this.popup.additionFields['sub_app' as keyof PopupAdditionFields] as string);
+			fd.append('sub_type', this.popup.additionFields['sub_type' as keyof PopupAdditionFields] as string);
+			return await axios.post(...formRequest('Users/addSubscription', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					throw e
+				}
+			)
+		},
+
 
 		async getContent(pageName: string, lang: string, contentId: string | null): Promise<void> {
 			this.loading = true

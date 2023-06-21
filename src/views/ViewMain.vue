@@ -121,7 +121,7 @@
 					</div>
 				</div>
 			</div>
-			<button class="home__user-delete" @click="confirmDeletingUser">
+			<button class="home__user-delete" @click="confirmDeletingUser()">
 				<IconTrash class="icon-trash" />
 				<p>Удалить пользователя</p>
 			</button>
@@ -179,14 +179,24 @@ function getUsersData(): void {
 	});
 }
 
-async function confirmDeletingUser(): Promise<void> {
+async function confirmDeletingUser(addition_data?: {
+	[key: string]: string;
+}): Promise<void> {
 	await store
-		.callPopupWithData("", { type: "user_delete" })
-		.then((r: PopupAdditionFields) => {
-			console.log(r);
-
-			if (r) {
-				// store.deleteUser(user_id).then(() => {});
+		.callPopupWithData("", { type: "user_delete", ...addition_data })
+		.then((r: PopupAdditionFields): void => {
+			if (Object.hasOwn(r, "user_creds")) {
+				store.deleteUser(r["user_creds" as keyof PopupAdditionFields]).then(
+					(r: boolean): void => {
+						console.log(r);
+						store.clearPopup();
+					},
+					async (e: any) => {
+						console.log(e.response.data);
+						await store.clearPopup();
+						confirmDeletingUser({ error: e.response.data.error.status });
+					}
+				);
 			}
 		});
 }

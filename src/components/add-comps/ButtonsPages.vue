@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { useRoute } from "vue-router";
-const props = defineProps<{ additionLinksNumber: number }>();
+const props = defineProps<{ additionLinksNumber?: number }>();
 
 const route = useRoute();
 </script>

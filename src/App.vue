@@ -23,11 +23,13 @@
 	<MainLoader v-if="loading" />
 	<Popup />
 	<PopupUserDelete />
+	<PopupSubscriptionActivation />
 </template>
 
 <script setup lang="ts">
 import Popup from "@add-comps/Popup.vue";
 import PopupUserDelete from "@add-comps/PopupUserDelete.vue";
+import PopupSubscriptionActivation from "@add-comps/PopupSubscriptionActivation.vue";
 import TheNavbar from "@comps/TheNavbar.vue";
 import MainLoader from "@add-comps/MainLoader.vue";
 import { computed, inject, watch } from "@vue/runtime-core";
