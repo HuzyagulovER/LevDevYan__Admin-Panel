@@ -30,6 +30,9 @@
 				>
 					<p>{{ premiumAppTypes[notification.premium_app_type] }}</p>
 				</div>
+				<div class="notification__os" v-if="notification.os">
+					<p>{{ OS[notification.os] }}</p>
+				</div>
 			</div>
 			<div class="notification__repeat repeat">
 				<p class="repeat__repeat-times">
@@ -118,7 +121,7 @@ const props = defineProps<{
 const emit = defineEmits(["confirmDeletingActive"]);
 
 const store = <StoreGeneric>inject("Store");
-const { notifications, languages, premiumAppTypes } = storeToRefs(store);
+const { notifications, languages, premiumAppTypes, OS } = storeToRefs(store);
 
 function confirmDeletingActive() {
 	emit("confirmDeletingActive", props.notification.notification_id);
@@ -199,7 +202,8 @@ function updateNotificationState(state: string) {
 	&__date,
 	&__type,
 	&__lang,
-	&__premium-app-type {
+	&__premium-app-type,
+	&__os {
 		background-color: var(--c__light-blue);
 		display: flex;
 		align-items: center;
@@ -222,7 +226,8 @@ function updateNotificationState(state: string) {
 	&__date,
 	&__type,
 	&__lang,
-	&__premium-app-type {
+	&__premium-app-type,
+	&__os {
 		padding: 0 3rem;
 
 		p {
@@ -346,6 +351,7 @@ function updateNotificationState(state: string) {
 
 			& + & {
 				margin-top: 1.5rem;
+				flex-direction: column;
 			}
 
 			& > * {
@@ -415,6 +421,16 @@ function updateNotificationState(state: string) {
 		&__body {
 			font-size: 1.65rem;
 			line-height: 1.7rem;
+		}
+
+		&__texts {
+			flex-direction: column;
+			margin: 0;
+			margin-bottom: 2rem;
+		}
+
+		&__edit {
+			justify-content: flex-end;
 		}
 	}
 }

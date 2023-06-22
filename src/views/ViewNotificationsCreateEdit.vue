@@ -49,7 +49,7 @@
 				class="form__input"
 				:class="{ _error: error.includes('title') }"
 				name="title"
-				:disabled="disabledForm || isAndroid"
+				:disabled="disabledForm"
 				v-model="notification.title"
 				@input="error = clearVariable(error)"
 			/>
@@ -61,7 +61,7 @@
 				name="body"
 				class="form__input"
 				:class="{ _error: error.includes('body') }"
-				:disabled="disabledForm || isAndroid"
+				:disabled="disabledForm"
 				v-model="notification.body"
 				@input="error = clearVariable(error)"
 			/>
@@ -301,8 +301,6 @@ const isNew: Ref<boolean> = ref(true);
 const isImageLoaded: Ref<boolean> = ref(false);
 
 const isAndroid: ComputedRef<boolean> = computed((): boolean => {
-	notification.value.title = "";
-	notification.value.body = "";
 	return notification.value.os === "android";
 });
 
