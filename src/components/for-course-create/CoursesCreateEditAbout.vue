@@ -124,7 +124,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(["saveCourse", "updateCourse"]);
 const store = <StoreGeneric>inject("Store");
-const { loadedFiles, languages, acceptedImageExtensions, imageErrorStatuses } =
+const { loadedFiles, languages, acceptedImageExtensions, fileErrorStatuses } =
 	storeToRefs(store);
 const clearVariable = <Function>inject("clearVariable");
 const isLargeFile: any = inject("isLargeFile");

@@ -5,7 +5,7 @@
 			_error:
 				isLargeImage ||
 				isInvalidExtension ||
-				imageErrorStatuses.indexOf(currentError) !== -1,
+				fileErrorStatuses.indexOf(currentError) !== -1,
 		}"
 	>
 		<div class="file-input__image" v-if="image">
@@ -59,7 +59,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(["displayImage"]);
 const store = <StoreGeneric>inject("Store");
-const { acceptedImageExtensions, imageErrorStatuses } = storeToRefs(store);
+const { acceptedImageExtensions, fileErrorStatuses } = storeToRefs(store);
 const isLargeFile: any = inject("isLargeFile");
 const maxFileSizeText: any = inject("maxFileSizeText");
 const isAcceptedExtension: any = inject("isAcceptedExtension");

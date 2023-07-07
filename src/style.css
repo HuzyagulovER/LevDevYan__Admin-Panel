@@ -105,6 +105,11 @@ select {
 	pointer-events: none;
 }
 
+.checkbox-container {
+	display: flex;
+	align-items: center;
+}
+
 * ::-webkit-scrollbar {
 	width: .5rem;
 }

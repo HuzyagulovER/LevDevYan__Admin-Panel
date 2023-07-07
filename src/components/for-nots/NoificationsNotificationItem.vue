@@ -33,6 +33,9 @@
 				<div class="notification__os" v-if="notification.os">
 					<p>{{ OS[notification.os] }}</p>
 				</div>
+				<div class="notification__test" v-if="notification.is_test">
+					<p>Тест</p>
+				</div>
 			</div>
 			<div class="notification__repeat repeat">
 				<p class="repeat__repeat-times">
@@ -192,6 +195,7 @@ function updateNotificationState(state: string) {
 	&__wrapper {
 		display: flex;
 		align-self: stretch;
+		flex-wrap: wrap;
 
 		div + div {
 			margin-left: 2rem;
@@ -203,7 +207,8 @@ function updateNotificationState(state: string) {
 	&__type,
 	&__lang,
 	&__premium-app-type,
-	&__os {
+	&__os,
+	&__test {
 		background-color: var(--c__light-blue);
 		display: flex;
 		align-items: center;
@@ -219,7 +224,8 @@ function updateNotificationState(state: string) {
 		}
 	}
 
-	&__time {
+	&__time,
+	&__test {
 		padding: 0 2rem;
 	}
 
@@ -286,6 +292,7 @@ function updateNotificationState(state: string) {
 		&__repeat-times {
 			font-size: 1.5rem;
 			margin-right: 1rem;
+			margin-left: 1rem;
 		}
 	}
 

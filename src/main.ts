@@ -26,6 +26,8 @@ export function clearVariable(variable: any): any {
 
 export const maxFileSize: number = 1048576;
 export const maxFileSizeText: string = formatBytes(maxFileSize);
+export const maxMediaSize: number = 1048576 * 20;
+export const maxMediaSizeText: string = formatBytes(maxMediaSize);
 
 function formatBytes(bytes: number, decimals: number = 2) {
 	if (!+bytes) return '0 B'
@@ -41,8 +43,8 @@ function formatBytes(bytes: number, decimals: number = 2) {
 
 export function isLargeFile(e: Event & {
 	currentTarget: HTMLInputElement
-}) {
-	return (e.currentTarget.files && e.currentTarget.files[0].size > 2097152) ? true : false
+}, maxSize: number = maxFileSize * 2) {
+	return (e.currentTarget.files && e.currentTarget.files[0].size > maxSize) ? true : false
 }
 
 export function isAcceptedExtension(e: Event & {
@@ -82,6 +84,8 @@ app
 	.provide('isLargeFile', isLargeFile)
 	.provide('maxFileSize', maxFileSize)
 	.provide('maxFileSizeText', maxFileSizeText)
+	.provide('maxMediaSize', maxMediaSize)
+	.provide('maxMediaSizeText', maxMediaSizeText)
 	.provide('isAcceptedExtension', isAcceptedExtension)
 	.use(router)
 	.mount('#app')

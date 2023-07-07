@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios';
 import { useCookies, globalCookiesConfig } from 'vue3-cookies';
-import { Course, Promocode, Promocodes, Notifications, CourseToPost, Content, Price, State, PopupAdditionFields } from "../../helpers";
+import { Course, Promocode, Promocodes, Notifications, CourseToPost, Content, Price, State, PopupAdditionFields, StringObject } from "../../helpers";
 import { cloneDeep } from 'lodash';
 import { clearVariable } from '../main';
 import { watch } from 'vue';
@@ -80,7 +80,8 @@ const monthNames: ReadonlyArray<string> = [
 export const Store = defineStore('Store', {
 	state: (): State => (
 		{
-			apps: ['PSY', 'Avocado'],
+			activeApp: 'psy',
+			apps: { psy: 'PSY', avocado: 'Avocado' },
 			OS: {
 				android: "Android",
 				iOS: "iOS",
@@ -149,9 +150,13 @@ export const Store = defineStore('Store', {
 				".ico",
 				".webp",
 			],
-			imageErrorStatuses: [
+			fileErrorStatuses: [
 				'FILE_SIZE_EXCEEDED',
 				'INVALID_FILE_EXTENSION'
+			],
+			acceptedMediaExtensions: [
+				".mp3",
+				".mp4",
 			],
 
 			defaultLang: '',
@@ -178,7 +183,7 @@ export const Store = defineStore('Store', {
 			defaultContent: {
 				id: "",
 				title: "",
-				image: '',
+				image: "",
 				app: "",
 				type: "",
 				lang: "",
@@ -460,7 +465,7 @@ export const Store = defineStore('Store', {
 			this.popup = cloneDeep(clearVariable(this.popup))
 		},
 
-		async callPopup(text: string, additionFields?: { [key: string]: string }): Promise<boolean> {
+		async callPopup(text: string, additionFields?: StringObject): Promise<boolean> {
 			this.popup.text = text
 			this.popup.isActive = true
 			this.popup.additionFields = additionFields && Object.keys(additionFields).length > 0 ? additionFields : {}
@@ -480,8 +485,8 @@ export const Store = defineStore('Store', {
 			})
 		},
 
-		async callPopupWithData(text: string, additionFields: { [key: string]: string }): Promise<{ [key: string]: string }> {
-			return this.callPopup(text, additionFields).then((r: boolean): Promise<{ [key: string]: string }> => {
+		async callPopupWithData(text: string, additionFields: StringObject): Promise<StringObject> {
+			return this.callPopup(text, additionFields).then((r: boolean): Promise<StringObject> => {
 				return new Promise((res, rej) => {
 					if (r) res(additionFields)
 				})
@@ -501,7 +506,7 @@ export const Store = defineStore('Store', {
 			)
 		},
 
-		async getUsersData(filters: { [key: string]: string }): Promise<void> {
+		async getUsersData(filters: StringObject): Promise<void> {
 			let filtersFormData = new FormData();
 			for (const filter in filters) {
 				filtersFormData.append(filter, filters[filter])

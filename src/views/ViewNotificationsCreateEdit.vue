@@ -35,7 +35,7 @@
 						class="form__input"
 						:class="{ _error: error.includes('date') }"
 						name="date"
-						:disabled="disabledForm || notification.repeat_times !== 1"
+						:disabled="!isEnabledDate"
 						v-model="notification.date"
 						@input="error = clearVariable(error)"
 					/>
@@ -229,13 +229,28 @@
 				@input="error = clearVariable(error)"
 			/>
 
+			<div class="form__input-container input-container checkbox-container">
+				<input
+					type="checkbox"
+					id="is_test"
+					name="is_test"
+					:class="{ _error: error.includes('is_test') }"
+					:disabled="disabledForm"
+					v-model="notification.is_test"
+					class="form__checkbox"
+					@input="error = clearVariable(error)"
+				/>
+				<label for="is_test" class="form__label">Тестовое уведомление</label>
+			</div>
+
 			<div class="form__input-container input-container">
 				<div class="input-container__wrapper">
 					<ButtonColored
 						type="submit"
 						:disabled="disabledForm"
 						class="form__button"
-					></ButtonColored>
+					>
+					</ButtonColored>
 				</div>
 			</div>
 		</form>
@@ -263,9 +278,10 @@ const {
 	premiumAppTypes,
 	languages,
 	acceptedImageExtensions,
-	imageErrorStatuses,
+	fileErrorStatuses,
 	apps,
 	OS,
+	activeApp,
 } = storeToRefs(store);
 const clearVariable = <Function>inject("clearVariable");
 const route = useRoute();
@@ -291,6 +307,7 @@ const notification: Ref<Notification> = ref({
 	days_without_subscription: 0,
 	os: "",
 	info: "",
+	is_test: false,
 });
 
 const disabledForm: Ref<boolean> = ref(false);
@@ -299,6 +316,7 @@ const image: Ref<string> = ref("");
 const currentError: Ref<string> = ref("");
 const isNew: Ref<boolean> = ref(true);
 const isImageLoaded: Ref<boolean> = ref(false);
+const isEnabledDate: Ref<boolean> = ref(false);
 
 const isAndroid: ComputedRef<boolean> = computed((): boolean => {
 	return notification.value.os === "android";
@@ -313,19 +331,42 @@ if (route.params.notificationId !== "new") {
 		if (Array.isArray(r)) {
 			router.replace({ path: "/notifications" });
 		}
+
+		const n: Notification = cloneDeep(
+			<Notification>(
+				(r as Notifications)[route.params.notificationId as keyof Notifications]
+			)
+		);
+
 		notification.value = cloneDeep(
 			<Notification>(
 				(r as Notifications)[route.params.notificationId as keyof Notifications]
 			)
 		);
+
+		isEnabledDate.value =
+			!disabledForm.value &&
+			(+notification.value.repeat_times === 1 ||
+				((!!notification.value.date ||
+					notification.value.date === "0000-00-00") &&
+					+notification.value.repeat_times === -1));
+
 		image.value = <string>notification.value.image;
 	});
+} else {
+	notification.value.app = activeApp.value;
+	console.log(notification.value);
 }
 
 watch(
 	() => notification.value.repeat_times,
 	() => {
-		if (notification.value.repeat_times !== 1) notification.value.date = "";
+		isEnabledDate.value =
+			!disabledForm.value &&
+			(+notification.value.repeat_times === 1 ||
+				((!!notification.value.date ||
+					notification.value.date === "0000-00-00") &&
+					+notification.value.repeat_times === -1));
 	}
 );
 
@@ -367,6 +408,8 @@ function notificationChangeHandler(e: Event): void {
 	}
 
 	loading.value = true;
+
+	if (!fd.get("is_test")) fd.append("is_test", "off");
 
 	if (isNew.value) {
 		store

@@ -12,6 +12,13 @@
 			</div>
 
 			<div class="content-item__info info">
+				<p class="info__title">
+					<span>Content ID</span>: {{ content.content_id }}
+				</p>
+				<p class="info__title"><span>ID</span>: {{ content.id }}</p>
+				<p class="info__title" v-if="!apps[content.app]">
+					<span>Приложение</span>: {{ content.app }}
+				</p>
 				<p class="info__title"><span>Название</span>: {{ content.title }}</p>
 				<p class="info__type"><span>Тип</span>: {{ content.type }}</p>
 				<p class="info__text">
@@ -39,16 +46,17 @@
 <script setup lang="ts">
 import IconTrash from "@icons/IconTrash.vue";
 import { inject, ref, Ref } from "@vue/runtime-core";
-import { StateTree } from "pinia";
+import { StateTree, StoreGeneric, storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 import { Content } from "../../../helpers";
 
-const store = <StateTree>inject("Store");
+const store = <StoreGeneric>inject("Store");
 const props = defineProps<{
 	contentId: string;
 	content: Content;
 }>();
 const emit = defineEmits(["confirmDeleteContent"]);
+const { apps } = storeToRefs(store);
 
 function confirmDeleteContent() {
 	emit("confirmDeleteContent", props.contentId);
@@ -62,7 +70,7 @@ function confirmDeleteContent() {
 	padding: 2.3rem;
 	border: 0.25rem solid var(--c__light-violet);
 	border-radius: 1.8rem;
-	height: 13.5rem;
+	// height: 13.5rem;
 
 	& + & {
 		margin-top: 1.7rem;
@@ -79,8 +87,8 @@ function confirmDeleteContent() {
 		justify-content: center;
 		align-items: center;
 		aspect-ratio: 26/11;
-		height: 100%;
-		width: auto;
+		height: 7rem;
+		width: 18rem;
 		overflow: hidden;
 		border-radius: 0.8rem;
 

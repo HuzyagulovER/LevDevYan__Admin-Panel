@@ -34,12 +34,14 @@ import TheNavbar from "@comps/TheNavbar.vue";
 import MainLoader from "@add-comps/MainLoader.vue";
 import { computed, inject, watch } from "@vue/runtime-core";
 import { ComputedRef, Ref, ref } from "@vue/reactivity";
-import { RouterView, useRoute } from "vue-router";
+import { RouterView, useRoute, useRouter } from "vue-router";
 import { StoreGeneric, storeToRefs } from "pinia";
+import { StringObject } from "../helpers";
 
 const route = useRoute();
+const router = useRouter();
 const store = <StoreGeneric>inject("Store");
-const { loading, mainTitle, popup } = storeToRefs(store);
+const { loading, mainTitle, popup, apps, activeApp } = storeToRefs(store);
 
 store.updateTime();
 let idSignIn: ComputedRef<boolean> = computed(() => route.path !== "/sign-in");
@@ -95,6 +97,15 @@ const isMobile: any = () => {
 	};
 };
 if (isMobile().isApple()) document.body.classList.add("apple");
+
+watch(
+	() => route.query.app,
+	() => {
+		if (route.query.app && apps.value[route.query.app as keyof StringObject]) {
+			activeApp.value = route.query.app;
+		}
+	}
+);
 </script>
 
 <style lang="scss">

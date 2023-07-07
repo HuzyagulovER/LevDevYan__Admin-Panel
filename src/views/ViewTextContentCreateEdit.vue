@@ -26,8 +26,22 @@
 			/>
 
 			<label for="input_app" class="form__label">Приложение</label>
-			<div class="select-container">
-				<select
+			<input
+				id="input_app"
+				name="app"
+				type="text"
+				list="input_app_datalist"
+				class="form__input"
+				:class="{ _error: error.includes('app') }"
+				v-model="activeContent.app"
+				:disabled="disabledForm"
+			/>
+			<datalist id="input_app_datalist">
+				<option v-for="app in apps" :key="app">
+					{{ app }}
+				</option>
+			</datalist>
+			<!-- <select
 					id="input_app"
 					name="app"
 					class="form__input"
@@ -35,12 +49,8 @@
 					v-model="activeContent.app"
 					:disabled="disabledForm"
 				>
-					<option v-for="app in apps" :key="app" :value="app.toLowerCase()">
-						{{ app }}
-					</option>
 					<option value="other">Другое</option>
-				</select>
-			</div>
+				</select> -->
 
 			<label for="input_lang" class="form__label">Язык</label>
 			<div class="select-container">
@@ -63,7 +73,7 @@
 				id="input_type"
 				type="text"
 				class="form__input"
-				:class="{ _error: error.includes('text') }"
+				:class="{ _error: error.includes('type') }"
 				name="type"
 				:disabled="disabledForm"
 				v-model="activeContent.type"
@@ -96,16 +106,29 @@
 					>
 						<div class="text__top-line">
 							<label class="form__label">Текст {{ i + 1 }}</label>
+							<InputMedia
+								class="form__media-input"
+								:media="activeContent.texts[j].media"
+								:name="'content_media_' + j"
+								:currentError="currentError"
+								:disabled="disabledForm"
+								@display-media="displayMedia($event, j)"
+							/>
+						</div>
+						<div class="text__delete">
 							<IconTrash
 								class="text__icon icon-trash"
 								@click="confirmDeleteText(j)"
 							/>
 						</div>
-						<div class="text__wrapper">
+						<!-- <div class="text__wrapper"> -->
+						<div>
 							<textarea
 								class="form__textarea text__textarea"
 								v-model="activeContent.texts[j].text"
 							></textarea>
+						</div>
+						<div>
 							<InputImage
 								class="text__file-input"
 								:image="activeContent.texts[j].image"
@@ -136,6 +159,7 @@ import OpeningList from "@add-comps/OpeningList.vue";
 import IconCorner from "@icons/IconCorner.vue";
 import ButtonColored from "@add-comps/ButtonColored.vue";
 import InputImage from "@add-comps/InputImage.vue";
+import InputMedia from "@add-comps/InputMedia.vue";
 import ButtonCreate from "@/components/add-comps/ButtonCreate.vue";
 import { useRoute, useRouter } from "vue-router";
 import {
@@ -169,12 +193,13 @@ const {
 	languages,
 	apps,
 	loadedFiles,
+	activeApp,
 } = storeToRefs(store);
 const route = useRoute();
 const router = useRouter();
 
+const requiredFields: ReadonlyArray<string> = ["title", "app", "type"];
 const disabledForm: Ref<boolean> = ref(false);
-const isOpenedPage: boolean = <boolean>router.options.history.state.replaced;
 const activeContent: Ref<Content> = ref(cloneDeep(defaultContent.value));
 const page: ComputedRef<string> = computed(() => {
 	return route.path.split("/")[route.path.split("/").length - 1];
@@ -182,16 +207,22 @@ const page: ComputedRef<string> = computed(() => {
 const currentError: Ref<string> = ref("");
 const error: Ref<Array<string>> = ref([]);
 const image: Ref<string> = ref("");
+const media: Ref<string> = ref("");
 const isNew: Ref<boolean> = ref(true);
 const opened: Ref<boolean> = ref(false);
 const isImageLoaded: Ref<boolean> = ref(false);
+const isMediaLoaded: Ref<boolean> = ref(false);
 const imagesCount: Ref<number> = ref(0);
+const mediaCount: Ref<number> = ref(0);
 
 if (route.params.contentId === "new") {
 	mainTitle.value = "Создание контента";
 	onMounted(() => {
 		changeLang(Object.keys(languages.value)[0]);
 	});
+
+	activeContent.value.app =
+		activeApp.value !== "" ? apps.value[activeApp.value] : activeApp.value;
 } else {
 	isNew.value = false;
 	mainTitle.value = "Редактирование контента";
@@ -204,6 +235,11 @@ if (route.params.contentId === "new") {
 			activeContent.value = <Content>(
 				r[route.params.contentId as keyof ContentList]
 			);
+
+			if (apps.value[activeContent.value.app]) {
+				activeContent.value.app = apps.value[activeContent.value.app];
+			}
+
 			image.value = activeContent.value.image;
 		});
 }
@@ -243,6 +279,21 @@ function displayImage(isImage: boolean, id: string | number): void {
 	}
 }
 
+function displayMedia(isMedia: boolean, id: string | number): void {
+	isMediaLoaded.value = isMedia;
+	isMedia ? mediaCount.value++ : mediaCount.value--;
+
+	if (id === "content_media") {
+		if (!isMedia) {
+			media.value = "";
+		}
+	} else {
+		if (!isMedia) {
+			activeContent.value.texts[id].media = "";
+		}
+	}
+}
+
 function contentChangeHandler(e: Event): void {
 	const fd: FormData = new FormData(e.target as HTMLFormElement);
 
@@ -256,6 +307,35 @@ function contentChangeHandler(e: Event): void {
 			}
 		}
 	}
+
+	if (isMediaLoaded.value) {
+		for (const [name, value] of fd) {
+			if (typeof value === "object" && (value as File).size) {
+				loadedFiles.value[name] = fd.get(name);
+			}
+		}
+	}
+
+	requiredFields.forEach((field) => {
+		if (
+			activeContent.value.hasOwnProperty(field as keyof Content) &&
+			activeContent.value[field as keyof Content] === ""
+		)
+			error.value.push(field);
+	});
+
+	if (error.value.length) {
+		disabledForm.value = false;
+		loading.value = false;
+		setTimeout(() => {
+			error.value = clearVariable(error.value);
+		}, 2000);
+		return;
+	}
+
+	const pushContent: Content = activeContent.value;
+
+	pushContent.app = pushContent.app.toLowerCase();
 
 	if (isNew.value) {
 		store
@@ -290,6 +370,7 @@ async function createNewText(): Promise<void> {
 	activeContent.value.texts[hash] = {
 		text: "",
 		image: "",
+		media: "",
 	};
 	opened.value = true;
 }
@@ -340,11 +421,24 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 			}
 
 			.text {
+				display: grid;
+				grid-template: auto / 4fr 1fr;
+				gap: 0.5rem 2rem;
+
 				&__top-line {
 					display: flex;
 					justify-content: space-between;
 					align-items: center;
-					margin-bottom: 0.5rem;
+					// margin-bottom: 0.5rem;
+
+					.form__label {
+						width: auto;
+					}
+				}
+
+				&__delete {
+					display: flex;
+					justify-content: flex-end;
 				}
 
 				&__wrapper {
@@ -391,6 +485,34 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 			p {
 				font-size: 1.5rem;
 				margin-right: 1rem;
+			}
+		}
+	}
+
+	@media screen and (max-width: $mobile--breakpoint) {
+		.form {
+			&__label {
+				white-space: nowrap;
+				margin-right: 1.5rem;
+				margin-bottom: 0;
+			}
+
+			.texts {
+				.text {
+					grid-template: auto/1fr;
+					position: relative;
+					padding-top: 2.8rem;
+
+					&__file-input {
+						box-sizing: border-box;
+					}
+
+					&__delete {
+						position: absolute;
+						top: 0;
+						right: 0;
+					}
+				}
 			}
 		}
 	}

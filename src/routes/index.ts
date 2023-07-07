@@ -112,7 +112,8 @@ const routes: Array<RouteRecordRawWithMeta> = [
 			title: "Все уведомления",
 			nav_icon: IconNotifications,
 			nav_title: 'Уведомления',
-			isNav: true
+			isNav: true,
+			variative: true,
 		},
 	},
 	{
@@ -139,7 +140,8 @@ const routes: Array<RouteRecordRawWithMeta> = [
 			title: "Контент",
 			nav_icon: IconText,
 			nav_title: "Контент",
-			isNav: true
+			isNav: true,
+			variative: true,
 		},
 	},
 	{
@@ -155,7 +157,8 @@ const routes: Array<RouteRecordRawWithMeta> = [
 			title: "Подписки",
 			nav_icon: IconSubscription,
 			nav_title: "Подписки",
-			isNav: true
+			isNav: true,
+			variative: true,
 		},
 	},
 	{

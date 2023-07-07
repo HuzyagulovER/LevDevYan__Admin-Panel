@@ -1,3 +1,5 @@
+import { RouteComponent } from "vue-router"
+
 export declare type Course = {
 	id?: number,
 	course_id?: any,
@@ -23,7 +25,7 @@ export declare interface Notification {
 	body?: string,
 	type?: string,
 	time: string,
-	date: string,
+	date?: string,
 	app: string,
 	state?: boolean | number,
 	repeat_times: number,
@@ -34,6 +36,7 @@ export declare interface Notification {
 	image?: string
 	os?: string
 	info?: string
+	is_test?: boolean
 }
 export declare type Notifications = Array<Notification> | Array<null>
 
@@ -109,6 +112,7 @@ export declare type UsersInfo = {
 
 export declare type Content = {
 	id: string
+	content_id?: string
 	title: string
 	image: string
 	app: string
@@ -119,6 +123,7 @@ export declare type Content = {
 export declare type ContentText = {
 	text: string
 	image: string
+	media?: string
 }
 export declare type ContentList = { [key: string]: Content } | {}
 
@@ -157,8 +162,9 @@ export declare type ScheduleSubscriptionType = {
 export declare type ScheduleSubscriptionTypes = { [key: string]: ScheduleSubscriptionType } | {}
 
 export declare type State = {
-	apps: string[],
-	OS: { [key: string]: string },
+	activeApp: string,
+	apps: StringObject,
+	OS: StringObject,
 	loading: boolean,
 	popup: {
 		text: string,
@@ -178,9 +184,10 @@ export declare type State = {
 	defaultDayItem: CourseDay,
 	defaultTaskItem: CourseDayTask,
 	languages: Object,
-	premiumAppTypes: { [key: string]: string }
+	premiumAppTypes: StringObject
 	acceptedImageExtensions: Array<string>
-	imageErrorStatuses: string[]
+	fileErrorStatuses: string[]
+	acceptedMediaExtensions: Array<string>
 	defaultLang: string,
 	commonInfo: UsersInfo
 	defaultContent: Content
@@ -190,3 +197,13 @@ export declare type State = {
 export declare type PopupAdditionFields = {
 	[key: string]: string
 } | {}
+
+export declare type StringObject = { [key: string]: string }
+
+export declare type Link = {
+	to: string
+	name: string
+	nav_title: string
+	nav_icon: RouteComponent | string
+	variative?: boolean
+}

@@ -490,6 +490,18 @@ async function addSubscription(addition_data?: {
 				}
 			}
 		}
+
+		.top-line {
+			display: grid;
+			grid-template: 1fr 1fr / repeat(6, 1fr);
+			gap: 1.5rem 2.5rem;
+			height: auto;
+
+			&__button-create {
+				width: 100%;
+				grid-column: 2/6;
+			}
+		}
 	}
 }
 </style>

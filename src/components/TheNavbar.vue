@@ -31,7 +31,10 @@
 					:key="j"
 					:data-page="activeNavPage === link.name"
 				>
-					<RouterLink class="pages__link" :to="link.to">
+					<RouterLink
+						class="pages__link"
+						:to="link.to + (link.variative ? '?app=' + activeApp : '')"
+					>
 						<div class="pages__icon">
 							<component :is="link.nav_icon" />
 						</div>
@@ -71,20 +74,16 @@ import {
 } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useCookies } from "vue3-cookies";
+import { StringObject, Link } from "../../helpers";
+import { String } from "lodash";
 
 const router = useRouter();
 const route = useRoute();
 const { cookies } = useCookies();
 
 const store = <StoreGeneric>inject("Store");
-const { popup } = storeToRefs(store);
+const { popup, activeApp } = storeToRefs(store);
 
-interface Link {
-	to: string;
-	name: string;
-	nav_title: string;
-	nav_icon: RouteComponent | string;
-}
 const links: ReadonlyArray<Link> = router.options.routes
 	.filter((r) => {
 		return r.meta?.isNav;
@@ -95,6 +94,7 @@ const links: ReadonlyArray<Link> = router.options.routes
 			to: <string>r.path,
 			nav_icon: <string>(!r.meta ? "" : r.meta.nav_icon),
 			nav_title: <string>(!r.meta ? "" : r.meta.nav_title),
+			variative: <boolean>(!r.meta ? false : r.meta.variative),
 		};
 	});
 

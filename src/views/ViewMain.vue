@@ -136,12 +136,12 @@ import MainInfoItem from "@for-main/MainInfoItem.vue";
 import TheMainBanner from "@for-main/TheMainBanner.vue";
 import { inject, Ref, ref, watch } from "vue";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { PopupAdditionFields } from "../../helpers";
+import { PopupAdditionFields, StringObject } from "../../helpers";
 
 const store = <StoreGeneric>inject("Store");
 const { loading, commonInfo } = storeToRefs(store);
 
-const selections: Array<{ [key: string]: string }> = [
+const selections: Array<StringObject> = [
 	{
 		text: "Все",
 		value: "all",
@@ -155,7 +155,7 @@ const selections: Array<{ [key: string]: string }> = [
 		value: "apple",
 	},
 ];
-const filters: Ref<{ [key: string]: string }> = ref({
+const filters: Ref<StringObject> = ref({
 	users: "all",
 	subs: "all",
 });
@@ -298,7 +298,7 @@ async function confirmDeletingUser(addition_data?: {
 		width: auto;
 		height: auto;
 		padding: 0.8rem 2rem;
-		border: 0.1rem solid #000;
+		border: 0.1rem solid var(--c__violet);
 		border-radius: 1.2rem;
 		background-color: #fff;
 		cursor: pointer;
