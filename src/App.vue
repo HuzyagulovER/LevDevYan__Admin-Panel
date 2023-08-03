@@ -22,12 +22,14 @@
 	</main>
 	<MainLoader v-if="loading" />
 	<Popup />
+	<InfoPopup />
 	<PopupUserDelete />
 	<PopupSubscriptionActivation />
 </template>
 
 <script setup lang="ts">
 import Popup from "@add-comps/Popup.vue";
+import InfoPopup from "@add-comps/InfoPopup.vue";
 import PopupUserDelete from "@add-comps/PopupUserDelete.vue";
 import PopupSubscriptionActivation from "@add-comps/PopupSubscriptionActivation.vue";
 import TheNavbar from "@comps/TheNavbar.vue";
@@ -130,6 +132,7 @@ watch(
 
 		&__title {
 			flex: 1;
+
 			font: {
 				size: 2rem;
 				family: "Montserrat";

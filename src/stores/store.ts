@@ -95,6 +95,11 @@ export const Store = defineStore('Store', {
 				additionFields: [],
 				type: ''
 			},
+			info_popup: {
+				text: '',
+				isActive: false,
+				additionFields: [],
+			},
 			mainTitle: '',
 			courses: {},
 			currentTime: '',
@@ -461,10 +466,6 @@ export const Store = defineStore('Store', {
 			)
 		},
 
-		clearPopup() {
-			this.popup = cloneDeep(clearVariable(this.popup))
-		},
-
 		async callPopup(text: string, additionFields?: StringObject): Promise<boolean> {
 			this.popup.text = text
 			this.popup.isActive = true
@@ -483,6 +484,19 @@ export const Store = defineStore('Store', {
 					}
 				)
 			})
+		},
+
+		clearPopup() {
+			this.popup = cloneDeep(clearVariable(this.popup))
+		},
+
+		callInfoPopup(text: string, additionFields?: StringObject): void {
+			this.info_popup.text = text
+			this.info_popup.isActive = true
+			this.info_popup.additionFields = additionFields && Object.keys(additionFields).length > 0 ? additionFields : {}
+			setTimeout(() => {
+				this.info_popup = cloneDeep(clearVariable(this.info_popup))
+			}, 2000);
 		},
 
 		async callPopupWithData(text: string, additionFields: StringObject): Promise<StringObject> {
@@ -553,7 +567,7 @@ export const Store = defineStore('Store', {
 		},
 
 
-		async getContent(pageName: string, lang: string, contentId: string | null): Promise<void> {
+		async getContent(pageName: string, lang: string, contentId: string | null, contentType?: string): Promise<void> {
 			this.loading = true
 			const contentIdFD = new FormData()
 			if (pageName) {
@@ -565,11 +579,28 @@ export const Store = defineStore('Store', {
 			if (contentId) {
 				contentIdFD.append('content_ids', JSON.stringify([contentId]))
 			}
+			if (contentType) {
+				contentIdFD.append('content_type', contentType)
+			}
 
 			return await axios.post(...formRequest('Content/getContent', contentIdFD) as [string])
 				.then(r => {
 					this.loading = false
 					this.contentList = r.data.data
+					return r.data.data
+				})
+				.catch(e => {
+					console.error(`${e.name}: ${e.message}`);
+				})
+		},
+		async getTypes(pageName: string): Promise<string[]> {
+			this.loading = true
+			const pageNameFD = new FormData()
+			pageNameFD.append('app', pageName)
+
+			return await axios.post(...formRequest('Content/getTypes', pageNameFD) as [string])
+				.then(r => {
+					this.loading = false
 					return r.data.data
 				})
 				.catch(e => {

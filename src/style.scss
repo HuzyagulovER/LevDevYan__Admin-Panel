@@ -2,6 +2,7 @@ $mobile--breakpoint: 800px;
 
 $file-input-color: #dbd4ff;
 $input-error-color: #ff4545;
+$input-success-color: #2ee201;
 
 .form {
 	display: flex;
@@ -107,12 +108,13 @@ $input-error-color: #ff4545;
 		margin-right: 0.5rem;
 	}
 
-	&__checkbox + &__label {
+	&__checkbox+&__label {
 		margin-bottom: 0;
 	}
 
 	&__label {
 		margin-bottom: 0.5rem;
+
 		font: {
 			family: "Mazzard SemiBold";
 			size: 1.6rem;
@@ -129,9 +131,11 @@ $input-error-color: #ff4545;
 	&__textarea {
 		border: 0.1rem solid #999999;
 		border-radius: 0.6rem;
+
 		font: {
 			size: 1.25rem;
 		}
+
 		height: 3rem;
 		padding: 0 1rem;
 	}
@@ -166,7 +170,8 @@ $input-error-color: #ff4545;
 		flex-direction: column;
 
 		margin-bottom: 1.2rem;
-		& > .form__input {
+
+		&>.form__input {
 			margin-bottom: 0;
 		}
 	}
@@ -176,6 +181,7 @@ $input-error-color: #ff4545;
 
 		&__label {
 			margin-bottom: 0.5rem;
+
 			font: {
 				size: 2.2rem;
 			}
@@ -186,6 +192,7 @@ $input-error-color: #ff4545;
 			font: {
 				size: 1.7rem;
 			}
+
 			padding: 0.8rem 1rem;
 			height: auto;
 		}
@@ -209,6 +216,7 @@ $input-error-color: #ff4545;
 
 .subtitle {
 	margin-bottom: 1rem;
+
 	font: {
 		size: 2rem;
 		family: var(--f__mazzard-sb);

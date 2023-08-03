@@ -1,41 +1,16 @@
 <template>
 	<section class="content-create-edit">
-		<form
-			class="content-create-edit__form form"
-			@submit.prevent="contentChangeHandler"
-		>
-			<InputImage
-				class="form__file-input"
-				:image="image"
-				:name="'content_image'"
-				:currentError="currentError"
-				:disabled="disabledForm"
-				@display-image="displayImage($event, 'content_image')"
-			/>
+		<form class="content-create-edit__form form" @submit.prevent="contentChangeHandler">
+			<InputImage class="form__file-input" :image="image" :name="'content_image'" :currentError="currentError"
+				:disabled="disabledForm" @display-image="displayImage($event, 'content_image')" />
 
 			<label for="input_title" class="form__label">Название</label>
-			<input
-				id="input_title"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('title') }"
-				name="title"
-				:disabled="disabledForm"
-				v-model="activeContent.title"
-				@input="error = clearVariable(error)"
-			/>
+			<input id="input_title" type="text" class="form__input" :class="{ _error: error.includes('title') }" name="title"
+				:disabled="disabledForm" v-model="activeContent.title" @input="error = clearVariable(error)" />
 
 			<label for="input_app" class="form__label">Приложение</label>
-			<input
-				id="input_app"
-				name="app"
-				type="text"
-				list="input_app_datalist"
-				class="form__input"
-				:class="{ _error: error.includes('app') }"
-				v-model="activeContent.app"
-				:disabled="disabledForm"
-			/>
+			<input id="input_app" name="app" type="text" list="input_app_datalist" class="form__input"
+				:class="{ _error: error.includes('app') }" v-model="activeContent.app" :disabled="disabledForm" />
 			<datalist id="input_app_datalist">
 				<option v-for="app in apps" :key="app">
 					{{ app }}
@@ -54,14 +29,8 @@
 
 			<label for="input_lang" class="form__label">Язык</label>
 			<div class="select-container">
-				<select
-					id="input_lang"
-					name="lang"
-					class="form__input"
-					:class="{ _error: error.includes('lang') }"
-					v-model="activeContent.lang"
-					:disabled="disabledForm"
-				>
+				<select id="input_lang" name="lang" class="form__input" :class="{ _error: error.includes('lang') }"
+					v-model="activeContent.lang" :disabled="disabledForm">
 					<option v-for="(language, j) in languages" :key="j" :value="j">
 						{{ language }}
 					</option>
@@ -69,85 +38,47 @@
 			</div>
 
 			<label for="input_type" class="form__label">Тип</label>
-			<input
-				id="input_type"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('type') }"
-				name="type"
-				:disabled="disabledForm"
-				v-model="activeContent.type"
-				@input="error = clearVariable(error)"
-			/>
+			<input id="input_type" type="text" class="form__input" :class="{ _error: error.includes('type') }" name="type"
+				:disabled="disabledForm" v-model="activeContent.type" @input="error = clearVariable(error)" />
 
 			<div class="form__texts-top-line justify-space-between">
-				<ButtonCreate
-					class="form__button-create"
-					@click.prevent="createNewText"
-				>
+				<ButtonCreate class="form__button-create" @click.prevent="createNewText">
 					Добавить текст
 				</ButtonCreate>
 
-				<div
-					class="form__texts-toggler texts-toggler"
-					:class="{ opened: opened }"
-				>
+				<div class="form__texts-toggler texts-toggler" :class="{ opened: opened }">
 					<p>Текст ({{ Object.keys(activeContent.texts).length }})</p>
 					<IconCorner class="texts-toggler__corner" @click="toggleTexts" />
 				</div>
 			</div>
 
 			<OpeningList class="form__texts texts" :isOpen="opened">
-				<TransitionGroup tag="div" name="list">
-					<div
-						class="texts__text text"
-						v-for="(text, j, i) in activeContent.texts"
-						:key="j"
-					>
+				<TransitionGroup tag="div" name="list" class="texts__container">
+					<div class="texts__text text" v-for="(text, j, i) in activeContent.texts" :key="j">
 						<div class="text__top-line">
 							<label class="form__label">Текст {{ i + 1 }}</label>
-							<InputMedia
-								class="form__media-input"
-								:media="activeContent.texts[j].media"
-								:name="'content_media_' + j"
-								:currentError="currentError"
-								:disabled="disabledForm"
-								@display-media="displayMedia($event, j)"
-							/>
+							<InputMedia class="form__media-input" :media="activeContent.texts[j].media"
+								:name="'content_media_' + j" :currentError="currentError" :disabled="disabledForm"
+								@display-media="displayMedia($event, j)" />
 						</div>
 						<div class="text__delete">
-							<IconTrash
-								class="text__icon icon-trash"
-								@click="confirmDeleteText(j)"
-							/>
-						</div>
-						<!-- <div class="text__wrapper"> -->
-						<div>
-							<textarea
-								class="form__textarea text__textarea"
-								v-model="activeContent.texts[j].text"
-							></textarea>
+							<IconTrash class="text__icon icon-trash" @click="confirmDeleteText(j)" />
 						</div>
 						<div>
-							<InputImage
-								class="text__file-input"
-								:image="activeContent.texts[j].image"
-								:name="'content_image_' + j"
-								:currentError="currentError"
-								:disabled="disabledForm"
-								@display-image="displayImage($event, j)"
-							/>
+							<textarea class="form__textarea text__textarea" v-model="activeContent.texts[j].text"></textarea>
+						</div>
+						<div>
+							<InputImage class="text__file-input" :image="activeContent.texts[j].image"
+								:name="'content_image_' + j" :currentError="currentError" :disabled="disabledForm"
+								@display-image="displayImage($event, j)" />
 						</div>
 					</div>
 				</TransitionGroup>
 			</OpeningList>
 
 			<div class="form__container justify-end">
-				<ButtonColored
-					type="submit"
-					:disabled="disabledForm"
-					class="form__button"
-				></ButtonColored>
+				<ButtonColored type="submit" :disabled="disabledForm" class="form__button">
+				</ButtonColored>
 			</div>
 		</form>
 	</section>
@@ -264,6 +195,24 @@ watch(
 	}
 );
 
+watch(
+	() => currentError.value,
+	() => {
+		switch (currentError.value) {
+			case "DUPLICATE_ENTRY":
+				error.value.push("title");
+				error.value.push("app");
+				error.value.push("lang");
+				error.value.push("type");
+				error.value.push("content_image");
+				break;
+
+			default:
+				error.value = [];
+		}
+	}
+);
+
 function displayImage(isImage: boolean, id: string | number): void {
 	isImageLoaded.value = isImage;
 	isImage ? imagesCount.value++ : imagesCount.value--;
@@ -333,22 +282,18 @@ function contentChangeHandler(e: Event): void {
 		return;
 	}
 
-	const pushContent: Content = activeContent.value;
+	const pushContent: Content = cloneDeep(activeContent.value);
 
 	pushContent.app = pushContent.app.toLowerCase();
 
 	if (isNew.value) {
 		store
-			.addContent(activeContent.value)
-			.then((r: ReturnedData | ReturnedError) => {
-				returnHandler(r);
-			});
+			.addContent(pushContent)
+			.then((r: ReturnedData | ReturnedError) => returnHandler(r));
 	} else {
-		store
-			.updateContent(activeContent.value)
-			.then((r: ReturnedData | ReturnedError) => {
-				returnHandler(r);
-			});
+		store.updateContent(pushContent).then((r: ReturnedData | ReturnedError) => {
+			returnHandler(r);
+		});
 	}
 }
 
@@ -397,6 +342,7 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 
 .content-create-edit {
 	.form {
+
 		&__container,
 		&__texts-top-line {
 			display: flex;
@@ -416,7 +362,12 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 			width: 100%;
 			margin-top: 2rem;
 
-			&__text + .texts__text {
+			&__container {
+				display: flex;
+				flex-direction: column-reverse;
+			}
+
+			&__text+.texts__text {
 				margin-top: 1rem;
 			}
 

@@ -2,12 +2,7 @@
 	<div class="content-item">
 		<div class="content-item__container">
 			<div class="content-item__content-image content-image">
-				<img
-					class="content-image__image"
-					:src="content.image"
-					alt=""
-					v-if="content.image"
-				/>
+				<img class="content-image__image" :src="content.image" alt="" v-if="content.image" />
 				<p class="content-image__empty-image" v-else>Без<br />изображения</p>
 			</div>
 
@@ -27,14 +22,8 @@
 			</div>
 			<div class="content-item__buttons buttons">
 				<div class="buttons__wrapper">
-					<IconTrash
-						class="buttons__delete icon-trash"
-						@click="confirmDeleteContent"
-					/>
-					<RouterLink
-						class="buttons__button"
-						:to="`/content/create-edit/${contentId}`"
-					>
+					<IconTrash class="buttons__delete icon-trash" @click="confirmDeleteContent" />
+					<RouterLink class="buttons__button" :to="`/content/create-edit/${contentId}`">
 						Редактировать
 					</RouterLink>
 				</div>
@@ -72,7 +61,7 @@ function confirmDeleteContent() {
 	border-radius: 1.8rem;
 	// height: 13.5rem;
 
-	& + & {
+	&+& {
 		margin-top: 1.7rem;
 	}
 
@@ -91,6 +80,7 @@ function confirmDeleteContent() {
 		width: 18rem;
 		overflow: hidden;
 		border-radius: 0.8rem;
+		margin-bottom: 1rem;
 
 		&__image {
 			width: 100%;
@@ -100,7 +90,7 @@ function confirmDeleteContent() {
 
 		&__empty-image {
 			text-align: center;
-			font-size: 2.5rem;
+			font-size: 2rem;
 		}
 	}
 
@@ -110,7 +100,7 @@ function confirmDeleteContent() {
 		display: flex;
 		flex-direction: column;
 
-		& > * {
+		&>* {
 			font-size: 1.4rem;
 			white-space: break-spaces;
 			word-break: break-all;
@@ -186,7 +176,7 @@ function confirmDeleteContent() {
 		.info {
 			margin: 0 0 2rem;
 
-			& > * {
+			&>* {
 				font-size: 1.7rem;
 				margin-bottom: 0.8rem;
 			}

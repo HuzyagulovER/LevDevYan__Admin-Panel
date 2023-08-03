@@ -3,24 +3,13 @@
 		<CoursesSearch class="courses__search" />
 		<LanguageChoice @return-lang="changeLang" :isCookie="true" />
 		<div class="courses__empty" v-if="isEmpty && !loading">
-			<img
-				src="@images/Courses__Empty-Courses.png"
-				alt=""
-				width="281"
-				height="255"
-			/>
+			<img src="@images/Courses__Empty-Courses.png" alt="" width="281" height="255" />
 			<p>Курсов еще нет...</p>
 		</div>
 		<TransitionGroup tag="div" name="list" v-else>
-			<CoursesCourseItem
-				v-for="course in courses"
-				:key="course.course_id"
-				:courseId="course.course_id"
-				:about="course.about"
-				:production="course.production"
-				@confirm-deleting-active="confirmDeletingActive"
-				@change-course-production="changeCourseProduction"
-			/>
+			<CoursesCourseItem v-for="course in courses" :key="course.course_id" :courseId="course.course_id"
+				:about="course.about" :production="course.production" :active="course.active"
+				@confirm-deleting-active="confirmDeletingActive" @change-course-production="changeCourseProduction" />
 		</TransitionGroup>
 	</section>
 </template>

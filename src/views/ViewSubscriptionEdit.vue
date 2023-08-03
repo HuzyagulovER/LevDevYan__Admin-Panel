@@ -213,11 +213,13 @@ async function getPrice(): Promise<void> {
 	loading.value = true;
 	await store.getPrices(app.value, subscriptionId.value).then((r: Prices) => {
 		price.value = r[subscriptionId.value as keyof Prices];
-		let curApp = apps.value.filter(
-			(i: string) => i.toLowerCase() === app.value
-		);
+
 		mainTitle.value =
-			"Редактирование подписки " + curApp[0] + " (" + price.value.name + ")";
+			"Редактирование подписки " +
+			apps.value[app.value] +
+			" (" +
+			price.value.name +
+			")";
 		loading.value = false;
 	});
 }

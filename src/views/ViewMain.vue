@@ -9,11 +9,7 @@
 						<div class="info__filter">
 							<IconFilter />
 							<select v-model="filters.users">
-								<option
-									v-for="selection in selections"
-									:key="selection.value"
-									:value="selection.value"
-								>
+								<option v-for="selection in selections" :key="selection.value" :value="selection.value">
 									{{ selection.text }}
 								</option>
 							</select>
@@ -21,28 +17,16 @@
 					</div>
 					<div class="info__container">
 						<div class="info__wrapper">
-							<MainInfoItem
-								:value="commonInfo.users.all_users"
-								text="Все пользователи"
-								color_from="#E9F7FB"
-								color_to="#CAE6FF"
-							/>
+							<MainInfoItem :value="commonInfo.users.all_users" text="Все пользователи" color_from="#E9F7FB"
+								color_to="#CAE6FF" />
 						</div>
 						<div class="info__wrapper">
-							<MainInfoItem
-								:value="commonInfo.users.psy"
-								text="PSY"
-								color_from="rgba(219, 213, 255, 0.52)"
-								color_to="rgba(149, 152, 244, 0.52)"
-							/>
+							<MainInfoItem :value="commonInfo.users.psy" text="PSY" color_from="rgba(219, 213, 255, 0.52)"
+								color_to="rgba(149, 152, 244, 0.52)" />
 						</div>
 						<div class="info__wrapper">
-							<MainInfoItem
-								:value="commonInfo.users.avocado"
-								text="Авокадо"
-								color_from="#D5F8D6"
-								color_to="#9CEA9E"
-							/>
+							<MainInfoItem :value="commonInfo.users.avocado" text="Авокадо" color_from="#D5F8D6"
+								color_to="#9CEA9E" />
 						</div>
 					</div>
 				</div>
@@ -52,11 +36,7 @@
 						<div class="info__filter">
 							<IconFilter />
 							<select v-model="filters.subs">
-								<option
-									v-for="selection in selections"
-									:key="selection.value"
-									:value="selection.value"
-								>
+								<option v-for="selection in selections" :key="selection.value" :value="selection.value">
 									{{ selection.text }}
 								</option>
 							</select>
@@ -64,28 +44,16 @@
 					</div>
 					<div class="info__container">
 						<div class="info__wrapper">
-							<MainInfoItem
-								:value="commonInfo.subs.all_subs"
-								text="Все подписки"
-								color_from="#E9F7FB"
-								color_to="#CAE6FF"
-							/>
+							<MainInfoItem :value="commonInfo.subs.all_subs" text="Все подписки" color_from="#E9F7FB"
+								color_to="#CAE6FF" />
 						</div>
 						<div class="info__wrapper">
-							<MainInfoItem
-								:value="commonInfo.subs.psy"
-								text="PSY"
-								color_from="rgba(219, 213, 255, 0.52)"
-								color_to="rgba(149, 152, 244, 0.52)"
-							/>
+							<MainInfoItem :value="commonInfo.subs.psy" text="PSY" color_from="rgba(219, 213, 255, 0.52)"
+								color_to="rgba(149, 152, 244, 0.52)" />
 						</div>
 						<div class="info__wrapper">
-							<MainInfoItem
-								:value="commonInfo.subs.avocado"
-								text="Авокадо"
-								color_from="#D5F8D6"
-								color_to="#9CEA9E"
-							/>
+							<MainInfoItem :value="commonInfo.subs.avocado" text="Авокадо" color_from="#D5F8D6"
+								color_to="#9CEA9E" />
 						</div>
 					</div>
 				</div>
@@ -95,28 +63,16 @@
 					</div>
 					<div class="info__container">
 						<div class="info__wrapper">
-							<MainInfoItem
-								:value="commonInfo.courses.active_courses"
-								text="Проходят сейчас"
-								color_from="#D7FFF0"
-								color_to="#98F2D2"
-							/>
+							<MainInfoItem :value="commonInfo.courses.active_courses" text="Проходят сейчас" color_from="#D7FFF0"
+								color_to="#98F2D2" />
 						</div>
 						<div class="info__wrapper">
-							<MainInfoItem
-								:value="commonInfo.courses.completed_courses"
-								text="Пройдено курсов"
-								color_from="#D5F8D6"
-								color_to="#9CEA9E"
-							/>
+							<MainInfoItem :value="commonInfo.courses.completed_courses" text="Пройдено курсов"
+								color_from="#D5F8D6" color_to="#9CEA9E" />
 						</div>
 						<div class="info__wrapper">
-							<MainInfoItem
-								:value="commonInfo.courses.rejected_courses"
-								text="Отказались"
-								color_from="#FCEBEB"
-								color_to="#F3C9C9"
-							/>
+							<MainInfoItem :value="commonInfo.courses.rejected_courses" text="Отказались" color_from="#FCEBEB"
+								color_to="#F3C9C9" />
 						</div>
 					</div>
 				</div>
@@ -190,6 +146,12 @@ async function confirmDeletingUser(addition_data?: {
 					(r: boolean): void => {
 						console.log(r);
 						store.clearPopup();
+						store.callInfoPopup(
+							'Пользователь удален',
+							{
+								isSuccess: true
+							}
+						)
 					},
 					async (e: any) => {
 						console.log(e.response.data);
@@ -214,7 +176,7 @@ async function confirmDeletingUser(addition_data?: {
 		flex-direction: column;
 		width: 100%;
 
-		& > * + * {
+		&>*+* {
 			margin-top: 2.75rem;
 		}
 	}
@@ -223,11 +185,11 @@ async function confirmDeletingUser(addition_data?: {
 		display: flex;
 		flex-direction: column;
 
-		& > div + div {
+		&>div+div {
 			margin-top: 2.75rem;
 		}
 
-		& > * {
+		&>* {
 			display: flex;
 			flex-direction: column;
 			box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.13);
@@ -247,6 +209,7 @@ async function confirmDeletingUser(addition_data?: {
 				align-items: center;
 				margin-bottom: 1.8rem;
 			}
+
 			&:last-child {
 				flex: 1;
 				display: grid;

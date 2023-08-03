@@ -2,12 +2,7 @@
 	<div class="course">
 		<div class="course__container">
 			<div class="course__course-image course-image">
-				<img
-					class="course-image__image"
-					:src="about.image"
-					alt=""
-					v-if="about.image"
-				/>
+				<img class="course-image__image" :src="about.image" alt="" v-if="about.image" />
 				<p class="course-image__empty-image" v-else>Без<br />изображения</p>
 			</div>
 
@@ -20,27 +15,21 @@
 				<p class="info__category">
 					<span>Категория</span>: {{ about.category }}
 				</p>
+				<p class="info__active">
+					<span>Активных</span>: {{ active }}
+				</p>
 			</div>
 			<div class="course__buttons buttons">
 				<div class="buttons__wrapper">
-					<IconTrash
-						class="buttons__delete icon-trash"
-						@click="confirmDeletingActive"
-					/>
-					<RouterLink
-						class="buttons__button"
-						:to="`/courses/create-edit/${courseId}/about`"
-					>
+					<IconTrash class="buttons__delete icon-trash" @click="confirmDeletingActive" />
+					<RouterLink class="buttons__button" :to="`/courses/create-edit/${courseId}/about`">
 						Редактировать
 					</RouterLink>
 				</div>
 				<div class="buttons__wrapper">
 					<p>Доступность в МП</p>
-					<Checkbox
-						:defaultChecked="props.production ? true : false"
-						class="promocode__active"
-						@change-state="changeCourseProduction"
-					/>
+					<Checkbox :defaultChecked="props.production ? true : false" class="promocode__active"
+						@change-state="changeCourseProduction" />
 				</div>
 			</div>
 		</div>
@@ -50,14 +39,11 @@
 <script setup lang="ts">
 import IconTrash from "@icons/IconTrash.vue";
 import Checkbox from "@add-comps/Checkbox.vue";
-import { inject, ref, Ref } from "@vue/runtime-core";
-import { StateTree } from "pinia";
-import { useRoute } from "vue-router";
 import { CourseAbout } from "../../../helpers";
 
-const store = <StateTree>inject("Store");
 const props = defineProps<{
 	courseId: string;
+	active: string | number;
 	about: CourseAbout;
 	production: number;
 }>();
@@ -74,14 +60,14 @@ function changeCourseProduction(state: boolean) {
 
 <style lang="scss" scoped>
 @import "../../style.scss";
+$vertical-padding: 2.3rem;
 
 .course {
-	padding: 2.3rem;
+	padding: $vertical-padding;
 	border: 0.25rem solid var(--c__light-violet);
 	border-radius: 1.8rem;
-	height: 13.5rem;
 
-	& + & {
+	&+& {
 		margin-top: 1.7rem;
 	}
 
@@ -96,7 +82,7 @@ function changeCourseProduction(state: boolean) {
 		justify-content: center;
 		align-items: center;
 		aspect-ratio: 26/11;
-		height: 100%;
+		height: calc(13.5rem - 2 * $vertical-padding);
 		width: auto;
 		overflow: hidden;
 		border-radius: 0.8rem;
@@ -120,10 +106,11 @@ function changeCourseProduction(state: boolean) {
 		flex-direction: column;
 		justify-content: space-between;
 
-		& > * {
+		&>* {
 			font-size: 1.4rem;
 			white-space: break-spaces;
 			word-break: break-all;
+			margin-bottom: .45rem;
 
 			span {
 				font-family: var(--f__mazzard-sb);
@@ -195,7 +182,7 @@ function changeCourseProduction(state: boolean) {
 		.info {
 			margin: 0 0 2rem;
 
-			& > * {
+			&>* {
 				font-size: 1.7rem;
 				margin-bottom: 0.8rem;
 			}

@@ -6,13 +6,14 @@
 	--c__blue_dark: #353B55;
 	--c__white: #FFF;
 	--c__violet: #8B2CF5;
-	--c__light-violet: #cb9dff;
+	/* --c__light-violet: #cb9dff; */
 	--c__orange: #EB8246;
 	--c__red: #ff5b51;
 	--c__light-blue: #F6F4FF;
 	--c__grey: #999999;
 	--c__light-violet: #DBD5FF;
 	--c__blue: #4476F6;
+	--c__green: #509E82;
 
 	--f__mazzard-r: "Mazzard", sans-serif;
 	--f__mazzard-sb: "Mazzard SemiBold", sans-serif;
@@ -112,6 +113,7 @@ select {
 
 * ::-webkit-scrollbar {
 	width: .5rem;
+	height: 0.5rem;
 }
 
 * ::-webkit-scrollbar-track {

@@ -6,6 +6,7 @@ export declare type Course = {
 	production: number,
 	about: CourseAbout | {},
 	days: CourseDays | {}
+	active?: number | string
 }
 export declare type Courses = { [key: string]: Course } | Array<null>
 
@@ -41,14 +42,14 @@ export declare interface Notification {
 export declare type Notifications = Array<Notification> | Array<null>
 
 export declare interface CourseAbout {
-	title: string,
-	lang: string,
-	period: number,
-	description: string,
-	for_whom: string,
-	results: string,
-	price: number,
-	category: string,
+	title: string
+	lang: string
+	period: number
+	description: string
+	for_whom: string
+	results: string
+	price: number
+	category: string
 	image?: string
 }
 export declare interface CourseDayTask {
@@ -174,6 +175,11 @@ export declare type State = {
 		additionFields: PopupAdditionFields,
 		type: string
 	},
+	info_popup: {
+		text: string,
+		isActive: boolean,
+		additionFields: PopupAdditionFields,
+	}
 	mainTitle: string,
 	courses: Courses,
 	currentTime: string,

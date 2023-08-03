@@ -112,9 +112,9 @@ function confirm(ans: boolean) {
 		flex-direction: column;
 		width: 100%;
 		margin-bottom: 3rem;
+
 		font: {
 			family: var(--f__montserrat-sb);
-			size: 2rem;
 		}
 
 		input {
@@ -173,6 +173,22 @@ function confirm(ans: boolean) {
 	@media screen and (max-width: $mobile--breakpoint) {
 		position: fixed;
 		width: 90%;
+		padding: 2rem 0;
+
+		&__input {
+			.form__label {
+				font: {
+					size: 1.8rem;
+				}
+			}
+		}
+
+		&__button {
+			padding: 0.6rem 4rem;
+			font: {
+				size: 1.2rem;
+			}
+		}
 	}
 }
 </style>
