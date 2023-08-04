@@ -18,11 +18,13 @@ defineProps<{ to?: string }>();
 </script>
 
 <style lang="scss" scoped>
+@import "@/style.scss";
+
 .button-create {
-	background-color: var(--c__orange);
+	background-color: $--c__orange;
 	border: 0;
 	padding: 0.7rem 2rem;
-	color: var(--c__white);
+	color: $--c__white;
 	display: flex;
 	align-items: center;
 	line-height: 1.5rem;

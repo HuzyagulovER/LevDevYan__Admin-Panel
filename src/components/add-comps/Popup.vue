@@ -3,21 +3,10 @@
 		<Transition name="list">
 			<div class="popup" v-if="popup.isActive && !popup.type">
 				<div class="popup__container">
-					<img
-						src="@images/Popup.png"
-						alt=""
-						width="164"
-						height="116"
-						class="popup__image"
-					/>
+					<img src="@images/Popup.png" alt="" width="164" height="116" class="popup__image" />
 					<p class="popup__text">{{ popup.text }}</p>
 					<div class="popup__wrapper">
-						<button
-							class="popup__button"
-							ref="button_true"
-							tabindex="1"
-							@click="confirm(true)"
-						>
+						<button class="popup__button" ref="button_true" tabindex="1" @click="confirm(true)">
 							Да
 						</button>
 						<button class="popup__button" tabindex="1" @click="confirm(false)">
@@ -69,7 +58,8 @@ function confirm(ans: boolean) {
 </script>
 
 <style scoped lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
+
 .popup {
 	position: absolute;
 	z-index: 9;
@@ -79,9 +69,9 @@ function confirm(ans: boolean) {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	box-shadow: 0 0 5rem 0 var(--c__grey);
+	box-shadow: 0 0 5rem 0 $--c__grey;
 	border-radius: 2rem;
-	background-color: var(--c__white);
+	background-color: $--c__white;
 	padding: 2rem;
 
 	&__container {
@@ -102,6 +92,7 @@ function confirm(ans: boolean) {
 	&__text {
 		margin-bottom: 3rem;
 		text-align: center;
+
 		font: {
 			family: var(--f__montserrat-sb);
 			size: 2rem;
@@ -115,8 +106,8 @@ function confirm(ans: boolean) {
 	}
 
 	&__button {
-		background-color: var(--c__white);
-		border: 0.25rem solid var(--c__light-violet);
+		background-color: $--c__white;
+		border: 0.25rem solid $--c__light-violet;
 		padding: 0.6rem 5rem;
 		border-radius: 0.8rem;
 		transition: var(--transition-03);
@@ -127,15 +118,15 @@ function confirm(ans: boolean) {
 			size: 1.5rem;
 		}
 
-		& + & {
+		&+& {
 			margin-left: 4rem;
 		}
 
 		&:focus,
 		&:hover {
-			background-color: var(--c__violet);
-			border-color: var(--c__violet);
-			color: var(--c__white);
+			background-color: $--c__violet;
+			border-color: $--c__violet;
+			color: $--c__white;
 		}
 	}
 
@@ -150,7 +141,7 @@ function confirm(ans: boolean) {
 		svg {
 			width: 100%;
 			height: 100%;
-			fill: var(--c__violet);
+			fill: $--c__violet;
 		}
 	}
 

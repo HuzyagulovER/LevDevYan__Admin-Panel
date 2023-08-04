@@ -57,7 +57,7 @@
 					<div class="texts__text text" v-for="(text, j, i) in activeContent.texts" :key="j">
 						<div class="text__top-line">
 							<label class="form__label">Текст {{ i + 1 }}</label>
-							<InputMedia class="form__media-input" :media="activeContent.texts[j].media"
+							<InputMedia class="form__media-input" :media="activeContent.texts[j]?.media"
 								:name="'content_media_' + j" :currentError="currentError" :disabled="disabledForm"
 								@display-media="displayMedia($event, j)" />
 						</div>
@@ -338,7 +338,7 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 </script>
 
 <style scoped lang="scss">
-@import "../style.scss";
+@import "@/style.scss";
 
 .content-create-edit {
 	.form {
@@ -419,7 +419,7 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 			&__corner {
 				width: 2rem !important;
 				height: auto !important;
-				fill: var(--c__violet);
+				fill: $--c__violet;
 				transform: rotate(180deg);
 				transition: var(--transition-03), opacity 0.3s ease, visibility 0s;
 				opacity: 1;

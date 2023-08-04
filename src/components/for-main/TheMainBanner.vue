@@ -9,17 +9,15 @@
 				<p class="info__welcome">Привет, администратор!</p>
 				<p class="info__wish">Хорошего дня!</p>
 			</div>
-			<img
-				src="@images/cat.png"
-				alt=""
-				class="banner__image"
-				width="92"
-				height="120"
-			/>
+			<img src="@images/cat.png" alt="" class="banner__image" width="92" height="120" />
 			<div class="banner__backgroud background">
 				<div class="background__container">
-					<div class="background__bubbles_first"><MainBubblesList /></div>
-					<div class="background__bubbles_second"><MainBubblesList /></div>
+					<div class="background__bubbles_first">
+						<MainBubblesList />
+					</div>
+					<div class="background__bubbles_second">
+						<MainBubblesList />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -37,15 +35,13 @@ let { currentTime } = storeToRefs(store);
 </script>
 
 <style lang="scss" scoped>
-@import "../../style.scss";
+@import "@/style.scss";
 
 .banner {
 	height: 13rem;
-	background: linear-gradient(
-		91.25deg,
-		rgba(219, 211, 255, 0.52) 1.31%,
-		rgba(255, 214, 251, 0.52) 77.81%
-	);
+	background: linear-gradient(91.25deg,
+			rgba(219, 211, 255, 0.52) 1.31%,
+			rgba(255, 214, 251, 0.52) 77.81%);
 	padding: 0.75rem;
 	border-radius: 3rem;
 
@@ -71,17 +67,18 @@ let { currentTime } = storeToRefs(store);
 			height: 3.3rem;
 			width: auto;
 			padding: 0.55rem 0.8rem;
-			background-color: var(--c__white);
+			background-color: $--c__white;
 			border-radius: 0.6rem;
 
 			p {
 				font-size: 1.2rem;
 			}
+
 			svg {
 				height: 100%;
 				width: auto;
 				margin-right: 1rem;
-				fill: var(--c__violet);
+				fill: $--c__violet;
 			}
 		}
 

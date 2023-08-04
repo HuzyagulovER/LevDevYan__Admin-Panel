@@ -11,7 +11,33 @@
 		"esModuleInterop": true,
 		"lib": ["ESNext", "DOM", "dom.iterable"],
 		"skipLibCheck": true,
-		"noEmit": true
+		"noEmit": true,
+
+		"paths": {
+			"@views/*": ["./src/views/*"],
+			"@stores/*": ["./src/stores/*"],
+			"@helpers/*": ["./src/helpers/*"],
+			"@comps/*": ["./src/components/*"],
+			"@add-comps/*": ["./src/components/add-comps/*"],
+			"@icons/*": ["./src/components/add-comps/icons/*"],
+			"@for-main/*": ["./src/components/for-main/*"],
+			"@images/*": ["./src/assets/images/*"],
+			"@for-courses/*": ["./src/components/for-courses/*"],
+			"@for-promo/*": ["./src/components/for-promo/*"],
+			"@for-nots/*": ["./src/components/for-nots/*"],
+			"@for-course-create/*": ["./src/components/for-course-create/*"],
+			"@for-content/*": ["./src/components/for-content/*"],
+			"@for-subscriptions/*": ["./src/components/for-subscriptions/*"]
+
+			// "@/*": ["./*"],
+			// "@main-components/*": [
+			// 	"resources/assets/js/src/components/main-components/*"
+			// ],
+			// "@addition/*": ["resources/assets/js/src/components/addition/*"],
+			// "@types/*": ["resources/assets/js/src/helpers/Types/*"],
+			// "@classes/*": ["resources/assets/js/src/helpers/Classes/*"],
+			// "@fonts/*": ["resources/assets/fonts/*"]
+		}
 	},
 	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
 	"references": [{ "path": "./tsconfig.node.json" }]

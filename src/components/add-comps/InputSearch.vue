@@ -3,11 +3,7 @@
 		<div class="input-search__icon">
 			<IconSearch />
 		</div>
-		<input
-			type="search"
-			class="input-search__input"
-			placeholder="Поиск по названию"
-		/>
+		<input type="search" class="input-search__input" placeholder="Поиск по названию" />
 	</div>
 </template>
 
@@ -16,7 +12,7 @@ import IconSearch from "@icons/IconSearch.vue";
 </script>
 
 <style scoped lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .input-search {
 	width: 100%;
@@ -28,7 +24,7 @@ import IconSearch from "@icons/IconSearch.vue";
 	border: 0.1rem solid rgba(0, 0, 0, 0.55);
 	border-radius: 0.7rem;
 	padding: 0 2.5%;
-	background-color: var(--c__light-blue);
+	background-color: $--c__light-blue;
 
 	&__icon {
 		height: 40%;

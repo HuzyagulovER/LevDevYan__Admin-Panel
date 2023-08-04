@@ -7,11 +7,7 @@
 						LEV<span class="nav__main-title_colored">DEV</span>YAN
 					</h1>
 				</RouterLink>
-				<div
-					class="nav__burger burger"
-					@click="toggleBurger"
-					:class="{ active: isActiveBurger }"
-				>
+				<div class="nav__burger burger" @click="toggleBurger" :class="{ active: isActiveBurger }">
 					<div class="burger__container">
 						<div class="burger__line"></div>
 						<div class="burger__line"></div>
@@ -20,32 +16,16 @@
 				</div>
 			</div>
 
-			<ul
-				class="nav__pages pages"
-				ref="pages"
-				:class="{ open: opened, opening: opening }"
-			>
-				<li
-					class="pages__page"
-					v-for="(link, j) of links"
-					:key="j"
-					:data-page="activeNavPage === link.name"
-				>
-					<RouterLink
-						class="pages__link"
-						:to="link.to + (link.variative ? '?app=' + activeApp : '')"
-					>
+			<ul class="nav__pages pages" ref="pages" :class="{ open: opened, opening: opening }">
+				<li class="pages__page" v-for="(link, j) of links" :key="j" :data-page="activeNavPage === link.name">
+					<RouterLink class="pages__link" :to="link.to + (link.variative ? '?app=' + activeApp : '')">
 						<div class="pages__icon">
 							<component :is="link.nav_icon" />
 						</div>
 						<p>{{ link.nav_title }}</p>
 					</RouterLink>
 				</li>
-				<li
-					class="pages__page"
-					@click="confirmSignOut"
-					@keypress="confirmSignOut"
-				>
+				<li class="pages__page" @click="confirmSignOut" @keypress="confirmSignOut">
 					<div class="pages__link">
 						<div class="pages__icon sign-out">
 							<IconLogout />
@@ -153,10 +133,11 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-@import "../style.scss";
+@import "@/style.scss";
+
 .nav {
-	background-color: var(--c__blue_dark);
-	color: var(--c__white);
+	background-color: $--c__blue_dark;
+	color: $--c__white;
 	border-radius: 0 3.125rem 3.125rem 0;
 	max-width: 400px;
 	width: 18%;
@@ -182,15 +163,17 @@ watch(
 			size: 3.3rem;
 			weight: 200;
 		}
+
 		text-align: center;
 
 		&_colored {
 			font-family: "Philosopher";
-			color: var(--c__light-violet);
+			color: $--c__light-violet;
 		}
 	}
 
 	$link-height: 2.8rem;
+
 	.pages {
 		position: relative;
 		margin-bottom: auto;
@@ -203,7 +186,7 @@ watch(
 			height: $link-height;
 			position: relative;
 
-			& + .pages__page {
+			&+.pages__page {
 				margin-top: 2rem;
 			}
 
@@ -219,7 +202,7 @@ watch(
 				left: 0;
 				width: 100%;
 				height: $link-height + 1rem;
-				background-color: var(--c__violet);
+				background-color: $--c__violet;
 				border-radius: 1rem;
 				z-index: 1;
 				transform: translateY(-50%);
@@ -242,7 +225,7 @@ watch(
 			align-items: center;
 
 			& * {
-				fill: var(--c__white) !important;
+				fill: $--c__white !important;
 			}
 
 			&.sign-out {
@@ -262,7 +245,7 @@ watch(
 		width: 100%;
 		height: auto;
 		align-self: center;
-		transform-origin: bottom;
+		transform-origin: 50% 40%;
 		transform: scale(0.7);
 	}
 
@@ -290,17 +273,19 @@ watch(
 			position: absolute;
 			width: 100%;
 			height: 18%;
-			background-color: var(--c__light-violet);
+			background-color: $--c__light-violet;
 			transition: all 0.5s ease;
 
 			&:nth-child(1) {
 				top: 0;
 				transform-origin: center center;
 			}
+
 			&:nth-child(2) {
 				top: 50%;
 				transform: translateY(-50%);
 			}
+
 			&:nth-child(3) {
 				top: 100%;
 				transform: translateY(-100%);
@@ -313,9 +298,11 @@ watch(
 					top: 50%;
 					transform: translateY(-50%) rotate(45deg);
 				}
+
 				&:nth-child(2) {
 					width: 0;
 				}
+
 				&:nth-child(3) {
 					top: 50%;
 					transform: translateY(-50%) rotate(-45deg);

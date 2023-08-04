@@ -53,11 +53,11 @@ function confirmDeleteContent() {
 </script>
 
 <style lang="scss" scoped>
-@import "../../style.scss";
+@import "@/style.scss";
 
 .content-item {
 	padding: 2.3rem;
-	border: 0.25rem solid var(--c__light-violet);
+	border: 0.25rem solid $--c__light-violet;
 	border-radius: 1.8rem;
 	// height: 13.5rem;
 
@@ -136,14 +136,14 @@ function confirmDeleteContent() {
 			border-radius: 0.8rem;
 			font-size: 1.4rem;
 			line-height: 1.4rem;
-			border: 0.2rem solid var(--c__light-violet);
+			border: 0.2rem solid $--c__light-violet;
 			transition: var(--transition-03);
 			text-align: center;
 
 			&:hover {
-				color: var(--c__white);
-				background-color: var(--c__violet);
-				border-color: var(--c__violet);
+				color: $--c__white;
+				background-color: $--c__violet;
+				border-color: $--c__violet;
 			}
 		}
 
@@ -199,7 +199,7 @@ function confirmDeleteContent() {
 				margin: 0;
 				top: 1rem;
 				right: 1rem;
-				background-color: var(--c__white);
+				background-color: $--c__white;
 				padding: 0.5rem;
 				border-radius: 25%;
 			}

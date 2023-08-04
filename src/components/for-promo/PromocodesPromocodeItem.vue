@@ -12,11 +12,8 @@
 					<p>{{ promocode.type }}</p>
 				</div>
 			</div>
-			<Checkbox
-				:defaultChecked="props.promocode.sended"
-				class="promocode__active"
-				@change-state="changePromocodeState"
-			/>
+			<Checkbox :defaultChecked="props.promocode.sended" class="promocode__active"
+				@change-state="changePromocodeState" />
 			<!-- <div
 				class="promocode__active active"
 				:class="{ _active: props.promocode.sended }"
@@ -70,14 +67,14 @@ function changePromocodeState(state: boolean): void {
 </script>
 
 <style lang="scss" scoped>
-@import "../../style.scss";
+@import "@/style.scss";
 
 .promocode {
 	padding: 0.8rem 2rem;
-	border: 0.25rem solid var(--c__light-violet);
+	border: 0.25rem solid $--c__light-violet;
 	border-radius: 0.6rem;
 
-	& + & {
+	&+& {
 		margin-top: 1.7rem;
 	}
 
@@ -97,6 +94,7 @@ function changePromocodeState(state: boolean): void {
 			family: var(--f__mazzard-sb);
 			size: 1.5rem;
 		}
+
 		text-align: center;
 		line-height: 1.5rem;
 		margin: 0 3rem 0 1rem;
@@ -105,7 +103,7 @@ function changePromocodeState(state: boolean): void {
 
 	&__value,
 	&__type {
-		background-color: var(--c__light-blue);
+		background-color: $--c__light-blue;
 		align-self: stretch;
 		display: flex;
 		align-items: center;
@@ -114,6 +112,7 @@ function changePromocodeState(state: boolean): void {
 
 		p {
 			text-align: center;
+
 			font: {
 				// family: var(--f__mazzard-sb);
 				size: 1.35rem;
@@ -154,7 +153,7 @@ function changePromocodeState(state: boolean): void {
 			height: auto;
 			overflow: hidden;
 
-			& > * {
+			&>* {
 				order: 4;
 			}
 		}

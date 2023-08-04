@@ -362,14 +362,14 @@ function addNotification(e: Event) {
 </script>
 
 <style scoped lang="scss">
-@import "../style.scss";
+@import "@/style.scss";
 
 .notification-create {
 	.form {
 		max-width: 450px;
 
 		&__comment {
-			color: var(--c__grey);
+			color: $--c__grey;
 			font-size: 0.9rem;
 		}
 

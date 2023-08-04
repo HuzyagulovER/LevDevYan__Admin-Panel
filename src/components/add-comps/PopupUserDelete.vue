@@ -1,37 +1,20 @@
 <template>
 	<Teleport to="body">
 		<Transition name="list">
-			<div
-				class="popup-user-delete"
-				v-if="popup.isActive && popup.type === 'user_delete'"
-			>
+			<div class="popup-user-delete" v-if="popup.isActive && popup.type === 'user_delete'">
 				<div class="popup-user-delete__container">
 					<p class="popup-user-delete__text">Удаление пользователя</p>
 					<div class="popup-user-delete__input">
 						<label for="user_creds" class="form__label">Почта или ID</label>
-						<input
-							id="user_creds"
-							type="text"
-							ref="user_creds"
-							class="form__input"
-							:class="{
-								_err: popup.additionFields.error === 'INVALID_ARGUMENT',
-							}"
-						/>
+						<input id="user_creds" type="text" ref="user_creds" class="form__input" :class="{
+							_err: popup.additionFields.error === 'EMPTY_DELETE_CONDITION',
+						}" :disabled="disabled" :value="init_value ? init_value : ''" />
 					</div>
 					<div class="popup-user-delete__wrapper">
-						<button
-							class="popup-user-delete__button"
-							tabindex="1"
-							@click="confirm(true)"
-						>
+						<button class="popup-user-delete__button" tabindex="1" @click="confirm(true)">
 							Удалить
 						</button>
-						<button
-							class="popup-user-delete__button"
-							tabindex="1"
-							@click="confirm(false)"
-						>
+						<button class="popup-user-delete__button" tabindex="1" @click="confirm(false)">
 							Отмена
 						</button>
 					</div>
@@ -42,20 +25,31 @@
 </template>
 
 <script setup lang="ts">
-import IconClose from "@icons/IconClose.vue";
 import { ref, Ref } from "@vue/reactivity";
-import { inject } from "@vue/runtime-core";
-import { merge } from "lodash";
+import { inject, watch } from "@vue/runtime-core";
+import { merge, cloneDeep } from "lodash";
 import { StoreGeneric, storeToRefs } from "pinia";
 
 const store = <StoreGeneric>inject("Store");
 const { popup } = storeToRefs(store);
 
-let disabled: Ref<boolean> = ref(false);
-let user_creds: Ref<HTMLInputElement | null> = ref(null);
+const disabled: Ref<boolean> = ref(false);
+const disable: Ref<boolean> = ref(false);
+const user_creds: Ref<HTMLInputElement | null> = ref(null);
+const init_value: Ref<number | string> = ref('');
+
+watch(() => popup.value,
+	() => {
+		console.log(cloneDeep(popup.value));
+
+		disabled.value = !!popup.value.additionFields.creds
+		init_value.value = popup.value.additionFields.creds
+	},
+	{ deep: true }
+)
 
 function confirm(ans: boolean) {
-	if (!disabled.value) {
+	if (!disable.value) {
 		disabled.value = true;
 		popup.value.answer = ans;
 		popup.value.isReturned = true;
@@ -74,7 +68,8 @@ function confirm(ans: boolean) {
 </script>
 
 <style scoped lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
+
 .popup-user-delete {
 	position: absolute;
 	z-index: 9;
@@ -84,9 +79,9 @@ function confirm(ans: boolean) {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	box-shadow: 0 0 5rem 0 var(--c__grey);
+	box-shadow: 0 0 5rem 0 $--c__grey;
 	border-radius: 2rem;
-	background-color: var(--c__white);
+	background-color: $--c__white;
 	padding: 2rem;
 
 	&__container {
@@ -101,6 +96,7 @@ function confirm(ans: boolean) {
 	&__text {
 		margin-bottom: 3rem;
 		text-align: center;
+
 		font: {
 			family: var(--f__montserrat-sb);
 			size: 2rem;
@@ -131,8 +127,8 @@ function confirm(ans: boolean) {
 	}
 
 	&__button {
-		background-color: var(--c__white);
-		border: 0.25rem solid var(--c__light-violet);
+		background-color: $--c__white;
+		border: 0.25rem solid $--c__light-violet;
 		padding: 0.6rem 5rem;
 		border-radius: 0.8rem;
 		transition: var(--transition-03);
@@ -143,15 +139,15 @@ function confirm(ans: boolean) {
 			size: 1.5rem;
 		}
 
-		& + & {
+		&+& {
 			margin-left: 4rem;
 		}
 
 		&:focus,
 		&:hover {
-			background-color: var(--c__violet);
-			border-color: var(--c__violet);
-			color: var(--c__white);
+			background-color: $--c__violet;
+			border-color: $--c__violet;
+			color: $--c__white;
 		}
 	}
 
@@ -166,7 +162,7 @@ function confirm(ans: boolean) {
 		svg {
 			width: 100%;
 			height: 100%;
-			fill: var(--c__violet);
+			fill: $--c__violet;
 		}
 	}
 
@@ -185,6 +181,7 @@ function confirm(ans: boolean) {
 
 		&__button {
 			padding: 0.6rem 4rem;
+
 			font: {
 				size: 1.2rem;
 			}

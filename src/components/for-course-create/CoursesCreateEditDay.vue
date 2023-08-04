@@ -3,26 +3,12 @@
 		<div class="day__container">
 			<div class="day__line">
 				<p class="day__title">День {{ number }}</p>
-				<IconTrash
-					class="day__icon icon-trash"
-					@click="confirmDeletingActive"
-				/>
+				<IconTrash class="day__icon icon-trash" @click="confirmDeletingActive" />
 			</div>
-			<input
-				type="text"
-				class="day__input"
-				name="title"
-				v-model="day.title"
-				placeholder="Название"
-			/>
+			<input type="text" class="day__input" name="title" v-model="day.title" placeholder="Название" />
 			<label for="description">Описание</label>
-			<textarea
-				type="text"
-				class="day__textarea"
-				name="description"
-				v-model="day.description"
-				placeholder="Описание дня"
-			>
+			<textarea type="text" class="day__textarea" name="description" v-model="day.description"
+				placeholder="Описание дня">
 			</textarea>
 			<div class="day__line" :class="{ opened: opened }">
 				<ButtonColored class="day__button" @click="addTask($event)">
@@ -37,23 +23,12 @@
 			<OpeningList class="progran__tasks tasks" :isOpen="opened">
 				<div class="tasks__container">
 					<div class="tasks__empty empty" v-if="emptyTasks">
-						<img
-							src="@images/Courses__Edit_Empty-Tasks.png"
-							alt=""
-							width="118"
-							height="123"
-							class="empty__image"
-						/>
+						<img src="@images/Courses__Edit_Empty-Tasks.png" alt="" width="118" height="123" class="empty__image" />
 						<p class="empty__text">Заданий еще нет...</p>
 					</div>
 					<TransitionGroup tag="div" name="list" v-else>
-						<CoursesCreateEditTask
-							v-for="(task, j, i) in day.tasks"
-							:key="j"
-							:task="task"
-							:number="i"
-							@delete-task="deleteTask(j)"
-						/>
+						<CoursesCreateEditTask v-for="(task, j, i) in day.tasks" :key="j" :task="task" :number="i"
+							@delete-task="deleteTask(j)" />
 					</TransitionGroup>
 				</div>
 			</OpeningList>
@@ -101,7 +76,7 @@ function toggleTasks(): void {
 function getEmptiesFromLastTask(): number {
 	const lastTask =
 		props.day.tasks[
-			Object.keys(props.day.tasks)[Object.keys(props.day.tasks).length - 1]
+		Object.keys(props.day.tasks)[Object.keys(props.day.tasks).length - 1]
 		];
 	let empties = 0;
 	for (const key in lastTask) {
@@ -146,14 +121,14 @@ async function confirmDeletingActive() {
 </script>
 
 <style scoped lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .day {
 	padding: 2rem 3rem;
 	border-radius: 1.4rem;
 	box-shadow: 0 0 1rem 0 rgba($color: #000000, $alpha: 0.13);
 
-	& + & {
+	&+& {
 		margin-top: 3rem;
 	}
 
@@ -186,6 +161,7 @@ async function confirmDeletingActive() {
 
 	label {
 		margin-bottom: 0.5rem;
+
 		font: {
 			family: var(--f__mazzard-sb);
 			size: 1.9rem;
@@ -201,12 +177,14 @@ async function confirmDeletingActive() {
 
 	&__input,
 	&__textarea {
-		border: 0.1rem solid var(--c__grey);
+		border: 0.1rem solid $--c__grey;
 		border-radius: 0.6rem;
 		margin-bottom: 1.5rem;
+
 		font: {
 			size: 1.5rem;
 		}
+
 		height: 3rem;
 		padding: 0 1rem;
 	}
@@ -238,7 +216,7 @@ async function confirmDeletingActive() {
 	&__corner {
 		width: 2rem !important;
 		height: auto !important;
-		fill: var(--c__violet);
+		fill: $--c__violet;
 		transform: rotate(180deg);
 		transition: var(--transition-03), opacity 0.3s ease, visibility 0s;
 		opacity: 1;
@@ -276,6 +254,7 @@ async function confirmDeletingActive() {
 			font: {
 				size: 1.7rem;
 			}
+
 			height: auto;
 			padding: 0.8rem 1rem;
 		}

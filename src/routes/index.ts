@@ -8,6 +8,7 @@ import ViewPromocodesCreate from "@views/ViewPromocodesCreate.vue";
 import ViewNotifications from "@views/ViewNotifications.vue";
 import ViewTextContent from "@views/ViewTextContent.vue";
 import ViewSubscriptions from "@views/ViewSubscriptions.vue";
+import ViewUsers from "@views/ViewUsers.vue";
 
 import ViewNotificationsCreateEdit from "@views/ViewNotificationsCreateEdit.vue";
 import CoursesCreateEditAbout from "@for-course-create/CoursesCreateEditAbout.vue";
@@ -21,6 +22,7 @@ import IconPromocodes from "@add-comps/icons/IconPromocodes.vue";
 import IconNotifications from "@add-comps/icons/IconNotifications.vue";
 import IconText from "@add-comps/icons/IconText.vue";
 import IconSubscription from "@add-comps/icons/IconSubscription.vue";
+import IconSmile from "@add-comps/icons/IconSmile.vue";
 
 import { Component } from 'vue';
 import { Store } from '../stores/store';
@@ -170,6 +172,18 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		},
 	},
 	{
+		path: '/users',
+		name: "Users",
+		component: ViewUsers,
+		meta: {
+			title: "Пользователи",
+			nav_icon: IconSmile,
+			nav_title: "Пользователи",
+			isNav: true,
+			variative: false,
+		},
+	},
+	{
 		path: "/:catchAll(.*)*",
 		name: "NotFound",
 		redirect: {
@@ -212,10 +226,12 @@ router.beforeEach(async (to, from, next) => {
 		}
 
 		if (cookies.get("session_token")) {
+			store.loading = true
 			await store.checkSessionToken().then(
 				(r: ReturnedError | ReturnedData) => {
 					let title = <HTMLElement>document.querySelector('head title')
 					title.innerText = <string>(to.meta.title || default_title)
+					store.loading = false
 
 					if (!r.success) {
 						throw new Error(r.error.status);

@@ -76,10 +76,10 @@ const monthNames: ReadonlyArray<string> = [
 ];
 
 
-
 export const Store = defineStore('Store', {
 	state: (): State => (
 		{
+			monthNames: monthNames,
 			activeApp: 'psy',
 			apps: { psy: 'PSY', avocado: 'Avocado' },
 			OS: {
@@ -547,7 +547,19 @@ export const Store = defineStore('Store', {
 					return r.data
 				},
 				e => {
-					throw e
+					throw e.response.data
+				}
+			)
+		},
+		async getUser(user_creds: string | number): Promise<void> {
+			const fd = new FormData()
+			fd.append('user_creds', user_creds as string);
+			return await axios.post(...formRequest('Users/getUser', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					throw e.response.data
 				}
 			)
 		},

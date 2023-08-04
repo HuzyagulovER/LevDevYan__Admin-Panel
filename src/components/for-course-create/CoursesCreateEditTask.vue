@@ -3,42 +3,22 @@
 		<div class="task__container">
 			<div class="task__line">
 				<p class="task__header">Задание {{ number + 1 }}</p>
-				<IconTrash
-					class="task__icon icon-trash"
-					@click="confirmDeletingActive"
-				/>
+				<IconTrash class="task__icon icon-trash" @click="confirmDeletingActive" />
 			</div>
 
 			<form class="task__form form">
 				<label class="form__label" for="task-title">
 					<p>Название:</p>
-					<input
-						type="text"
-						id="task-title"
-						name="title"
-						class="form__input"
-						v-model="task.title"
-					/>
+					<input type="text" id="task-title" name="title" class="form__input" v-model="task.title" />
 				</label>
 				<label class="form__label" for="task-type">
 					<p>Тип:</p>
-					<input
-						type="text"
-						id="task-type"
-						name="type"
-						class="form__input"
-						v-model="task.type"
-					/>
+					<input type="text" id="task-type" name="type" class="form__input" v-model="task.type" />
 				</label>
 				<label class="form__label" for="task-description">
 					<p>Описание:</p>
-					<textarea
-						type="text"
-						id="task-description"
-						name="description"
-						class="form__textarea"
-						v-model="task.description"
-					></textarea>
+					<textarea type="text" id="task-description" name="description" class="form__textarea"
+						v-model="task.description"></textarea>
 				</label>
 			</form>
 		</div>
@@ -71,14 +51,14 @@ async function confirmDeletingActive() {
 </script>
 
 <style scoped lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .task {
-	background-color: var(--c__light-blue);
+	background-color: $--c__light-blue;
 	border-radius: 0.65rem;
 	padding: 1.4rem 2rem;
 
-	& + & {
+	&+& {
 		margin-top: 2rem;
 	}
 
@@ -118,7 +98,7 @@ async function confirmDeletingActive() {
 				margin-top: 0.3rem;
 			}
 
-			& + .form__label {
+			&+.form__label {
 				margin-top: 0.8rem;
 			}
 		}
@@ -129,7 +109,7 @@ async function confirmDeletingActive() {
 			font-size: 1.5rem;
 			line-height: 1.5rem;
 			background-color: rgba($color: #000000, $alpha: 0);
-			border: 0.1rem solid var(--c__grey);
+			border: 0.1rem solid $--c__grey;
 			border-radius: 0.6rem;
 			padding: 0 1rem;
 		}
@@ -147,7 +127,7 @@ async function confirmDeletingActive() {
 
 		&__input:focus,
 		&__textarea:focus {
-			background-color: var(--c__white);
+			background-color: $--c__white;
 		}
 
 		&__textarea:focus {
@@ -176,7 +156,7 @@ async function confirmDeletingActive() {
 					margin-bottom: 0.4rem;
 				}
 
-				& + .form__label {
+				&+.form__label {
 					margin-top: 1.2rem;
 				}
 			}

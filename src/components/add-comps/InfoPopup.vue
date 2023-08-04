@@ -23,7 +23,7 @@ const { info_popup } = storeToRefs(store);
 </script>
 
 <style scoped lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .info-popup {
 	position: absolute;
@@ -34,9 +34,9 @@ const { info_popup } = storeToRefs(store);
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	box-shadow: 0 0 5rem 0 var(--c__grey);
+	box-shadow: 0 0 5rem 0 $--c__grey;
 	border-radius: 2rem;
-	background-color: var(--c__white);
+	background-color: $--c__white;
 	padding: 2rem;
 
 	&__container {
@@ -79,8 +79,8 @@ const { info_popup } = storeToRefs(store);
 	}
 
 	&__button {
-		background-color: var(--c__white);
-		border: 0.25rem solid var(--c__light-violet);
+		background-color: $--c__white;
+		border: 0.25rem solid $--c__light-violet;
 		padding: 0.6rem 5rem;
 		border-radius: 0.8rem;
 		transition: var(--transition-03);
@@ -97,9 +97,9 @@ const { info_popup } = storeToRefs(store);
 
 		&:focus,
 		&:hover {
-			background-color: var(--c__violet);
-			border-color: var(--c__violet);
-			color: var(--c__white);
+			background-color: $--c__violet;
+			border-color: $--c__violet;
+			color: $--c__white;
 		}
 	}
 
@@ -114,7 +114,7 @@ const { info_popup } = storeToRefs(store);
 		svg {
 			width: 100%;
 			height: 100%;
-			fill: var(--c__violet);
+			fill: $--c__violet;
 		}
 	}
 

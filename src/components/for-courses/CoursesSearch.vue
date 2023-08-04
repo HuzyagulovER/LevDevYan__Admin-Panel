@@ -1,11 +1,7 @@
 <template>
 	<div class="search">
 		<InputSearch class="search__input-search" />
-		<ButtonCreate
-			:to="`/courses/create-edit/new/about`"
-			class="search__button-create"
-			@click="createNewCourse"
-		>
+		<ButtonCreate :to="`/courses/create-edit/new/about`" class="search__button-create" @click="createNewCourse">
 			Создать курс
 		</ButtonCreate>
 	</div>
@@ -27,6 +23,8 @@ function createNewCourse() {
 </script>
 
 <style scoped lang="scss">
+@import "@/style.scss";
+
 .search {
 	display: flex;
 	margin-bottom: 2rem;
@@ -35,7 +33,7 @@ function createNewCourse() {
 
 	&__input-search {
 		flex: 1;
-		fill: var(--c__grey);
+		fill: $--c__grey;
 	}
 
 	&__button-create {

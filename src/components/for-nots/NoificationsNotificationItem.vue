@@ -12,10 +12,7 @@
 						{{ notification.time.substring(0, notification.time.length - 3) }}
 					</p>
 				</div>
-				<div
-					class="notification__date"
-					v-if="notification.date !== '0000-00-00'"
-				>
+				<div class="notification__date" v-if="notification.date !== '0000-00-00'">
 					<p>{{ notification.date }}</p>
 				</div>
 				<div class="notification__type" v-if="notification.type">
@@ -24,10 +21,7 @@
 				<div class="notification__lang" v-if="notification.lang">
 					<p>{{ languages[notification.lang] }}</p>
 				</div>
-				<div
-					class="notification__premium-app-type"
-					v-if="notification.premium_app_type"
-				>
+				<div class="notification__premium-app-type" v-if="notification.premium_app_type">
 					<p>{{ premiumAppTypes[notification.premium_app_type] }}</p>
 				</div>
 				<div class="notification__os" v-if="notification.os">
@@ -44,50 +38,27 @@
 					}}
 				</p>
 				<div class="repeat__img">
-					<svg
-						width="29"
-						height="29"
-						viewBox="0 0 29 29"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
+					<svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path
-							d="M27.6406 0.90625C26.8902 0.90625 26.2812 1.51525 26.2812 2.26565V6.04925C23.5825 2.2747 19.2415 0 14.5 0C6.50505 0 0 6.50505 0 14.5C0 22.4949 6.50505 29 14.5 29C20.3934 29 25.6559 25.4792 27.9071 20.0318C28.0502 19.6847 28.0394 19.3131 27.9062 18.9932C27.7729 18.6715 27.5165 18.4005 27.1685 18.2564C26.8223 18.1132 26.4507 18.1241 26.1299 18.2573C25.8091 18.3905 25.5381 18.6479 25.394 18.9941C23.5652 23.4212 19.2886 26.2812 14.5 26.2812C8.004 26.2812 2.71875 20.996 2.71875 14.5C2.71875 8.004 8.004 2.71875 14.5 2.71875C18.5654 2.71875 22.2666 4.77865 24.4225 8.15625H20.3906C19.6402 8.15625 19.0312 8.76525 19.0312 9.51565C19.0312 10.266 19.6402 10.875 20.3906 10.875H27.6406C28.391 10.875 29 10.266 29 9.51565V2.26565C29 1.51525 28.391 0.90625 27.6406 0.90625Z"
-						/>
+							d="M27.6406 0.90625C26.8902 0.90625 26.2812 1.51525 26.2812 2.26565V6.04925C23.5825 2.2747 19.2415 0 14.5 0C6.50505 0 0 6.50505 0 14.5C0 22.4949 6.50505 29 14.5 29C20.3934 29 25.6559 25.4792 27.9071 20.0318C28.0502 19.6847 28.0394 19.3131 27.9062 18.9932C27.7729 18.6715 27.5165 18.4005 27.1685 18.2564C26.8223 18.1132 26.4507 18.1241 26.1299 18.2573C25.8091 18.3905 25.5381 18.6479 25.394 18.9941C23.5652 23.4212 19.2886 26.2812 14.5 26.2812C8.004 26.2812 2.71875 20.996 2.71875 14.5C2.71875 8.004 8.004 2.71875 14.5 2.71875C18.5654 2.71875 22.2666 4.77865 24.4225 8.15625H20.3906C19.6402 8.15625 19.0312 8.76525 19.0312 9.51565C19.0312 10.266 19.6402 10.875 20.3906 10.875H27.6406C28.391 10.875 29 10.266 29 9.51565V2.26565C29 1.51525 28.391 0.90625 27.6406 0.90625Z" />
 					</svg>
 				</div>
 			</div>
-			<div
-				class="notification__play"
-				@click="updateNotificationState('1')"
+			<div class="notification__play" @click="updateNotificationState('1')"
 				v-if="!notification.state || notification.repeat_times == -1"
-				:class="{ _inactive: notification.repeat_times == -1 }"
-			>
+				:class="{ _inactive: notification.repeat_times == -1 }">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
 					<g>
 						<g>
-							<path
-								d="M20,0A20,20,0,1,0,40,20,20,20,0,0,0,20,0ZM15.47,28.74V12l13,8.35Z"
-							/>
+							<path d="M20,0A20,20,0,1,0,40,20,20,20,0,0,0,20,0ZM15.47,28.74V12l13,8.35Z" />
 						</g>
 					</g>
 				</svg>
 			</div>
-			<div
-				class="notification__pause"
-				v-else
-				@click="updateNotificationState('0')"
-			>
-				<svg
-					width="40"
-					height="40"
-					viewBox="0 0 40 40"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
+			<div class="notification__pause" v-else @click="updateNotificationState('0')">
+				<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path
-						d="M20 0C8.96 0 0 8.96 0 20C0 31.04 8.96 40 20 40C31.04 40 40 31.04 40 20C40 8.96 31.04 0 20 0ZM18 28H14V12H18V28ZM26 28H22V12H26V28Z"
-					/>
+						d="M20 0C8.96 0 0 8.96 0 20C0 31.04 8.96 40 20 40C31.04 40 40 31.04 40 20C40 8.96 31.04 0 20 0ZM18 28H14V12H18V28ZM26 28H22V12H26V28Z" />
 				</svg>
 			</div>
 			<div class="notification__delete">
@@ -100,10 +71,7 @@
 				<p class="notification__body">{{ notification.body }}</p>
 			</div>
 			<div class="notification__edit">
-				<RouterLink
-					class="buttons__button"
-					:to="`/notifications/create-edit/${props.notification.notification_id}/`"
-				>
+				<RouterLink class="buttons__button" :to="`/notifications/create-edit/${props.notification.notification_id}/`">
 					Редактировать
 				</RouterLink>
 			</div>
@@ -143,34 +111,34 @@ function updateNotificationState(state: string) {
 </script>
 
 <style lang="scss" scoped>
-@import "../../style.scss";
+@import "@/style.scss";
 
 .notification {
 	padding: 0.8rem 2rem;
-	border: 0.25rem solid var(--c__light-violet);
+	border: 0.25rem solid $--c__light-violet;
 	border-radius: 0.6rem;
 
 	._inactive {
-		color: var(--c__grey);
-		fill: var(--c__grey);
-		stroke: var(--c__grey);
+		color: $--c__grey;
+		fill: $--c__grey;
+		stroke: $--c__grey;
 	}
 
-	& + & {
+	&+& {
 		margin-top: 1.7rem;
 	}
 
 	&__container {
 		display: flex;
 
-		& > * {
+		&>* {
 			height: 2.3rem;
 		}
 
-		& + & {
+		&+& {
 			margin-top: 1rem;
 
-			& > * {
+			&>* {
 				height: unset;
 			}
 		}
@@ -182,6 +150,7 @@ function updateNotificationState(state: string) {
 			family: var(--f__mazzard-sb);
 			size: 1.3rem;
 		}
+
 		line-height: 1.5rem;
 		height: auto;
 	}
@@ -197,7 +166,7 @@ function updateNotificationState(state: string) {
 		align-self: stretch;
 		flex-wrap: wrap;
 
-		div + div {
+		div+div {
 			margin-left: 2rem;
 		}
 	}
@@ -209,7 +178,7 @@ function updateNotificationState(state: string) {
 	&__premium-app-type,
 	&__os,
 	&__test {
-		background-color: var(--c__light-blue);
+		background-color: $--c__light-blue;
 		display: flex;
 		align-items: center;
 		border-radius: 0.6rem;
@@ -218,6 +187,7 @@ function updateNotificationState(state: string) {
 
 		p {
 			text-align: center;
+
 			font: {
 				size: 1.35rem;
 			}
@@ -252,6 +222,7 @@ function updateNotificationState(state: string) {
 			object-fit: contain;
 		}
 	}
+
 	&__empty-image {
 		margin: 0 2rem 1.8rem 0;
 	}
@@ -325,14 +296,14 @@ function updateNotificationState(state: string) {
 			border-radius: 0.8rem;
 			font-size: 1.4rem;
 			line-height: 1.4rem;
-			border: 0.2rem solid var(--c__light-violet);
+			border: 0.2rem solid $--c__light-violet;
 			transition: var(--transition-03);
 			text-align: center;
 
 			&:hover {
-				color: var(--c__white);
-				background-color: var(--c__violet);
-				border-color: var(--c__violet);
+				color: $--c__white;
+				background-color: $--c__violet;
+				border-color: $--c__violet;
 			}
 		}
 
@@ -356,12 +327,12 @@ function updateNotificationState(state: string) {
 			flex-wrap: wrap;
 			height: auto;
 
-			& + & {
+			&+& {
 				margin-top: 1.5rem;
 				flex-direction: column;
 			}
 
-			& > * {
+			&>* {
 				// order: 3;
 				display: flex;
 			}
@@ -376,11 +347,11 @@ function updateNotificationState(state: string) {
 			height: auto;
 			order: 3;
 
-			div + div {
+			div+div {
 				margin: 0;
 			}
 
-			& > * {
+			&>* {
 				margin: 0;
 
 				p {

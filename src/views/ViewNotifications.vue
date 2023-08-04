@@ -3,31 +3,19 @@
 		<div class="notifications__top-line top-line">
 			<ButtonsPages class="top-line__buttons-pages" />
 
-			<ButtonCreate
-				to="/notifications/create-edit/new"
-				class="top-line__button-create"
-			>
+			<ButtonCreate to="/notifications/create-edit/new" class="top-line__button-create">
 				Создать уведомление
 			</ButtonCreate>
 		</div>
 		<LanguageChoice @return-lang="changeLang" :isCookie="true" />
 		<div class="notifications__empty" v-if="isEmpty">
-			<img
-				src="@images/Notifications__Empty-Notifications.png"
-				width="234"
-				height="288"
-			/>
+			<img src="@images/Notifications__Empty-Notifications.png" width="234" height="288" />
 			<p>Уведомлений еще нет...</p>
 		</div>
 		<TransitionGroup tag="div" :name="transitionName">
-			<NoificationsNotificationItem
-				v-for="(notification, j) in nots"
-				:key="notification?.notification_id"
-				:index="j"
-				:notification="notification"
-				class="notifications__notification"
-				@confirm-deleting-active="deleteNotification"
-			/>
+			<NoificationsNotificationItem v-for="(notification, j) in nots" :key="notification?.notification_id" :index="j"
+				:notification="(notification as Notification)" class="notifications__notification"
+				@confirm-deleting-active="deleteNotification" />
 		</TransitionGroup>
 	</section>
 </template>
@@ -136,7 +124,7 @@ function changeLang(lang: string): void {
 </script>
 
 <style lang="scss">
-@import "../style.scss";
+@import "@/style.scss";
 
 .notifications {
 	flex: 1;
@@ -149,7 +137,7 @@ function changeLang(lang: string): void {
 		margin-bottom: 2rem;
 		height: 3.3rem;
 
-		& > * {
+		&>* {
 			height: 100%;
 		}
 
@@ -174,6 +162,7 @@ function changeLang(lang: string): void {
 
 		p {
 			margin-top: -2rem;
+
 			font: {
 				size: 1.9rem;
 				weight: bold;

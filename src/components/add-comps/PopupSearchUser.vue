@@ -1,37 +1,21 @@
 <template>
 	<Teleport to="body">
 		<Transition name="list">
-			<div class="popup-user-add-sub" v-if="popup.isActive && popup.type === 'add_subscription'">
-				<div class="popup-user-add-sub__container">
-					<p class="popup-user-add-sub__text">Включение подписки</p>
-					<div class="popup-user-add-sub__input">
+			<div class="popup-search-user" v-if="popup.isActive && popup.type === 'search_user'">
+				<div class="popup-search-user__container">
+					<p class="popup-search-user__text">Поиск пользователя</p>
+					<div class="popup-search-user__input">
 						<label for="user_creds" class="form__label">Почта или ID</label>
 						<input id="user_creds" type="text" ref="user_creds" class="form__input" :class="{
 							_err: popup.additionFields.error === 'INVALID_ARGUMENT',
 						}" />
 					</div>
-					<div class="popup-user-add-sub__input">
-						<label for="user_creds" class="form__label">Приложение</label>
-						<select id="sub_app" class="form__input" v-model="sub_app">
-							<option v-for="sub in apps" :value="sub.toLowerCase()" :key="sub">
-								{{ sub }}
-							</option>
-						</select>
-					</div>
-					<div class="popup-user-add-sub__input">
-						<label for="user_creds" class="form__label">Тип подписки</label>
-						<select id="sub_name" class="form__input" v-model="sub_type">
-							<option v-for="type in popup.additionFields.prices[sub_app]" :value="type.id" :key="type.id">
-								{{ type.name }}
-							</option>
-						</select>
-					</div>
-					<div class="popup-user-add-sub__wrapper">
-						<button class="popup-user-add-sub__button" tabindex="1" @click="confirm(true)">
-							Включить
-						</button>
-						<button class="popup-user-add-sub__button" tabindex="1" @click="confirm(false)">
+					<div class="popup-search-user__wrapper">
+						<button class="popup-search-user__button" tabindex="1" @click="confirm(false)">
 							Отмена
+						</button>
+						<button class="popup-search-user__button" tabindex="1" @click="confirm(true)">
+							Поиск
 						</button>
 					</div>
 				</div>
@@ -41,19 +25,16 @@
 </template>
 
 <script setup lang="ts">
-import IconClose from "@icons/IconClose.vue";
 import { ref, Ref } from "@vue/reactivity";
 import { inject } from "@vue/runtime-core";
 import { merge } from "lodash";
 import { StoreGeneric, storeToRefs } from "pinia";
 
 const store = <StoreGeneric>inject("Store");
-const { popup, apps } = storeToRefs(store);
+const { popup } = storeToRefs(store);
 
 let disabled: Ref<boolean> = ref(false);
 let user_creds: Ref<HTMLInputElement | null> = ref(null);
-let sub_app: Ref<string> = ref("");
-let sub_type: Ref<string> = ref("");
 
 function confirm(ans: boolean) {
 	if (!disabled.value) {
@@ -62,15 +43,9 @@ function confirm(ans: boolean) {
 		popup.value.isReturned = true;
 		popup.value.additionFields = merge(popup.value.additionFields, {
 			user_creds: (user_creds.value as HTMLInputElement).value,
-			sub_app: sub_app.value,
-			sub_type: sub_type.value,
 		});
 		setTimeout(() => {
 			disabled.value = false;
-
-			user_creds.value = null;
-			sub_app.value = "";
-			sub_type.value = "";
 		}, 500);
 	}
 
@@ -83,7 +58,7 @@ function confirm(ans: boolean) {
 <style scoped lang="scss">
 @import "@/style.scss";
 
-.popup-user-add-sub {
+.popup-search-user {
 	position: absolute;
 	z-index: 9;
 	top: 50%;
@@ -124,7 +99,6 @@ function confirm(ans: boolean) {
 
 		font: {
 			family: var(--f__montserrat-sb);
-			size: 2rem;
 		}
 
 		input {

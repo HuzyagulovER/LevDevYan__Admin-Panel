@@ -1,105 +1,39 @@
 <template>
 	<div class="create-edit-about">
-		<form
-			class="create-edit-about__form form"
-			enctype="multipart/form-data"
-			@submit.prevent="saveCourse($event)"
-		>
-			<InputImage
-				class="form__file-input"
-				:image="image"
-				:name="'image'"
-				:currentError="currentError"
-				:disabled="disabledForm"
-				@display-image="displayImage"
-			/>
+		<form class="create-edit-about__form form" enctype="multipart/form-data" @submit.prevent="saveCourse($event)">
+			<InputImage class="form__file-input" :image="image" :name="'image'" :currentError="currentError"
+				:disabled="disabledForm" @display-image="displayImage" />
 
 			<label for="promocode" class="form__label">Название</label>
-			<input
-				id="title"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('title') }"
-				name="title"
-				:disabled="disabledForm"
-				v-model="data.title"
-				@input="error = clearVariable(error)"
-			/>
+			<input id="title" type="text" class="form__input" :class="{ _error: error.includes('title') }" name="title"
+				:disabled="disabledForm" v-model="data.title" @input="error = clearVariable(error)" />
 
 			<label for="period" class="form__label">Продолжительность в днях</label>
-			<input
-				id="period"
-				type="number"
-				class="form__input"
-				min="0"
-				:class="{ _error: error.includes('period') }"
-				name="period"
-				:disabled="disabledForm"
-				v-model="data.period"
-				@input="error = clearVariable(error)"
-			/>
+			<input id="period" type="number" class="form__input" min="0" :class="{ _error: error.includes('period') }"
+				name="period" :disabled="disabledForm" v-model="data.period" @input="error = clearVariable(error)" />
 
 			<label for="price" class="form__label" v-if="false">Стоимость</label>
-			<input
-				id="price"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('price') }"
-				name="price"
-				:disabled="disabledForm"
-				v-model="data.price"
-				@input="error = clearVariable(error)"
-				v-if="false"
-			/>
+			<input id="price" type="text" class="form__input" :class="{ _error: error.includes('price') }" name="price"
+				:disabled="disabledForm" v-model="data.price" @input="error = clearVariable(error)" v-if="false" />
 
 			<label for="category" class="form__label">Категория</label>
-			<input
-				id="category"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('category') }"
-				name="category"
-				:disabled="disabledForm"
-				v-model="data.category"
-				@input="error = clearVariable(error)"
-			/>
+			<input id="category" type="text" class="form__input" :class="{ _error: error.includes('category') }"
+				name="category" :disabled="disabledForm" v-model="data.category" @input="error = clearVariable(error)" />
 
 			<label for="description" class="form__label">Описание</label>
-			<textarea
-				id="description"
-				type="text"
-				class="form__textarea"
-				:class="{ _error: error.includes('description') }"
-				name="description"
-				:disabled="disabledForm"
-				v-model="data.description"
-				@input="error = clearVariable(error)"
-			>
+			<textarea id="description" type="text" class="form__textarea" :class="{ _error: error.includes('description') }"
+				name="description" :disabled="disabledForm" v-model="data.description" @input="error = clearVariable(error)">
 			</textarea>
 
 			<label for="for_whom" class="form__label">Кому подойдет</label>
-			<textarea
-				id="for_whom"
-				type="text"
-				class="form__textarea"
-				:class="{ _error: error.includes('for_whom') }"
-				name="for_whom"
-				:disabled="disabledForm"
-				v-model="data.for_whom"
-				@input="error = clearVariable(error)"
-			></textarea>
+			<textarea id="for_whom" type="text" class="form__textarea" :class="{ _error: error.includes('for_whom') }"
+				name="for_whom" :disabled="disabledForm" v-model="data.for_whom"
+				@input="error = clearVariable(error)"></textarea>
 
 			<label for="results" class="form__label">Результаты</label>
-			<textarea
-				id="results"
-				type="text"
-				class="form__textarea"
-				:class="{ _error: error.includes('results') }"
-				name="results"
-				:disabled="disabledForm"
-				v-model="data.results"
-				@input="error = clearVariable(error)"
-			></textarea>
+			<textarea id="results" type="text" class="form__textarea" :class="{ _error: error.includes('results') }"
+				name="results" :disabled="disabledForm" v-model="data.results"
+				@input="error = clearVariable(error)"></textarea>
 
 			<ButtonColored type="submit" :disabled="disabledForm"></ButtonColored>
 		</form>
@@ -201,13 +135,14 @@ function saveCourse(e: Event): void {
 </script>
 
 <style scoped lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .create-edit-about {
 	@media screen and (max-width: $mobile--breakpoint) {
 		.form {
 			&__label {
 				margin-bottom: 0.5rem;
+
 				font: {
 					size: 2.2rem;
 				}
@@ -218,6 +153,7 @@ function saveCourse(e: Event): void {
 				font: {
 					size: 1.7rem;
 				}
+
 				height: auto;
 				padding: 0.8rem 1rem;
 			}

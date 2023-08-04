@@ -9,7 +9,7 @@ import TheLoader from "@add-comps/TheLoader.vue";
 </script>
 
 <style lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .main-loader {
 	position: absolute;

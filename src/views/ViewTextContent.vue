@@ -28,7 +28,7 @@
 			<p>Контента еще нет...</p>
 		</div>
 		<TransitionGroup tag="div" :name="transitionName" v-else>
-			<ContentItem v-for="(content, j) in contentList" :key="j" :contentId="j" :content="content"
+			<ContentItem v-for="(content, j) in contentList" :key="j" :contentId="(<unknown>j as string)" :content="content"
 				@confirm-delete-content="confirmDeleteContent" />
 		</TransitionGroup>
 	</section>
@@ -117,7 +117,7 @@ async function getContent(): Promise<void> {
 </script>
 
 <style scoped lang="scss">
-@import "../style.scss";
+@import "@/style.scss";
 
 .content {
 	flex: 1;
@@ -178,7 +178,7 @@ async function getContent(): Promise<void> {
 
 			&__link {
 				border-radius: 0.7rem;
-				border: 0.2rem solid var(--c__grey);
+				border: 0.2rem solid $--c__grey;
 				font-size: 1.2rem;
 				display: flex;
 				align-items: center;
@@ -186,9 +186,9 @@ async function getContent(): Promise<void> {
 				padding: 0.4rem 2rem;
 
 				&.js_active {
-					background-color: var(--c__green);
+					background-color: $--c__green;
 					border-width: 0;
-					color: var(--c__white);
+					color: $--c__white;
 				}
 			}
 		}

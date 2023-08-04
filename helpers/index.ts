@@ -93,7 +93,7 @@ export declare type ReturnedError = {
 	success: false
 }
 
-export declare type UsersInfo = {
+export declare type AllUsersInfo = {
 	courses: {
 		active_courses: number,
 		completed_courses: number,
@@ -151,18 +151,20 @@ export declare type ActiveSubscription = {
 }
 export declare type ActiveSubscriptions = { [key: string]: ActiveSubscription } | {}
 
+export declare type ScheduleSubscriptionTypeUser = {
+	email: string
+	id: number
+}
 export declare type ScheduleSubscriptionType = {
 	id: string
 	price: number
 	name: string
-	users: {
-		email: string
-		id: number
-	}[]
+	users: ScheduleSubscriptionTypeUser[]
 }
 export declare type ScheduleSubscriptionTypes = { [key: string]: ScheduleSubscriptionType } | {}
 
 export declare type State = {
+	monthNames: ReadonlyArray<string>
 	activeApp: string,
 	apps: StringObject,
 	OS: StringObject,
@@ -195,7 +197,7 @@ export declare type State = {
 	fileErrorStatuses: string[]
 	acceptedMediaExtensions: Array<string>
 	defaultLang: string,
-	commonInfo: UsersInfo
+	commonInfo: AllUsersInfo
 	defaultContent: Content
 	contentList: ContentList
 }
@@ -205,6 +207,9 @@ export declare type PopupAdditionFields = {
 } | {}
 
 export declare type StringObject = { [key: string]: string }
+export declare type NumberObject = { [key: string]: number }
+export declare type NumberOrStringObject = StringObject | NumberObject
+export declare type ObjectOfStringObject = { [key: string]: StringObject }
 
 export declare type Link = {
 	to: string
@@ -212,4 +217,34 @@ export declare type Link = {
 	nav_title: string
 	nav_icon: RouteComponent | string
 	variative?: boolean
+}
+
+export declare type User = {
+	id?: number | string
+	email?: string
+	name?: string
+	password?: string
+	photo?: string
+	typePremium: {
+		psy: StringObject
+		avocado: StringObject
+	}
+	session_series?: string
+	session_token?: string
+	device_token?: string
+	user_id?: number | string
+	app?: string[]
+	phone_model?: string
+	registration_date: string
+	lang?: string
+	premium_app?: ObjectOfStringObject
+	open_app: NumberOrStringObject
+	timezone?: string
+	sys_notifications_state?: boolean | number
+	level?: string
+	active_course?: string
+	completed_courses?: string[]
+	device_tokens?: StringObject
+	versions?: StringObject
+	is_test?: boolean | number
 }

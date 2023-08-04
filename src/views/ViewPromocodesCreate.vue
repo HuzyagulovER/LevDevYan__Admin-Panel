@@ -2,38 +2,15 @@
 	<section class="promocodes-create">
 		<form class="promocodes-create__form form" @submit.prevent="addPromocode">
 			<label for="promocode" class="form__label">Название</label>
-			<input
-				id="promocode"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('promocode') }"
-				name="promocode"
-				:disabled="disabledForm"
-				v-model="newPromocode.promocode"
-				@input="error = clearVariable(error)"
-			/>
+			<input id="promocode" type="text" class="form__input" :class="{ _error: error.includes('promocode') }"
+				name="promocode" :disabled="disabledForm" v-model="newPromocode.promocode"
+				@input="error = clearVariable(error)" />
 			<label for="type" class="form__label">Тип</label>
-			<input
-				id="type"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('value') }"
-				name="type"
-				:disabled="disabledForm"
-				v-model="newPromocode.value"
-				@input="error = clearVariable(error)"
-			/>
+			<input id="type" type="text" class="form__input" :class="{ _error: error.includes('value') }" name="type"
+				:disabled="disabledForm" v-model="newPromocode.value" @input="error = clearVariable(error)" />
 			<label for="value" class="form__label">Значение</label>
-			<input
-				id="value"
-				type="text"
-				class="form__input"
-				:class="{ _error: error.includes('type') }"
-				name="value"
-				:disabled="disabledForm"
-				v-model="newPromocode.type"
-				@input="error = clearVariable(error)"
-			/>
+			<input id="value" type="text" class="form__input" :class="{ _error: error.includes('type') }" name="value"
+				:disabled="disabledForm" v-model="newPromocode.type" @input="error = clearVariable(error)" />
 
 			<ButtonColored type="submit" :disabled="disabledForm"></ButtonColored>
 		</form>
@@ -91,7 +68,7 @@ function addPromocode(): void {
 </script>
 
 <style scoped lang="scss">
-@import "../style.scss";
+@import "@/style.scss";
 
 .promocodes-create {
 	.form {
@@ -108,6 +85,7 @@ function addPromocode(): void {
 
 		&__label {
 			margin-bottom: 0.5rem;
+
 			font: {
 				family: "Mazzard SemiBold";
 				size: 1.6rem;
@@ -116,11 +94,13 @@ function addPromocode(): void {
 
 		&__input {
 			margin-bottom: 1.2rem;
-			border: 0.1rem solid var(--c__grey);
+			border: 0.1rem solid $--c__grey;
 			border-radius: 0.6rem;
+
 			font: {
 				size: 1.25rem;
 			}
+
 			height: 2.5rem;
 			padding: 0 1rem;
 		}
@@ -144,7 +124,7 @@ function addPromocode(): void {
 				margin-bottom: 0;
 			}
 
-			input + label {
+			input+label {
 				margin-top: 1.3rem;
 			}
 

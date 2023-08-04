@@ -1,13 +1,10 @@
 <template>
-	<div
-		class="media-input"
-		:class="{
-			_error:
-				isLargeMedia ||
-				isInvalidExtension ||
-				fileErrorStatuses.indexOf(currentError) !== -1,
-		}"
-	>
+	<div class="media-input" :class="{
+		_error:
+			isLargeMedia ||
+			isInvalidExtension ||
+			fileErrorStatuses.indexOf(currentError) !== -1,
+	}">
 		<div class="media-input__media">
 			<IconClip />
 			<a :href="media" target="_blank" v-if="media && !/blob:/i.test(media)">{{
@@ -19,39 +16,23 @@
 			<p v-else-if="isLargeMedia || currentError === 'FILE_SIZE_EXCEEDED'">
 				Файл должен быть не больше {{ maxMediaSizeText }}
 			</p>
-			<p
-				v-else-if="
-					isInvalidExtension || currentError === 'INVALID_FILE_EXTENSION'
-				"
-			>
+			<p v-else-if="isInvalidExtension || currentError === 'INVALID_FILE_EXTENSION'
+				">
 				Файл должен иметь верное расширение ({{
 					acceptedMediaExtensions.join(", ")
 				}})
 			</p>
-			<div
-				v-show="
-					!media && !(!!currentError || isLargeMedia || isInvalidExtension)
-				"
-			>
+			<div v-show="!media && !(!!currentError || isLargeMedia || isInvalidExtension)
+					">
 				<p>Прикрепить аудио или видео (.mp3/.mp4)</p>
 
-				<input
-					:id="name"
-					type="file"
-					:accept="acceptedMediaExtensions.join(',')"
-					:name="name"
-					:disabled="disabled"
-					@change="displayMedia($event)"
-					ref="formMedia"
-				/>
+				<input :id="name" type="file" :accept="acceptedMediaExtensions.join(',')" :name="name" :disabled="disabled"
+					@change="displayMedia($event)" ref="formMedia" />
 			</div>
 		</div>
 
-		<IconTrash
-			@click="deleteImage"
-			class="media-input__delete icon-trash"
-			v-if="(media && !/blob:/i.test(media)) || (media && /blob:/i.test(media))"
-		/>
+		<IconTrash @click="deleteImage" class="media-input__delete icon-trash"
+			v-if="(media && !/blob:/i.test(media)) || (media && /blob:/i.test(media))" />
 	</div>
 </template>
 
@@ -63,7 +44,7 @@ import { inject, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 
 const props = defineProps<{
-	media: string;
+	media?: string;
 	currentError: string;
 	disabled: boolean;
 	name: string;
@@ -81,12 +62,12 @@ let isInvalidExtension: Ref<boolean> = ref(false);
 let media: Ref<string> = ref("");
 let formMedia: Ref = ref();
 
-media.value = props.media;
+media.value = props.media ?? '';
 
 watch(
 	() => props.media,
 	() => {
-		media.value = props.media;
+		media.value = props.media ?? '';
 	}
 );
 
@@ -135,7 +116,7 @@ function deleteImage() {
 </script>
 
 <style scoped lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .media-input {
 	display: flex;
@@ -177,6 +158,7 @@ function deleteImage() {
 		text-align: center;
 		color: #7b61ff;
 		line-height: 1.5rem;
+
 		font: {
 			size: 1.5rem;
 			family: var(--f__mazzard-sb);

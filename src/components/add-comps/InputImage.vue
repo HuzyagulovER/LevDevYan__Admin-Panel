@@ -1,13 +1,10 @@
 <template>
-	<div
-		class="file-input"
-		:class="{
-			_error:
-				isLargeImage ||
-				isInvalidExtension ||
-				fileErrorStatuses.indexOf(currentError) !== -1,
-		}"
-	>
+	<div class="file-input" :class="{
+		_error:
+			isLargeImage ||
+			isInvalidExtension ||
+			fileErrorStatuses.indexOf(currentError) !== -1,
+	}">
 		<div class="file-input__image" v-if="image">
 			<img :src="image" alt="" />
 		</div>
@@ -17,11 +14,8 @@
 				Изображение должно быть
 				<br />не больше {{ maxFileSizeText }}
 			</p>
-			<p
-				v-else-if="
-					isInvalidExtension || currentError === 'INVALID_FILE_EXTENSION'
-				"
-			>
+			<p v-else-if="isInvalidExtension || currentError === 'INVALID_FILE_EXTENSION'
+				">
 				Изображение должно иметь
 				<br />верное расширение ({{ acceptedImageExtensions.join(", ") }})
 			</p>
@@ -31,15 +25,8 @@
 			</p>
 		</div>
 
-		<input
-			id="input_image"
-			type="file"
-			:accept="acceptedImageExtensions.join(',')"
-			:name="name"
-			:disabled="disabled"
-			@change="displayImage($event)"
-			ref="formImage"
-		/>
+		<input id="input_image" type="file" :accept="acceptedImageExtensions.join(',')" :name="name" :disabled="disabled"
+			@change="displayImage($event)" ref="formImage" />
 		<IconTrash @click="deleteImage" class="file-input__delete icon-trash" />
 	</div>
 </template>
@@ -123,7 +110,7 @@ function deleteImage() {
 </script>
 
 <style scoped lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .file-input {
 	background-color: rgba($color: $file-input-color, $alpha: 0.23);
@@ -167,6 +154,7 @@ function deleteImage() {
 		text-align: center;
 		color: #7b61ff;
 		line-height: 1.5rem;
+
 		font: {
 			size: 1.5rem;
 			family: var(--f__mazzard-sb);

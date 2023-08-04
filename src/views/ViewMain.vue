@@ -77,10 +77,6 @@
 					</div>
 				</div>
 			</div>
-			<button class="home__user-delete" @click="confirmDeletingUser()">
-				<IconTrash class="icon-trash" />
-				<p>Удалить пользователя</p>
-			</button>
 		</div>
 	</section>
 </template>
@@ -135,37 +131,10 @@ function getUsersData(): void {
 	});
 }
 
-async function confirmDeletingUser(addition_data?: {
-	[key: string]: string;
-}): Promise<void> {
-	await store
-		.callPopupWithData("", { type: "user_delete", ...addition_data })
-		.then((r: PopupAdditionFields): void => {
-			if (Object.hasOwn(r, "user_creds")) {
-				store.deleteUser(r["user_creds" as keyof PopupAdditionFields]).then(
-					(r: boolean): void => {
-						console.log(r);
-						store.clearPopup();
-						store.callInfoPopup(
-							'Пользователь удален',
-							{
-								isSuccess: true
-							}
-						)
-					},
-					async (e: any) => {
-						console.log(e.response.data);
-						await store.clearPopup();
-						confirmDeletingUser({ error: e.response.data.error.status });
-					}
-				);
-			}
-		});
-}
 </script>
 
 <style lang="scss" scoped>
-@import "../style.scss";
+@import "@/style.scss";
 
 .home {
 	flex: 1;
@@ -238,7 +207,7 @@ async function confirmDeletingUser(addition_data?: {
 				transform: translateY(-50%);
 				width: 2rem;
 				height: 2rem;
-				fill: var(--c__violet);
+				fill: $--c__violet;
 				pointer-events: none;
 			}
 
@@ -261,7 +230,7 @@ async function confirmDeletingUser(addition_data?: {
 		width: auto;
 		height: auto;
 		padding: 0.8rem 2rem;
-		border: 0.1rem solid var(--c__violet);
+		border: 0.1rem solid $--c__violet;
 		border-radius: 1.2rem;
 		background-color: #fff;
 		cursor: pointer;

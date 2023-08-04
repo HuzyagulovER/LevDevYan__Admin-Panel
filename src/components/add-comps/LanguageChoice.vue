@@ -3,19 +3,10 @@
 		<div class="lang-choice__container">
 			<div class="lang-choice__active-lang">
 				<p class="lang-choice__text">{{ languages[activeLang] }}</p>
-				<img
-					class="lang-choice__arrow"
-					src="@images/Down-arrow.svg"
-					@click="activeDropdown = !activeDropdown"
-				/>
+				<img class="lang-choice__arrow" src="@images/Down-arrow.svg" @click="activeDropdown = !activeDropdown" />
 			</div>
 			<div class="lang-choice__drop-down drop-down">
-				<div
-					class="drop-down__item"
-					v-for="(language, j) in languages"
-					:key="j"
-					@click="returnLang(j)"
-				>
+				<div class="drop-down__item" v-for="(language, j) in languages" :key="j" @click="returnLang(j)">
 					<p class="drop-down__text">{{ language }}</p>
 				</div>
 			</div>
@@ -35,7 +26,7 @@ const route = useRoute();
 
 const props = defineProps<{
 	isCookie?: boolean;
-	defaultLang?: string | undefined;
+	defaultLang?: string;
 }>();
 const store = <StoreGeneric>inject("Store");
 const { languages } = storeToRefs(store);
@@ -76,7 +67,7 @@ function returnLang(langId: string | number) {
 </script>
 
 <style lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .lang-choice {
 	display: flex;
@@ -114,9 +105,9 @@ function returnLang(langId: string | number) {
 		top: 100%;
 		right: 1rem;
 		overflow: hidden;
-		background-color: var(--c__white);
+		background-color: $--c__white;
 		border-radius: 0.5rem;
-		border: 0.1rem solid var(--c__grey);
+		border: 0.1rem solid $--c__grey;
 		opacity: 0;
 
 		&__item {
@@ -124,11 +115,11 @@ function returnLang(langId: string | number) {
 			cursor: pointer;
 
 			&:hover {
-				background-color: var(--c__light-blue);
+				background-color: $--c__light-blue;
 			}
 
 			&:active {
-				background-color: var(--c__light-violet);
+				background-color: $--c__light-violet;
 			}
 		}
 

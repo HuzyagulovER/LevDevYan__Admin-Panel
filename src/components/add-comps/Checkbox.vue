@@ -1,22 +1,10 @@
 <template>
 	<div class="checkbox" :class="{ _active: checked }">
-		<input
-			type="checkbox"
-			v-model="checked"
-			class="checkbox__input"
-			@change.prevent="changeState"
-		/>
+		<input type="checkbox" v-model="checked" class="checkbox__input" @change.prevent="changeState" />
 		<div class="checkbox__background"></div>
-		<svg
-			width="15"
-			height="11"
-			viewBox="0 0 15 11"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
+		<svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path
-				d="M5.47875 10.4498L0.776245 5.7473L1.95187 4.57167L5.47875 8.09855L13.0481 0.529175L14.2237 1.7048L5.47875 10.4498Z"
-			/>
+				d="M5.47875 10.4498L0.776245 5.7473L1.95187 4.57167L5.47875 8.09855L13.0481 0.529175L14.2237 1.7048L5.47875 10.4498Z" />
 		</svg>
 	</div>
 </template>
@@ -42,7 +30,7 @@ function changeState() {
 </script>
 
 <style lang="scss" scoped>
-@import "../../style.scss";
+@import "@/style.scss";
 
 .checkbox {
 	margin-left: auto;

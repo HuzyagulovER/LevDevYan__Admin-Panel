@@ -10,14 +10,10 @@
 		<div class="subscriptions__block active">
 			<p class="subscriptions__subtitle subtitle">Активные</p>
 			<div class="subscriptions__wrapper">
-				<SubscriptionsItem
-					class="subscriptions__item item"
-					:color="'#F3FFF4'"
-					v-for="(activeSubscription, j) in activeSubscriptions"
-					:key="j"
-				>
-					<p class="item__name">{{ activeSubscription.name }}</p>
-					<p class="item__value">{{ activeSubscription.count }}</p>
+				<SubscriptionsItem class="subscriptions__item item" :color="'#F3FFF4'"
+					v-for="(activeSubscription, j) in activeSubscriptions" :key="j">
+					<p class="item__name">{{ activeSubscription['name' as keyof ActiveSubscription] }}</p>
+					<p class="item__value">{{ activeSubscription['count' as keyof ActiveSubscription] }}</p>
 				</SubscriptionsItem>
 			</div>
 		</div>
@@ -25,36 +21,30 @@
 		<div class="subscriptions__block settings">
 			<p class="subscriptions__subtitle subtitle">Настройки</p>
 			<div class="subscriptions__wrapper">
-				<SubscriptionsItem
-					class="subscriptions__item item"
-					:color="'#F3FCFF'"
-					v-for="(price, j) in prices"
-					:key="j"
-				>
-					<p class="item__name">{{ price.name }}</p>
-					<p class="item__value">{{ price.price }} <span>&#x20bd;</span></p>
+				<SubscriptionsItem class="subscriptions__item item" :color="'#F3FCFF'" v-for="(price, j) in prices" :key="j">
+					<p class="item__name">{{ price['name' as keyof Price] }}</p>
+					<p class="item__value">{{ price['price' as keyof Price] }} <span>&#x20bd;</span></p>
 					<div class="item__second-price">
-						<p
-							:class="{ strikethrough: price.strikethrough }"
-							v-if="price.second_price_visibility"
-						>
+						<p :class="{ strikethrough: price['strikethrough' as keyof Price] }"
+							v-if="price['second_price_visibility' as keyof Price]">
 							{{
-								price.price_divison > 1
-									? Math.floor(price.price / price.price_divison)
-									: price.second_price
+								price['price_divison' as keyof Price] > 1
+								? Math.floor(
+									(price['price' as keyof Price] as number)
+									/
+									(price['price_divison' as keyof Price] as number)
+								)
+								: price['second_price' as keyof Price]
 							}}
 							<span>
-								&#x20bd;<span v-if="price.second_price_per_month"
-									>/мес</span
-								></span
-							>
+								&#x20bd;<span v-if="price['second_price_per_month' as keyof Price]">/мес</span></span>
 						</p>
 						<p class="empty" v-else>Текста нет</p>
 					</div>
 					<div class="item__icon">
-						<RouterLink :to="'/subscription-edit/' + app + '/' + price.id">
-							<IconPencil
-						/></RouterLink>
+						<RouterLink :to="'/subscription-edit/' + app + '/' + price['id' as keyof Price]">
+							<IconPencil />
+						</RouterLink>
 					</div>
 				</SubscriptionsItem>
 			</div>
@@ -63,33 +53,21 @@
 		<div class="subscriptions__block schedule">
 			<div class="schedule__top-line">
 				<p class="subscriptions__subtitle subtitle">Запланированные платежи</p>
-				<input
-					type="date"
-					class="schedule__date-select"
-					v-model="date"
-					@change.prevent="selectDate"
-				/>
+				<input type="date" class="schedule__date-select" v-model="date" @change.prevent="selectDate" />
 			</div>
-			<div
-				class="subscriptions__wrapper"
-				v-if="Object.keys(scheduleSubscriptionTypes).length !== 0"
-			>
-				<div
-					class="subscriptions__container"
-					v-for="(scheduleSubscriptionType, j) in scheduleSubscriptionTypes"
-					:key="j"
-				>
-					<div
-						class="schedule__item item"
-						v-for="scheduleSubscription in scheduleSubscriptionType.users"
-						:key="scheduleSubscription.id"
-					>
-						<p class="item__name">{{ scheduleSubscriptionType.name }}</p>
+			<div class="subscriptions__wrapper" v-if="Object.keys(scheduleSubscriptionTypes).length !== 0">
+				<div class="subscriptions__container" v-for="(scheduleSubscriptionType, j) in scheduleSubscriptionTypes"
+					:key="j">
+					<div class="schedule__item item"
+						v-for="scheduleSubscription in scheduleSubscriptionType['users' as keyof ScheduleSubscriptionType]"
+						:key="j">
+						<p class="item__name">{{ scheduleSubscriptionType['name' as keyof ScheduleSubscriptionType] }}</p>
 						<p class="item__value">
-							{{ scheduleSubscriptionType.price }} <span>&#x20bd;</span>
+							{{ scheduleSubscriptionType['price' as keyof ScheduleSubscriptionType] }} <span>&#x20bd;</span>
 						</p>
-						<p class="item__user-email">{{ scheduleSubscription.email }}</p>
-						<p class="item__user-id">id: {{ scheduleSubscription.id }}</p>
+						<p class="item__user-email">{{ (<unknown>scheduleSubscription as ScheduleSubscriptionTypeUser).email }}
+						</p>
+						<p class="item__user-id">id: {{ (<unknown>scheduleSubscription as ScheduleSubscriptionTypeUser).id }}</p>
 						<p class="item__pay-number">платеж X</p>
 					</div>
 				</div>
@@ -107,14 +85,16 @@ import ButtonsPages from "@add-comps/ButtonsPages.vue";
 import IconPencil from "@icons/IconPencil.vue";
 import SubscriptionsItem from "@for-subscriptions/SubscriptionsItem.vue";
 import { useRoute } from "vue-router";
-import { Store } from "../stores/store";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref, Ref, watch } from "vue";
 import {
 	Prices,
 	Price,
 	ActiveSubscriptions,
+	ActiveSubscription,
 	ScheduleSubscriptionTypes,
+	ScheduleSubscriptionType,
+	ScheduleSubscriptionTypeUser,
 	PopupAdditionFields,
 } from "../../helpers";
 
@@ -161,6 +141,8 @@ async function getScheduleSubscriptions(date: string): Promise<void> {
 		.getScheduleSubscriptions(app.value, date)
 		.then((r: ScheduleSubscriptionTypes) => {
 			scheduleSubscriptionTypes.value = r;
+			console.log(scheduleSubscriptionTypes.value);
+
 			return;
 		});
 }
@@ -234,7 +216,7 @@ async function addSubscription(addition_data?: {
 </script>
 
 <style lang="scss" scoped>
-@import "../style.scss";
+@import "@/style.scss";
 
 .subscriptions {
 	padding-right: 20rem;
@@ -249,12 +231,11 @@ async function addSubscription(addition_data?: {
 		}
 	}
 
-	&__block + &__block {
+	&__block+&__block {
 		margin-top: 3rem;
 	}
 
-	&__subtitle {
-	}
+	&__subtitle {}
 
 	&__wrapper {
 		display: grid;
@@ -276,19 +257,23 @@ async function addSubscription(addition_data?: {
 	}
 
 	.item {
+
 		&__name,
 		&__value {
 			font: {
 				size: 2rem;
 			}
 		}
+
 		&__name {
 			font: {
 				family: var(--f__mazzard-r);
 			}
 		}
+
 		&__value {
 			text-align: right;
+
 			font: {
 				family: var(--f__mazzard-b);
 			}
@@ -297,8 +282,9 @@ async function addSubscription(addition_data?: {
 		&__icon {
 			display: flex;
 			justify-content: flex-end;
+
 			& * {
-				fill: var(--c__blue);
+				fill: $--c__blue;
 			}
 
 			a {
@@ -317,6 +303,7 @@ async function addSubscription(addition_data?: {
 		&__second-price {
 			display: flex;
 			align-items: flex-end;
+
 			font: {
 				size: 1.6rem;
 			}
@@ -325,7 +312,7 @@ async function addSubscription(addition_data?: {
 				position: relative;
 
 				&.empty {
-					color: var(--c__grey);
+					color: $--c__grey;
 				}
 
 				&.strikethrough {
@@ -345,6 +332,7 @@ async function addSubscription(addition_data?: {
 
 		span {
 			line-height: 1.6rem;
+
 			font: {
 				size: 0.92em;
 			}
@@ -355,7 +343,7 @@ async function addSubscription(addition_data?: {
 		.item {
 			padding-right: 2.2rem !important;
 
-			span > span {
+			span>span {
 				margin: 0;
 				font-size: 1.085em;
 			}
@@ -368,13 +356,13 @@ async function addSubscription(addition_data?: {
 			flex-direction: column;
 			background-color: rgba(251, 245, 187, 0.17);
 			padding: 2rem 3rem;
-			border: 0.1rem solid var(--c__light-violet);
+			border: 0.1rem solid $--c__light-violet;
 			border-radius: 1.6rem;
 			gap: 0;
 		}
 
 		.subscriptions__container {
-			& + .subscriptions__container {
+			&+.subscriptions__container {
 				margin-top: 2rem;
 			}
 		}
@@ -392,17 +380,20 @@ async function addSubscription(addition_data?: {
 		&__date-select {
 			border: 0;
 			background-color: transparent;
+
 			font: {
 				size: 2rem;
 				weight: bold;
 			}
-			color: var(--c__violet);
+
+			color: $--c__violet;
 			width: 13rem;
 
 			&::-webkit-inner-spin-button {
 				display: none;
 				width: 0;
 			}
+
 			&::-webkit-calendar-picker-indicator {
 				background: url(/assets/Down-arrow.svg) no-repeat center/contain;
 				width: 1.1rem;
@@ -417,7 +408,7 @@ async function addSubscription(addition_data?: {
 			display: flex;
 			justify-content: space-between;
 
-			& > * + * {
+			&>*+* {
 				margin-left: 2rem;
 			}
 
@@ -427,6 +418,7 @@ async function addSubscription(addition_data?: {
 			&__pay-number {
 				flex: 1;
 			}
+
 			&__user-email {
 				flex: 3;
 				word-break: break-word;
@@ -437,6 +429,7 @@ async function addSubscription(addition_data?: {
 			&__user-id {
 				text-align: center;
 			}
+
 			&__pay-number {
 				text-align: end;
 			}
@@ -454,7 +447,7 @@ async function addSubscription(addition_data?: {
 			}
 		}
 
-		&__item + .item {
+		&__item+.item {
 			margin-top: 2rem;
 		}
 	}
@@ -482,9 +475,10 @@ async function addSubscription(addition_data?: {
 			}
 
 			.item {
-				& > * {
+				&>* {
 					font-size: 1.2rem;
-					& + * {
+
+					&+* {
 						margin-left: 1rem;
 					}
 				}

@@ -1,9 +1,5 @@
 <template>
-	<button
-		class="form-button"
-		:class="{ disabled: disabled }"
-		:style="{ 'background-color': color }"
-	>
+	<button class="form-button" :class="{ disabled: disabled }" :style="{ 'background-color': color }">
 		<slot>Сохранить</slot>
 	</button>
 </template>
@@ -16,12 +12,14 @@ const props = defineProps<{
 </script>
 
 <style lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .form-button {
+	display: flex;
+	align-items: center;
 	background-color: #31ac71;
 	border: 0;
-	color: var(--c__white);
+	color: $--c__white;
 	font-size: 1.6rem;
 	height: 3.5rem;
 	padding: 0 5rem;
@@ -29,7 +27,7 @@ const props = defineProps<{
 	cursor: pointer;
 
 	&.disabled {
-		background-color: var(--c__grey);
+		background-color: $--c__grey;
 		cursor: auto;
 	}
 

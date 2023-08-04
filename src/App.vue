@@ -23,15 +23,11 @@
 	<MainLoader v-if="loading" />
 	<Popup />
 	<InfoPopup />
-	<PopupUserDelete />
-	<PopupSubscriptionActivation />
 </template>
 
 <script setup lang="ts">
 import Popup from "@add-comps/Popup.vue";
 import InfoPopup from "@add-comps/InfoPopup.vue";
-import PopupUserDelete from "@add-comps/PopupUserDelete.vue";
-import PopupSubscriptionActivation from "@add-comps/PopupSubscriptionActivation.vue";
 import TheNavbar from "@comps/TheNavbar.vue";
 import MainLoader from "@add-comps/MainLoader.vue";
 import { computed, inject, watch } from "@vue/runtime-core";
@@ -111,7 +107,7 @@ watch(
 </script>
 
 <style lang="scss">
-@import "style.scss";
+@import "@/style.scss";
 
 .main {
 	flex-grow: 1;

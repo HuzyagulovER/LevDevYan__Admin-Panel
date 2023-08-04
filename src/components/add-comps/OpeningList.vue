@@ -33,7 +33,7 @@ watch(
 </script>
 
 <style scoped lang="scss">
-@import "../../style.scss";
+@import "@/style.scss";
 
 .opening-list {
 	height: 0;

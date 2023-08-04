@@ -5,34 +5,18 @@
 				LEV<span class="sign-in__main-title_colored">DEV</span>YAN
 			</h1>
 			<form class="sign-in__form form" @submit.prevent="signIn($event)">
-				<input
-					type="email"
-					name="email"
-					class="form__input"
-					:class="{
-						_error:
-							returnedErrorStatus === 'INVALID_EMAIL' ||
-							error.includes('email'),
-					}"
-					placeholder="Логин"
-					v-model="userCreds.email"
-				/>
-				<div
-					class="form__wrapper"
-					:class="{
-						_error:
-							returnedErrorStatus === 'INVALID_PASSWORD' ||
-							error.includes('password'),
-					}"
-				>
-					<input
-						:type="inputType"
-						name="password"
-						class="form__input_password"
-						placeholder="Пароль"
-						v-model="userCreds.password"
-						spellcheck="false"
-					/>
+				<input type="email" name="email" class="form__input" :class="{
+					_error:
+						returnedErrorStatus === 'INVALID_EMAIL' ||
+						error.includes('email'),
+				}" placeholder="Логин" v-model="userCreds.email" />
+				<div class="form__wrapper" :class="{
+					_error:
+						returnedErrorStatus === 'INVALID_PASSWORD' ||
+						error.includes('password'),
+				}">
+					<input :type="inputType" name="password" class="form__input_password" placeholder="Пароль"
+						v-model="userCreds.password" spellcheck="false" />
 					<p class="form__mask">{{ pass_mask }}</p>
 				</div>
 
@@ -100,7 +84,7 @@ async function signIn(e: Event) {
 </script>
 
 <style scoped lang="scss">
-@import "../style.scss";
+@import "@/style.scss";
 
 .sign-in {
 	width: 100%;
@@ -110,7 +94,7 @@ async function signIn(e: Event) {
 	align-items: center;
 
 	&__container {
-		background-color: var(--c__blue_dark);
+		background-color: $--c__blue_dark;
 		width: 50%;
 		max-width: 700px;
 		height: auto;
@@ -124,11 +108,11 @@ async function signIn(e: Event) {
 		text-align: center;
 		margin-bottom: 3.2rem;
 		font-weight: 200;
-		color: var(--c__white);
+		color: $--c__white;
 
 		&_colored {
 			font-family: "Philosopher";
-			color: var(--c__light-violet);
+			color: $--c__light-violet;
 		}
 	}
 
@@ -141,15 +125,16 @@ async function signIn(e: Event) {
 			display: flex;
 			position: relative;
 			background-color: rgba(217, 217, 217, 0.12);
-			border: 0.2rem solid var(--c__white);
+			border: 0.2rem solid $--c__white;
 			border-radius: 1.2rem;
-			color: var(--c__white);
+			color: $--c__white;
 			margin-bottom: 4rem;
 			padding: 1.2rem 2rem;
 		}
 
 		input {
 			height: auto !important;
+
 			font: {
 				family: var(--f__montserrat-sb);
 				size: 1.3rem;
@@ -158,7 +143,7 @@ async function signIn(e: Event) {
 			&:-webkit-autofill,
 			&:-webkit-autofill:hover,
 			&:-webkit-autofill:focus {
-				-webkit-text-fill-color: var(--c__white);
+				-webkit-text-fill-color: $--c__white;
 				-webkit-box-shadow: 0 0 0 5rem rgb(73, 78, 101) inset;
 			}
 
@@ -169,7 +154,7 @@ async function signIn(e: Event) {
 
 		&__input_password {
 			color: transparent !important;
-			caret-color: var(--c__white) !important;
+			caret-color: $--c__white !important;
 			background-color: transparent !important;
 			letter-spacing: 0.2rem !important;
 			border: 0 !important;
@@ -198,6 +183,7 @@ async function signIn(e: Event) {
 
 			&::placeholder {
 				letter-spacing: 0;
+
 				font: {
 					family: var(--f__montserrat-sb);
 					size: 1.3rem;
@@ -207,10 +193,10 @@ async function signIn(e: Event) {
 
 		&__input {
 			background-color: rgba(217, 217, 217, 0.12);
-			border: 0.2rem solid var(--c__white);
+			border: 0.2rem solid $--c__white;
 			border-radius: 1.2rem;
 			padding: 1.2rem 2rem;
-			color: var(--c__white);
+			color: $--c__white;
 			margin-bottom: 2rem;
 		}
 
@@ -220,6 +206,7 @@ async function signIn(e: Event) {
 			height: 1.5rem;
 			overflow: hidden;
 			pointer-events: none;
+
 			font: {
 				family: monospace;
 				size: 1.5rem;
@@ -227,13 +214,14 @@ async function signIn(e: Event) {
 		}
 
 		&__button {
-			background-color: var(--c__violet);
+			background-color: $--c__violet;
 			border: 0;
-			color: var(--c__white);
+			color: $--c__white;
 			border-radius: 1.2rem;
 			padding: 1.2rem;
 			cursor: pointer;
 			margin-left: 0;
+
 			font: {
 				family: var(--f__montserrat-sb);
 				size: 1.6rem;
@@ -255,9 +243,9 @@ async function signIn(e: Event) {
 				display: flex;
 				position: relative;
 				background-color: rgba(217, 217, 217, 0.12);
-				border: 0.2rem solid var(--c__white);
+				border: 0.2rem solid $--c__white;
 				border-radius: 1.2rem;
-				color: var(--c__white);
+				color: $--c__white;
 				margin-bottom: 4rem;
 				padding: 1.2rem 2rem;
 			}
@@ -265,7 +253,7 @@ async function signIn(e: Event) {
 			&__input_password {
 				height: 1.5rem;
 				width: 100%;
-				color: var(--c__white) !important;
+				color: $--c__white !important;
 				position: relative;
 				top: unset;
 				left: unset;
@@ -285,6 +273,7 @@ async function signIn(e: Event) {
 
 				&::placeholder {
 					letter-spacing: 0;
+
 					font: {
 						family: var(--f__montserrat-sb);
 						size: 1.3rem;
@@ -297,12 +286,13 @@ async function signIn(e: Event) {
 			}
 
 			&__button {
-				background-color: var(--c__violet);
+				background-color: $--c__violet;
 				border: 0;
-				color: var(--c__white);
+				color: $--c__white;
 				border-radius: 1.2rem;
 				padding: 1.2rem;
 				cursor: pointer;
+
 				font: {
 					family: var(--f__montserrat-sb);
 					size: 1.6rem;

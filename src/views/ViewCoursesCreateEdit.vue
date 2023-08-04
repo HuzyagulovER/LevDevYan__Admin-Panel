@@ -1,47 +1,26 @@
 <template>
 	<section class="courses-create-edit">
 		<div class="courses-create-edit__top-line top-line">
-			<RouterLink
-				class="top-line__link-about"
-				:to="`/courses/create-edit/${route.params.courseId}/about`"
-				:class="{ js_active: route.path.includes('about') }"
-			>
+			<RouterLink class="top-line__link-about" :to="`/courses/create-edit/${route.params.courseId}/about`"
+				:class="{ js_active: route.path.includes('about') }">
 				О курсе
 			</RouterLink>
-			<RouterLink
-				class="top-line__link-days"
-				:class="{ js_active: route.path.includes('days') }"
-				:to="`/courses/create-edit/${route.params.courseId}/days`"
-			>
+			<RouterLink class="top-line__link-days" :class="{ js_active: page === 'days' }"
+				:to="`/courses/create-edit/${route.params.courseId}/days`">
 				Программа курса
 			</RouterLink>
-			<ButtonCreate
-				class="top-line__button-create"
-				v-if="route.path.includes('days')"
-				@click="createNewDay"
-			>
+			<ButtonCreate class="top-line__button-create" v-if="page === 'days'" @click="createNewDay">
 				Добавить день
 			</ButtonCreate>
-			<LanguageChoice
-				:isCookie="false"
-				:defaultLang="activeData.lang"
-				@return-lang="changeLang"
-				v-else
-				class="top-line__lang-choice"
-			/>
+			<LanguageChoice :isCookie="false" v-else :defaultLang="(activeData as CourseAbout).lang" @return-lang="changeLang"
+				class="top-line__lang-choice" />
 		</div>
 		<div class="courses-create-edit__container">
 			<RouterView v-slot="{ Component }">
 				<KeepAlive>
-					<Component
-						:is="Component"
-						:data="activeData"
-						:courseId="route.params.courseId"
-						:current-error="currentError"
-						:disabled-form="disabledForm"
-						@save-course="saveCourse"
-						@update-course="updateCourse"
-					/>
+					<Component :is="Component" :data="activeData" :courseId="route.params.courseId"
+						:current-error="currentError" :disabled-form="disabledForm" @save-course="saveCourse"
+						@update-course="updateCourse" />
 				</KeepAlive>
 			</RouterView>
 		</div>
@@ -181,7 +160,7 @@ function changeLang(lang: string) {
 </script>
 
 <style scoped lang="scss">
-@import "../style.scss";
+@import "@/style.scss";
 
 .courses-create-edit {
 	flex: 1;
@@ -199,15 +178,15 @@ function changeLang(lang: string) {
 		&__link-about,
 		&__link-days {
 			border-radius: 0.7rem;
-			border: 0.2rem solid var(--c__violet);
+			border: 0.2rem solid $--c__violet;
 			font-size: 1.5rem;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 
 			&.js_active {
-				background-color: var(--c__violet);
-				color: var(--c__white);
+				background-color: $--c__violet;
+				color: $--c__white;
 			}
 		}
 
