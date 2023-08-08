@@ -17,6 +17,7 @@ const props = defineProps<{
 .form-button {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	background-color: #31ac71;
 	border: 0;
 	color: $--c__white;

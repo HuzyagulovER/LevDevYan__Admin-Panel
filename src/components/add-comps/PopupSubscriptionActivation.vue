@@ -6,13 +6,13 @@
 					<p class="popup-user-add-sub__text">Включение подписки</p>
 					<div class="popup-user-add-sub__input">
 						<label for="user_creds" class="form__label">Почта или ID</label>
-						<input id="user_creds" type="text" ref="user_creds" class="form__input" :class="{
+						<input id="user_creds" type="text" v-model="user_creds" class="form__input" :class="{
 							_err: popup.additionFields.error === 'INVALID_ARGUMENT',
-						}" />
+						}" :disabled="disabled" />
 					</div>
 					<div class="popup-user-add-sub__input">
 						<label for="user_creds" class="form__label">Приложение</label>
-						<select id="sub_app" class="form__input" v-model="sub_app">
+						<select id="sub_app" class="form__input" v-model="sub_app" :disabled="disabled">
 							<option v-for="sub in apps" :value="sub.toLowerCase()" :key="sub">
 								{{ sub }}
 							</option>
@@ -21,8 +21,11 @@
 					<div class="popup-user-add-sub__input">
 						<label for="user_creds" class="form__label">Тип подписки</label>
 						<select id="sub_name" class="form__input" v-model="sub_type">
-							<option v-for="type in popup.additionFields.prices[sub_app]" :value="type.id" :key="type.id">
-								{{ type.name }}
+							<option value="none">
+								Отключить
+							</option>
+							<option v-for="_type in popup.additionFields.prices[sub_app]" :value="_type.id" :key="_type.id">
+								{{ _type.name }}
 							</option>
 						</select>
 					</div>
@@ -41,34 +44,50 @@
 </template>
 
 <script setup lang="ts">
-import IconClose from "@icons/IconClose.vue";
 import { ref, Ref } from "@vue/reactivity";
-import { inject } from "@vue/runtime-core";
+import { inject, watch } from "@vue/runtime-core";
 import { merge } from "lodash";
 import { StoreGeneric, storeToRefs } from "pinia";
 
 const store = <StoreGeneric>inject("Store");
 const { popup, apps } = storeToRefs(store);
 
-let disabled: Ref<boolean> = ref(false);
-let user_creds: Ref<HTMLInputElement | null> = ref(null);
-let sub_app: Ref<string> = ref("");
-let sub_type: Ref<string> = ref("");
+const disabled: Ref<boolean> = ref(false);
+const disable: Ref<boolean> = ref(false);
+const user_creds: Ref<string> = ref("");
+const sub_app: Ref<string> = ref("");
+const sub_type: Ref<string> = ref("");
+
+watch(
+	() => popup.value,
+	() => {
+		if (popup.value.additionFields.app) {
+			sub_app.value = popup.value.additionFields.app
+		}
+		if (popup.value.additionFields.creds) {
+			user_creds.value = popup.value.additionFields.creds
+		}
+		if (sub_app.value && user_creds.value) {
+			disabled.value = true
+		}
+	},
+	{ deep: true }
+)
 
 function confirm(ans: boolean) {
-	if (!disabled.value) {
+	if (!disable.value) {
 		disabled.value = true;
 		popup.value.answer = ans;
 		popup.value.isReturned = true;
 		popup.value.additionFields = merge(popup.value.additionFields, {
-			user_creds: (user_creds.value as HTMLInputElement).value,
+			user_creds: user_creds.value,
 			sub_app: sub_app.value,
 			sub_type: sub_type.value,
 		});
 		setTimeout(() => {
 			disabled.value = false;
 
-			user_creds.value = null;
+			user_creds.value = '';
 			sub_app.value = "";
 			sub_type.value = "";
 		}, 500);

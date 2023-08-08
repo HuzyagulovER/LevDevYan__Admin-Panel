@@ -2,10 +2,6 @@
 	<section class="subscriptions">
 		<div class="subscriptions__top-line top-line">
 			<ButtonsPages class="top-line__buttons-pages" />
-
-			<ButtonCreate @click="addSubscription()" class="top-line__button-create">
-				Включить подписку
-			</ButtonCreate>
 		</div>
 		<div class="subscriptions__block active">
 			<p class="subscriptions__subtitle subtitle">Активные</p>
@@ -95,7 +91,6 @@ import {
 	ScheduleSubscriptionTypes,
 	ScheduleSubscriptionType,
 	ScheduleSubscriptionTypeUser,
-	PopupAdditionFields,
 } from "../../helpers";
 
 const route = useRoute();
@@ -160,59 +155,6 @@ function selectDate() {
 	getScheduleSubscriptions(date.value).then(() => (loading.value = false));
 }
 
-// async function addSubscription(addition_data?: {
-// 	[key: string]: string;
-// }): Promise<void> {
-// 	await store
-// 		.callPopupWithData("", {
-// 			type: "add_subscription",
-// 			prices,
-// 			...addition_data,
-// 		})
-// 		.then(async (r: PopupAdditionFields): Promise<void> => {
-// 			if (Object.hasOwn(r, "user_creds")) {
-// 				await store
-// 					.addSubscription(r["user_creds" as keyof PopupAdditionFields])
-// 					.then(
-// 						(r: boolean): void => {
-// 							store.clearPopup();
-// 							console.log(r);
-// 						},
-// 						(e: any) => {
-// 							console.log(e);
-// 							addSubscription({ error: e.response.data });
-// 						}
-// 					);
-// 			}
-// 		});
-// }
-
-async function addSubscription(addition_data?: {
-	[key: string]: string;
-}): Promise<void> {
-	const prices: Prices = await store.getPrices("both");
-	await store
-		.callPopupWithData("", {
-			type: "add_subscription",
-			prices,
-			...addition_data,
-		})
-		.then((r: PopupAdditionFields): void => {
-			if (Object.hasOwn(r, "user_creds")) {
-				store.addSubscription().then(
-					(r: boolean): void => {
-						console.log(r);
-						store.clearPopup();
-					},
-					async (e: any) => {
-						console.log(e.response.data);
-						await store.clearPopup();
-						addSubscription({ error: e.response.data.error.status });
-					}
-				);
-			}
-		});
-}
 </script>
 
 <style lang="scss" scoped>

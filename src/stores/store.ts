@@ -686,7 +686,6 @@ export const Store = defineStore('Store', {
 			if (priceId) {
 				fd.append('id', priceId);
 			}
-
 			return await axios.post(...formRequest('Prices/getPrices', fd) as [string, FormData]).then(
 				r => {
 					return r.data.data

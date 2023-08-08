@@ -40,8 +40,6 @@ const init_value: Ref<number | string> = ref('');
 
 watch(() => popup.value,
 	() => {
-		console.log(cloneDeep(popup.value));
-
 		disabled.value = !!popup.value.additionFields.creds
 		init_value.value = popup.value.additionFields.creds
 	},

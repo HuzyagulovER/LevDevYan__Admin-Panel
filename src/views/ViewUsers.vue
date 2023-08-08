@@ -19,7 +19,7 @@
 					</ButtonColored>
 				</div>
 				<div class="buttons__container" v-else>
-					<ButtonColored class="buttons__button button">
+					<ButtonColored class="buttons__button button" @click="addSubscription()">
 						<IconPencil />
 						Управление подпиской
 					</ButtonColored>
@@ -63,7 +63,7 @@
 									'-'
 								}}
 							</p>
-							<IconPencil class="item__edit" />
+							<IconPencil class="item__edit" @click="addSubscription({ app: 'psy' })" />
 						</li>
 						<li class="user__item item">
 							<p class="item__title">Подписка Avocado</p>
@@ -76,7 +76,7 @@
 									'-'
 								}}
 							</p>
-							<IconPencil class="item__edit" />
+							<IconPencil class="item__edit" @click="addSubscription({ app: 'avocado' })" />
 						</li>
 						<li class="user__item item">
 							<p class="item__title">Уведомления</p>
@@ -124,7 +124,7 @@ import PopupSearchUser from "@add-comps/PopupSearchUser.vue";
 import { useRoute, useRouter } from "vue-router";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref, Ref, watch } from "vue";
-import { User, NumberObject, PopupAdditionFields, ReturnedError, ReturnedData, StringObject, NumberOrStringObject } from "../../helpers";
+import { User, NumberObject, PopupAdditionFields, ReturnedError, ReturnedData, StringObject, NumberOrStringObject, Prices } from "../../helpers";
 import { cloneDeep } from "lodash";
 import { clearVariable } from "../main";
 
@@ -134,6 +134,8 @@ const store = <StoreGeneric>inject("Store");
 const { loading, commonInfo, apps, monthNames } = storeToRefs(store);
 
 const user_creds: ComputedRef<string | undefined> = computed((): string | undefined => route.query.creds as string | undefined)
+const sub_app: Ref<string> = ref('')
+
 const selectedUser: Ref<User | {}> = ref({})
 const isUser: ComputedRef<boolean> = computed((): boolean => Object.keys(selectedUser.value).length !== 0)
 const appsInfo: ComputedRef<NumberObject> = computed(() => {
@@ -149,13 +151,6 @@ const open_app: ComputedRef<StringObject> = computed((): StringObject => {
 		avocado: getDateFromString((selectedUser.value as User).open_app['avocado' as keyof NumberOrStringObject] as string),
 	}
 })
-
-watch(() => selectedUser.value,
-	() => {
-		console.log(selectedUser.value);
-	},
-	{ deep: true }
-)
 
 getUsersData()
 
@@ -192,9 +187,9 @@ async function confirmDeletingUser(addition_data?: {
 		.then((r: PopupAdditionFields): void => {
 			if (Object.hasOwn(r, "user_creds")) {
 				store.deleteUser(r["user_creds" as keyof PopupAdditionFields]).then(
-					(r: boolean): void => {
+					async (r: boolean): Promise<void> => {
 						console.log(r);
-						store.clearPopup();
+						await store.clearPopup();
 						store.callInfoPopup(
 							'Пользователь удален',
 							{
@@ -205,11 +200,19 @@ async function confirmDeletingUser(addition_data?: {
 							getUser(user_creds.value)
 						}
 					},
-					async (e: ReturnedError) => {
+					async (e: ReturnedError): Promise<void> => {
 						error.value = e.error.status
 						console.log(e);
 						await store.clearPopup();
-						confirmDeletingUser({ error: e.error.status });
+						store.callInfoPopup(
+							'Пользователь не удален',
+							{
+								isSuccess: false
+							}
+						)
+						// confirmDeletingUser({
+						// 	error: e.error.status
+						// });
 					}
 				);
 			}
@@ -269,6 +272,48 @@ function getDateFromString(init_date: string | number): string {
 function clearUser(): void {
 	router.push({ name: "Users" })
 }
+
+async function addSubscription(addition_data?: {
+	[key: string]: string;
+}): Promise<void> {
+	const prices: Prices = await store.getPrices("both");
+	await store
+		.callPopupWithData("", {
+			type: "add_subscription",
+			prices,
+			creds: user_creds.value,
+			...addition_data,
+		})
+		.then((r: PopupAdditionFields): void => {
+			if (Object.hasOwn(r, "user_creds")) {
+				store.addSubscription().then(
+					async (r: boolean): Promise<void> => {
+						console.log(r);
+						await store.clearPopup();
+						store.callInfoPopup(
+							'Подписка включена',
+							{
+								isSuccess: true
+							}
+						)
+					},
+					async (e: any): Promise<void> => {
+						console.log(e.response.data);
+						await store.clearPopup();
+						store.callInfoPopup(
+							'Подписка не включена',
+							{
+								isSuccess: false
+							}
+						)
+						// addSubscription({
+						// 	error: e.response.data.error.status
+						// });
+					}
+				);
+			}
+		});
+}
 </script>
 
 <style lang="scss" scoped>
@@ -286,8 +331,9 @@ function clearUser(): void {
 
 .top-line {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	margin-bottom: 4rem;
+	margin-bottom: 3rem;
 
 	.info {
 		display: flex;
@@ -296,6 +342,7 @@ function clearUser(): void {
 		border: .1rem solid rgba($color: $--c__grey, $alpha: 0.5);
 		border-radius: 1.5rem;
 		margin-right: 2rem;
+		margin-bottom: 1rem;
 
 		&:first-child {
 			background-color: $--c__light-violet;
@@ -439,6 +486,85 @@ function clearUser(): void {
 
 				svg {
 					fill: $--c__red;
+				}
+			}
+		}
+	}
+
+	@media screen and (max-width: $mobile--breakpoint) {
+		height: 100%;
+		max-width: 100%;
+
+		.preview {
+
+			.user {
+
+				&__list {
+					grid-template: 1fr / 1fr;
+					row-gap: 1rem;
+				}
+
+				.item {
+					padding: 1rem 3rem 1rem 2rem;
+					background-color: rgba($color: $--c__yellow, $alpha: 0.3);
+					border: .1rem solid rgba($color: $--c__grey, $alpha: 0.5);
+					border-radius: 1.5rem;
+					font-size: 1.4rem;
+
+					&__value {
+						&>span {
+							span {
+								font-weight: bold;
+							}
+
+							&+span {
+								margin-left: 2rem;
+							}
+						}
+					}
+
+					&__edit {
+						width: 1.5rem;
+						height: 1.5rem;
+						left: calc(100% + 0.8rem);
+					}
+				}
+			}
+
+			.empty {
+
+				&__image {
+					max-width: 100%;
+				}
+
+				&__error {
+					font-size: 2rem;
+				}
+			}
+		}
+
+		.buttons {
+			flex-direction: column;
+
+			&__container {
+				display: grid;
+				grid-template: 1fr / 1fr;
+				row-gap: 1rem;
+			}
+
+			.button {
+				margin-right: 0;
+				font-size: 1.8rem;
+				height: auto;
+				padding: 1rem 3rem;
+
+				svg {
+					width: 1.8rem;
+				}
+
+				&-delete {
+					margin-top: 1rem;
+					padding: 0;
 				}
 			}
 		}
