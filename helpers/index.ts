@@ -225,10 +225,7 @@ export declare type User = {
 	name?: string
 	password?: string
 	photo?: string
-	typePremium: {
-		psy: StringObject
-		avocado: StringObject
-	}
+	typePremium: UsersTypePremiums
 	session_series?: string
 	session_token?: string
 	device_token?: string
@@ -247,4 +244,19 @@ export declare type User = {
 	device_tokens?: StringObject
 	versions?: StringObject
 	is_test?: boolean | number
+}
+export declare type UsersTypePremiums = {
+	psy: UsersTypePremium
+	avocado: UsersTypePremium
+}
+export declare type UsersTypePremium = {
+	autopayment: string | number
+	keyPaymant: string
+	payDate: string | number
+	payment_method_type: string
+	status: string
+	subscriptionDuration: string
+	subscriptionDurationText: string
+	typeApp: string
+	typePremium: string
 }

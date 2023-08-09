@@ -13,7 +13,7 @@
 						<IconClose />
 						Сбросить поиск
 					</ButtonColored>
-					<ButtonColored class="buttons__button button button-transparent">
+					<ButtonColored class="buttons__button button button-transparent" @click="viewJson(true)">
 						<IconEye />
 						Json
 					</ButtonColored>
@@ -81,20 +81,22 @@
 						<li class="user__item item">
 							<p class="item__title">Уведомления</p>
 							<p class="item__value">В{{ (selectedUser as User).sys_notifications_state ? '' : 'ы' }}ключены</p>
-							<IconPencil class="item__edit" />
+							<IconPencil class="item__edit" @click="toggleNotifications" />
 						</li>
 						<li class="user__item item">
 							<p class="item__title">Дата входа:</p>
-							<p class="item__value">
-								<span>
-									<span>PSY</span>:
-									{{ open_app.psy }}
-								</span>
-								<span>
-									<span>Avocado</span>:
-									{{ open_app.avocado }}
-								</span>
-							</p>
+							<div class="item__container">
+								<p class="item__value">
+									<span>
+										<span>PSY</span>:
+										{{ open_app.psy }}
+									</span>
+									<span>
+										<span>Avocado</span>:
+										{{ open_app.avocado }}
+									</span>
+								</p>
+							</div>
 						</li>
 					</ul>
 				</div>
@@ -104,9 +106,16 @@
 				</div>
 			</div>
 		</div>
+		<div class="users__json json" v-if="isJson">
+			<div class="json__container">
+				<pre>{{ JSON.stringify(json, null, 2) }}</pre>
+				<IconClose class="json__close" @click="viewJson(false)" />
+			</div>
+		</div>
 
 		<PopupUserDelete />
 		<PopupSubscriptionActivation />
+		<PopupToggleNotifications />
 		<PopupSearchUser />
 	</section>
 </template>
@@ -120,11 +129,12 @@ import IconClose from "@icons/IconClose.vue";
 import IconEye from "@icons/IconEye.vue";
 import PopupUserDelete from "@add-comps/PopupUserDelete.vue";
 import PopupSubscriptionActivation from "@add-comps/PopupSubscriptionActivation.vue";
+import PopupToggleNotifications from "@add-comps/PopupToggleNotifications.vue";
 import PopupSearchUser from "@add-comps/PopupSearchUser.vue";
 import { useRoute, useRouter } from "vue-router";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref, Ref, watch } from "vue";
-import { User, NumberObject, PopupAdditionFields, ReturnedError, ReturnedData, StringObject, NumberOrStringObject, Prices } from "../../helpers";
+import { User, NumberObject, PopupAdditionFields, ReturnedError, ReturnedData, StringObject, NumberOrStringObject, Prices, UsersTypePremium, UsersTypePremiums } from "../../helpers";
 import { cloneDeep } from "lodash";
 import { clearVariable } from "../main";
 
@@ -135,6 +145,8 @@ const { loading, commonInfo, apps, monthNames } = storeToRefs(store);
 
 const user_creds: ComputedRef<string | undefined> = computed((): string | undefined => route.query.creds as string | undefined)
 const sub_app: Ref<string> = ref('')
+const json: Ref<User | {}> = ref({})
+const isJson: ComputedRef<boolean> = computed(() => Object.keys(json.value).length > 0)
 
 const selectedUser: Ref<User | {}> = ref({})
 const isUser: ComputedRef<boolean> = computed((): boolean => Object.keys(selectedUser.value).length !== 0)
@@ -155,14 +167,12 @@ const open_app: ComputedRef<StringObject> = computed((): StringObject => {
 getUsersData()
 
 if (user_creds.value) {
-	loading.value = true
 	getUser(user_creds.value)
 }
 
 watch(() => user_creds.value,
 	() => {
 		if (user_creds.value) {
-			loading.value = true
 			getUser(user_creds.value as string)
 		} else {
 			selectedUser.value = {}
@@ -237,6 +247,7 @@ async function searchUser(addition_data?: {
 		});
 }
 function getUser(data: string | number) {
+	loading.value = true
 	store.getUser(data).then(
 		(r: ReturnedError | ReturnedData): void => {
 			selectedUser.value = (r as ReturnedData).data.user
@@ -281,26 +292,34 @@ async function addSubscription(addition_data?: {
 		.callPopupWithData("", {
 			type: "add_subscription",
 			prices,
-			creds: user_creds.value,
+			creds: user_creds.value ? (selectedUser.value as User).email : null,
+			autopayment: user_creds.value ? (selectedUser.value as User).typePremium[(addition_data as StringObject)['app'] as keyof UsersTypePremiums].autopayment : null,
 			...addition_data,
 		})
 		.then((r: PopupAdditionFields): void => {
-			if (Object.hasOwn(r, "user_creds")) {
+			loading.value = true
+
+			if (Object.hasOwn(r, "creds")) {
 				store.addSubscription().then(
 					async (r: boolean): Promise<void> => {
-						console.log(r);
+						loading.value = false
 						await store.clearPopup();
-						store.callInfoPopup(
+						await store.callInfoPopup(
 							'Подписка включена',
 							{
 								isSuccess: true
 							}
-						)
+						).then((): void => {
+							if (user_creds.value) {
+								getUser(user_creds.value as string)
+							}
+						})
 					},
 					async (e: any): Promise<void> => {
+						loading.value = false
 						console.log(e.response.data);
 						await store.clearPopup();
-						store.callInfoPopup(
+						await store.callInfoPopup(
 							'Подписка не включена',
 							{
 								isSuccess: false
@@ -314,6 +333,60 @@ async function addSubscription(addition_data?: {
 			}
 		});
 }
+
+async function toggleNotifications(addition_data?: StringObject): Promise<void> {
+	await store
+		.callPopupWithData("", {
+			type: "toggle_notifications",
+			creds: user_creds.value,
+			sys_notifications: user_creds.value ? (selectedUser.value as User).sys_notifications_state : null,
+			...addition_data,
+		})
+		.then((r: PopupAdditionFields): void => {
+			if (Object.hasOwn(r, "creds")) {
+				loading.value = true
+				store.toggleNotifications().then(
+					async (r: boolean): Promise<void> => {
+						loading.value = false
+						await store.clearPopup();
+						await store.callInfoPopup(
+							'Уведомления сохранены',
+							{
+								isSuccess: !!r
+							}
+						).then((): void => {
+							if (user_creds.value) {
+								getUser(user_creds.value as string)
+							}
+						})
+					},
+					async (e: ReturnedError): Promise<void> => {
+						loading.value = false
+						console.log(e.error.status);
+						await store.clearPopup();
+						await store.callInfoPopup(
+							'Уведомления не сохранены',
+							{
+								isSuccess: false
+							}
+						)
+					}
+				);
+			}
+		});
+}
+
+function viewJson(is_view: boolean): void {
+	json.value = is_view ? {
+		id: (selectedUser.value as User).id,
+		name: (selectedUser.value as User).name,
+		email: (selectedUser.value as User).email,
+		registration_date: (selectedUser.value as User).registration_date,
+		typePremium: (selectedUser.value as User).typePremium,
+		sys_notifications_state: (selectedUser.value as User).sys_notifications_state,
+		open_app: (selectedUser.value as User).open_app,
+	} : {}
+}
 </script>
 
 <style lang="scss" scoped>
@@ -323,6 +396,7 @@ async function addSubscription(addition_data?: {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	position: relative;
 
 	&__top-line {}
 
@@ -496,6 +570,7 @@ async function addSubscription(addition_data?: {
 		max-width: 100%;
 
 		.preview {
+			margin-right: 1rem;
 
 			.user {
 
@@ -511,14 +586,17 @@ async function addSubscription(addition_data?: {
 					border-radius: 1.5rem;
 					font-size: 1.4rem;
 
-					&__value {
-						&>span {
-							span {
-								font-weight: bold;
-							}
+					&__container {}
 
+					&__value {
+						word-wrap: break-word;
+						width: 100%;
+						max-width: 20rem;
+						text-align: right;
+
+						&>span {
 							&+span {
-								margin-left: 2rem;
+								margin-left: 0;
 							}
 						}
 					}
@@ -527,6 +605,19 @@ async function addSubscription(addition_data?: {
 						width: 1.5rem;
 						height: 1.5rem;
 						left: calc(100% + 0.8rem);
+					}
+
+					&:last-child {
+						.item__value {
+							display: flex;
+							flex-direction: column;
+
+							&>span {
+								&+span {
+									text-align: left;
+								}
+							}
+						}
 					}
 				}
 			}
@@ -563,11 +654,46 @@ async function addSubscription(addition_data?: {
 				}
 
 				&-delete {
-					margin-top: 1rem;
+					margin-top: 1.5rem;
 					padding: 0;
 				}
 			}
 		}
+	}
+}
+
+.json {
+	position: absolute;
+	z-index: 9;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-shadow: 0 0 5rem 0 $--c__grey;
+	border-radius: 2rem;
+	background-color: $--c__white;
+	padding: 2rem;
+	width: 100%;
+	height: 100%;
+	max-width: 60rem;
+	max-height: 48rem;
+
+	&__container {
+		width: 100%;
+		height: 100%;
+		overflow: auto;
+	}
+
+	&__close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		width: 1.8rem;
+		height: auto;
+		fill: $--c__grey;
+		cursor: pointer;
 	}
 }
 </style>

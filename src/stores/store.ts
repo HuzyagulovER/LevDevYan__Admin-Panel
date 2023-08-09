@@ -490,13 +490,20 @@ export const Store = defineStore('Store', {
 			this.popup = cloneDeep(clearVariable(this.popup))
 		},
 
-		callInfoPopup(text: string, additionFields?: StringObject): void {
+		async callInfoPopup(text: string, additionFields?: StringObject): Promise<void> {
+
 			this.info_popup.text = text
 			this.info_popup.isActive = true
 			this.info_popup.additionFields = additionFields && Object.keys(additionFields).length > 0 ? additionFields : {}
-			setTimeout(() => {
-				this.info_popup = cloneDeep(clearVariable(this.info_popup))
-			}, 2000);
+			// setTimeout(() => {
+			// 	this.info_popup = cloneDeep(clearVariable(this.info_popup))
+			// }, 2000);
+			return new Promise((res) => {
+				setTimeout(() => {
+					this.info_popup = cloneDeep(clearVariable(this.info_popup));
+					res();
+				}, 2000);
+			})
 		},
 
 		async callPopupWithData(text: string, additionFields: StringObject): Promise<StringObject> {
@@ -565,15 +572,34 @@ export const Store = defineStore('Store', {
 		},
 		async addSubscription(): Promise<void> {
 			const fd = new FormData()
-			fd.append('user_creds', this.popup.additionFields['user_creds' as keyof PopupAdditionFields] as string);
-			fd.append('sub_app', this.popup.additionFields['sub_app' as keyof PopupAdditionFields] as string);
-			fd.append('sub_type', this.popup.additionFields['sub_type' as keyof PopupAdditionFields] as string);
+			fd.append('creds', this.popup.additionFields['creds' as keyof PopupAdditionFields] as string);
+			fd.append('app', this.popup.additionFields['app' as keyof PopupAdditionFields] as string);
+			fd.append('type', this.popup.additionFields['type' as keyof PopupAdditionFields] as string);
+			if (this.popup.additionFields['autopayment' as keyof PopupAdditionFields]) {
+				fd.append('autopayment', this.popup.additionFields['autopayment' as keyof PopupAdditionFields] as string);
+			}
+
 			return await axios.post(...formRequest('Users/addSubscription', fd) as [string, FormData]).then(
 				r => {
 					return r.data
 				},
 				e => {
-					throw e
+					throw e.response.data
+				}
+			)
+		},
+
+		async toggleNotifications(): Promise<void> {
+			const fd = new FormData()
+			fd.append('creds', this.popup.additionFields['creds' as keyof PopupAdditionFields] as string);
+			fd.append('sys_notifications', this.popup.additionFields['sys_notifications' as keyof PopupAdditionFields] as string);
+
+			return await axios.post(...formRequest('Users/toggleNotifications', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					throw e.response.data
 				}
 			)
 		},

@@ -1,52 +1,25 @@
 <template>
 	<Teleport to="body">
 		<Transition name="list">
-			<div class="popup-user-add-sub" v-if="popup.isActive && popup.type === 'add_subscription'">
-				<div class="popup-user-add-sub__container">
-					<p class="popup-user-add-sub__text">Включение подписки</p>
-					<div class="popup-user-add-sub__input">
-						<label for="user_creds" class="form__label">Почта или ID</label>
-						<input id="user_creds" type="text" v-model="user_creds" class="form__input" :class="{
-							_err: popup.additionFields.error === 'INVALID_ARGUMENT',
-						}" :disabled="disabled" />
-					</div>
-					<div class="popup-user-add-sub__input">
-						<label for="user_creds" class="form__label">Приложение</label>
-						<select id="sub_app" class="form__input" v-model="sub_app" :disabled="disabled">
-							<option v-for="sub in apps" :value="sub.toLowerCase()" :key="sub">
-								{{ sub }}
-							</option>
-						</select>
-					</div>
-					<div class="popup-user-add-sub__input">
-						<label for="user_creds" class="form__label">Тип подписки</label>
-						<select id="sub_name" class="form__input" v-model="sub_type">
-							<option value="">Без изменений</option>
-							<option value="none">
-								Отключить
-							</option>
-							<option v-for="_type in popup.additionFields.prices[sub_app]" :value="_type.id" :key="_type.id">
-								{{ _type.name }}
-							</option>
-						</select>
-					</div>
-					<div class="popup-user-add-sub__input" v-if="popup.additionFields.autopayment && sub_type === ''">
-						<label for="user_creds" class="form__label">Автооплата</label>
-						<select id="sub_name" class="form__input" v-model="sub_autopayment">
+			<div class="popup-toggle-notifications" v-if="popup.isActive && popup.type === 'toggle_notifications'">
+				<div class="popup-toggle-notifications__container">
+					<p class="popup-toggle-notifications__text">Уведомления</p>
+					<div class="popup-toggle-notifications__input">
+						<select id="sub_name" class="form__input" v-model="sys_notifications">
 							<option value="1">
-								Включить
+								Включены
 							</option>
 							<option value="0">
-								Отключить
+								Отключены
 							</option>
 						</select>
 					</div>
-					<div class="popup-user-add-sub__wrapper">
-						<button class="popup-user-add-sub__button" tabindex="1" @click="confirm(true)">
-							Включить
-						</button>
-						<button class="popup-user-add-sub__button" tabindex="1" @click="confirm(false)">
+					<div class="popup-toggle-notifications__wrapper">
+						<button class="popup-toggle-notifications__button" tabindex="1" @click="confirm(false)">
 							Отмена
+						</button>
+						<button class="popup-toggle-notifications__button" tabindex="1" @click="confirm(true)">
+							Сохранить
 						</button>
 					</div>
 				</div>
@@ -67,36 +40,18 @@ const { popup, apps } = storeToRefs(store);
 const disabled: Ref<boolean> = ref(false);
 const disable: Ref<boolean> = ref(false);
 const user_creds: Ref<string> = ref("");
-const sub_app: Ref<string> = ref("");
-const sub_type: Ref<string> = ref("");
-const sub_autopayment: Ref<string> = ref("");
+const sys_notifications: Ref<string> = ref("");
 
 watch(
 	() => popup.value,
-	(a, b) => {
-		// console.log(a.additionFields);
-		// console.log(b.additionFields);
-
-		if (popup.value.additionFields.app) {
-			sub_app.value = popup.value.additionFields.app
-		}
+	() => {
 		if (popup.value.additionFields.creds) {
 			user_creds.value = popup.value.additionFields.creds
 		}
-		if (sub_app.value && user_creds.value) {
-			sub_autopayment.value = popup.value.additionFields.autopayment
-			disabled.value = true
-		}
+		sys_notifications.value = popup.value.additionFields.sys_notifications
 	},
 	{ deep: true }
 )
-
-watch(() => sub_type.value,
-	() => {
-		if (sub_type.value === "") {
-			sub_autopayment.value = ""
-		}
-	})
 
 function confirm(ans: boolean): void {
 	if (!disable.value) {
@@ -105,17 +60,13 @@ function confirm(ans: boolean): void {
 		popup.value.isReturned = true;
 		popup.value.additionFields = merge(popup.value.additionFields, {
 			creds: user_creds.value,
-			app: sub_app.value,
-			type: sub_type.value,
-			autopayment: sub_autopayment.value
+			sys_notifications: sys_notifications.value
 		});
 		setTimeout(() => {
 			disabled.value = false;
 
 			user_creds.value = '';
-			sub_app.value = "";
-			sub_type.value = "";
-			sub_autopayment.value = ""
+			sys_notifications.value = ""
 		}, 500);
 	}
 
@@ -128,7 +79,7 @@ function confirm(ans: boolean): void {
 <style scoped lang="scss">
 @import "@/style.scss";
 
-.popup-user-add-sub {
+.popup-toggle-notifications {
 	position: absolute;
 	z-index: 9;
 	top: 50%;
