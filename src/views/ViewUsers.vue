@@ -52,29 +52,17 @@
 							<p class="item__title">Дата регистрации</p>
 							<p class="item__value">{{ getDateFromString((selectedUser as User).registration_date) }}</p>
 						</li>
-						<li class="user__item item">
+						<li class="user__item item" v-if="open_app.psy !== '-'">
 							<p class="item__title">Подписка PSY</p>
 							<p class="item__value">
-								{{
-									(selectedUser as User).typePremium.psy.subscriptionDurationText !== ''
-									?
-									(selectedUser as User).typePremium.psy.subscriptionDurationText
-									:
-									'-'
-								}}
+								{{ (selectedUser as User).typePremium.psy.subscriptionDurationText }}
 							</p>
 							<IconPencil class="item__edit" @click="addSubscription({ app: 'psy' })" />
 						</li>
-						<li class="user__item item">
+						<li class="user__item item" v-if="open_app.avocado !== '-'">
 							<p class="item__title">Подписка Avocado</p>
 							<p class="item__value">
-								{{
-									(selectedUser as User).typePremium.avocado.subscriptionDurationText !== ''
-									?
-									(selectedUser as User).typePremium.avocado.subscriptionDurationText
-									:
-									'-'
-								}}
+								{{ (selectedUser as User).typePremium.avocado.subscriptionDurationText }}
 							</p>
 							<IconPencil class="item__edit" @click="addSubscription({ app: 'avocado' })" />
 						</li>
@@ -87,11 +75,11 @@
 							<p class="item__title">Дата входа:</p>
 							<div class="item__container">
 								<p class="item__value">
-									<span>
+									<span v-if="open_app.psy !== '-'">
 										<span>PSY</span>:
 										{{ open_app.psy }}
 									</span>
-									<span>
+									<span v-if="open_app.avocado !== '-'">
 										<span>Avocado</span>:
 										{{ open_app.avocado }}
 									</span>
