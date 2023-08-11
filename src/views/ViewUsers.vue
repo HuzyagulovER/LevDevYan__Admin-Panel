@@ -293,7 +293,7 @@ async function addSubscription(addition_data?: {
 						loading.value = false
 						await store.clearPopup();
 						await store.callInfoPopup(
-							'Подписка включена',
+							'Изменения сохранены успешно',
 							{
 								isSuccess: true
 							}
@@ -308,7 +308,7 @@ async function addSubscription(addition_data?: {
 						console.log(e.response.data);
 						await store.clearPopup();
 						await store.callInfoPopup(
-							'Подписка не включена',
+							'Изменения не сохранены',
 							{
 								isSuccess: false
 							}
