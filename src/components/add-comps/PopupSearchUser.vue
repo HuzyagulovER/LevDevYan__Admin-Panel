@@ -46,7 +46,7 @@ function confirm(ans: boolean) {
 		});
 		setTimeout(() => {
 			disabled.value = false;
-		}, 500);
+		}, 1000);
 	}
 
 	if (!ans) {

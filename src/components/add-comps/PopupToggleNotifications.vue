@@ -67,7 +67,7 @@ function confirm(ans: boolean): void {
 
 			user_creds.value = '';
 			sys_notifications.value = ""
-		}, 500);
+		}, 1000);
 	}
 
 	if (!ans) {

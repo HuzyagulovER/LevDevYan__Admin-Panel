@@ -73,10 +73,7 @@ const sub_autopayment: Ref<string> = ref("");
 
 watch(
 	() => popup.value,
-	(a, b) => {
-		// console.log(a.additionFields);
-		// console.log(b.additionFields);
-
+	() => {
 		if (popup.value.additionFields.app) {
 			sub_app.value = popup.value.additionFields.app
 		}
@@ -116,7 +113,7 @@ function confirm(ans: boolean): void {
 			sub_app.value = "";
 			sub_type.value = "";
 			sub_autopayment.value = ""
-		}, 500);
+		}, 1000);
 	}
 
 	if (!ans) {
