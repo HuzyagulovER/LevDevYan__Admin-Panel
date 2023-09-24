@@ -84,7 +84,7 @@ export const Store = defineStore('Store', {
 			apps: { psy: 'PSY', avocado: 'Avocado' },
 			OS: {
 				android: "Android",
-				iOS: "iOS",
+				apple: "Apple",
 			},
 			loading: false,
 			popup: {
