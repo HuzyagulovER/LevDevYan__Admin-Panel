@@ -52,14 +52,16 @@
 							<p class="item__title">Дата регистрации</p>
 							<p class="item__value">{{ getDateFromString((selectedUser as User).registration_date) }}</p>
 						</li>
-						<li class="user__item item" v-if="open_app.psy !== '-'">
+						<li class="user__item item"
+							v-if="open_app.psy !== '-' || (selectedUser as User).typePremium.psy.status !== 'inactive'">
 							<p class="item__title">Подписка PSY</p>
 							<p class="item__value">
 								{{ (selectedUser as User).typePremium.psy.subscriptionDurationText }}
 							</p>
 							<IconPencil class="item__edit" @click="addSubscription({ app: 'psy' })" />
 						</li>
-						<li class="user__item item" v-if="open_app.avocado !== '-'">
+						<li class="user__item item"
+							v-if="open_app.avocado !== '-' || (selectedUser as User).typePremium.avocado.status !== 'inactive'">
 							<p class="item__title">Подписка Avocado</p>
 							<p class="item__value">
 								{{ (selectedUser as User).typePremium.avocado.subscriptionDurationText }}
@@ -276,13 +278,19 @@ async function addSubscription(addition_data?: {
 	[key: string]: string;
 }): Promise<void> {
 	const prices: Prices = await store.getPrices("both");
+	let add_data: {
+		[key: string]: string | UsersTypePremiums
+	} = {};
+	add_data = { ...addition_data };
+	if (selectedUser.value && addition_data) add_data.subs = (selectedUser.value as User).typePremium;
+
 	await store
 		.callPopupWithData("", {
 			type: "add_subscription",
 			prices,
 			creds: user_creds.value ? (selectedUser.value as User).email : null,
 			autopayment: user_creds.value ? (selectedUser.value as User).typePremium[(addition_data as StringObject)['app'] as keyof UsersTypePremiums].autopayment : null,
-			...addition_data,
+			...add_data,
 		})
 		.then((r: PopupAdditionFields): void => {
 			loading.value = true
@@ -293,7 +301,7 @@ async function addSubscription(addition_data?: {
 						loading.value = false
 						await store.clearPopup();
 						await store.callInfoPopup(
-							'Изменения сохранены успешно',
+							'Изменения сохранены',
 							{
 								isSuccess: true
 							}

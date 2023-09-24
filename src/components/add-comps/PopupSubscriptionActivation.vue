@@ -21,7 +21,7 @@
 					<div class="popup-user-add-sub__input">
 						<label for="user_creds" class="form__label">Тип подписки</label>
 						<select id="sub_name" class="form__input" v-model="sub_type">
-							<option value="">Без изменений</option>
+							<option value="">Без изменений {{ currentsSubName ? "(" + currentsSubName + ")" : '' }}</option>
 							<option value="none">
 								Отключить
 							</option>
@@ -43,7 +43,7 @@
 					</div>
 					<div class="popup-user-add-sub__wrapper">
 						<button class="popup-user-add-sub__button" tabindex="1" @click="confirm(true)">
-							Включить
+							Сохранить
 						</button>
 						<button class="popup-user-add-sub__button" tabindex="1" @click="confirm(false)">
 							Отмена
@@ -70,6 +70,7 @@ const user_creds: Ref<string> = ref("");
 const sub_app: Ref<string> = ref("");
 const sub_type: Ref<string> = ref("");
 const sub_autopayment: Ref<string> = ref("");
+const currentsSubName: Ref<string> = ref("")
 
 watch(
 	() => popup.value,
@@ -83,6 +84,8 @@ watch(
 		if (sub_app.value && user_creds.value) {
 			sub_autopayment.value = popup.value.additionFields.autopayment
 			disabled.value = true
+			let typePremium = popup.value.additionFields.subs[sub_app.value].typePremium
+			currentsSubName.value = popup.value.additionFields.prices[sub_app.value][typePremium]?.name
 		}
 	},
 	{ deep: true }
@@ -90,9 +93,14 @@ watch(
 
 watch(() => sub_type.value,
 	() => {
-		if (sub_type.value === "") {
-			sub_autopayment.value = ""
-		}
+		console.log(popup.value.additionFields);
+		console.log(sub_type.value);
+		console.log("");
+
+		sub_autopayment.value =
+			(sub_type.value === "")
+				? popup.value.additionFields.autopayment
+				: ''
 	})
 
 function confirm(ans: boolean): void {
@@ -100,6 +108,7 @@ function confirm(ans: boolean): void {
 		disabled.value = true;
 		popup.value.answer = ans;
 		popup.value.isReturned = true;
+
 		popup.value.additionFields = merge(popup.value.additionFields, {
 			creds: user_creds.value,
 			app: sub_app.value,
