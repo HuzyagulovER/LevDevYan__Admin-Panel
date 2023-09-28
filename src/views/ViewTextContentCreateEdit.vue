@@ -65,7 +65,10 @@
 							<IconTrash class="text__icon icon-trash" @click="confirmDeleteText(j)" />
 						</div>
 						<div>
-							<textarea class="form__textarea text__textarea" v-model="activeContent.texts[j].text"></textarea>
+							<input type="text" class="form__input text__input" name="title" :disabled="disabledForm"
+								v-model="activeContent.texts[j].title" placeholder="Заголовок..." />
+							<textarea class="form__textarea text__textarea" v-model="activeContent.texts[j].text"
+								:disabled="disabledForm" placeholder="Текст..."></textarea>
 						</div>
 						<div>
 							<InputImage class="text__file-input" :image="activeContent.texts[j].image"
@@ -117,7 +120,6 @@ const store = <StoreGeneric>inject("Store");
 const clearVariable = <Function>inject("clearVariable");
 const getSHA256Hash = <Function>inject("getSHA256Hash");
 const {
-	contentList,
 	defaultContent,
 	loading,
 	mainTitle,
@@ -313,6 +315,7 @@ function returnHandler(r: ReturnedData | ReturnedError) {
 async function createNewText(): Promise<void> {
 	let hash: string = await getSHA256Hash(Date.now());
 	activeContent.value.texts[hash] = {
+		title: "",
 		text: "",
 		image: "",
 		media: "",

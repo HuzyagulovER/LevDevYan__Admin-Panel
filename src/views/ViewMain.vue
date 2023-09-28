@@ -60,6 +60,14 @@
 				<div class="info__courses">
 					<div class="info__container">
 						<p class="info__title">Курсы</p>
+						<div class="info__filter">
+							<IconFilter />
+							<select v-model="filters.courses">
+								<option v-for="selection in selections" :key="selection.value" :value="selection.value">
+									{{ selection.text }}
+								</option>
+							</select>
+						</div>
 					</div>
 					<div class="info__container">
 						<div class="info__wrapper">
@@ -88,7 +96,7 @@ import MainInfoItem from "@for-main/MainInfoItem.vue";
 import TheMainBanner from "@for-main/TheMainBanner.vue";
 import { inject, Ref, ref, watch } from "vue";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { PopupAdditionFields, StringObject } from "../../helpers";
+import { StringObject } from "../../helpers";
 
 const store = <StoreGeneric>inject("Store");
 const { loading, commonInfo } = storeToRefs(store);
@@ -110,6 +118,7 @@ const selections: Array<StringObject> = [
 const filters: Ref<StringObject> = ref({
 	users: "all",
 	subs: "all",
+	courses: "all",
 });
 
 getUsersData();
@@ -117,7 +126,6 @@ getUsersData();
 watch(
 	() => filters.value,
 	() => {
-		console.log(filters.value);
 		getUsersData();
 	},
 	{

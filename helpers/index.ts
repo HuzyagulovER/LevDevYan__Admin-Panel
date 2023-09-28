@@ -122,6 +122,7 @@ export declare type Content = {
 	texts: { [key: string]: ContentText }
 }
 export declare type ContentText = {
+	title: string
 	text: string
 	image: string
 	media?: string
