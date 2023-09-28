@@ -736,9 +736,11 @@ export const Store = defineStore('Store', {
 			)
 		},
 
-		async getActiveSubscriptions(app: string): Promise<void> {
+		async getActiveSubscriptions(app: string, filter?: string): Promise<void> {
 			const fd = new FormData()
 			fd.append('app', app)
+			if (filter)
+				fd.append('filter', filter)
 
 			return await axios.post(...formRequest('Subscriptions/getActiveSubscriptions', fd) as [string, FormData]).then(
 				r => {

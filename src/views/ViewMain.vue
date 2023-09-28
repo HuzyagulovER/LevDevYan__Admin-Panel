@@ -6,14 +6,7 @@
 				<div class="info__users">
 					<div class="info__container">
 						<p class="info__title">Пользователи</p>
-						<div class="info__filter">
-							<IconFilter />
-							<select v-model="filters.users">
-								<option v-for="selection in selections" :key="selection.value" :value="selection.value">
-									{{ selection.text }}
-								</option>
-							</select>
-						</div>
+						<Filter :init-value="filters.users" @on-change-value="filters.users = $event" />
 					</div>
 					<div class="info__container">
 						<div class="info__wrapper">
@@ -33,14 +26,7 @@
 				<div class="info__subscriptions">
 					<div class="info__container">
 						<p class="info__title">Подписки</p>
-						<div class="info__filter">
-							<IconFilter />
-							<select v-model="filters.subs">
-								<option v-for="selection in selections" :key="selection.value" :value="selection.value">
-									{{ selection.text }}
-								</option>
-							</select>
-						</div>
+						<Filter :init-value="filters.subs" @on-change-value="filters.subs = $event" />
 					</div>
 					<div class="info__container">
 						<div class="info__wrapper">
@@ -60,14 +46,7 @@
 				<div class="info__courses">
 					<div class="info__container">
 						<p class="info__title">Курсы</p>
-						<div class="info__filter">
-							<IconFilter />
-							<select v-model="filters.courses">
-								<option v-for="selection in selections" :key="selection.value" :value="selection.value">
-									{{ selection.text }}
-								</option>
-							</select>
-						</div>
+						<Filter :init-value="filters.courses" @on-change-value="filters.courses = $event" />
 					</div>
 					<div class="info__container">
 						<div class="info__wrapper">
@@ -90,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import IconFilter from "@icons/IconFilter.vue";
+import Filter from "@add-comps/Filter.vue";
 import MainInfoItem from "@for-main/MainInfoItem.vue";
 import TheMainBanner from "@for-main/TheMainBanner.vue";
 import { inject, Ref, ref, watch } from "vue";

@@ -2,6 +2,7 @@
 	<section class="subscriptions">
 		<div class="subscriptions__top-line top-line">
 			<ButtonsPages class="top-line__buttons-pages" />
+			<Filter :init-value="subs" @on-change-value="subs = $event" class="top-line__filter" />
 		</div>
 		<div class="subscriptions__block active">
 			<p class="subscriptions__subtitle subtitle">Активные</p>
@@ -76,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import ButtonCreate from "@add-comps/ButtonCreate.vue";
+import Filter from "@add-comps/Filter.vue";
 import ButtonsPages from "@add-comps/ButtonsPages.vue";
 import IconPencil from "@icons/IconPencil.vue";
 import SubscriptionsItem from "@for-subscriptions/SubscriptionsItem.vue";
@@ -95,7 +96,7 @@ import {
 
 const route = useRoute();
 const store = <StoreGeneric>inject("Store");
-const { loading, popup } = storeToRefs(store);
+const { loading } = storeToRefs(store);
 
 const prices: Ref<Prices> = ref({});
 const activeSubscriptions: Ref<ActiveSubscriptions> = ref({});
@@ -104,12 +105,21 @@ const date: Ref<string> = ref(dateForm());
 const app: ComputedRef<string> = computed(() =>
 	route.query.app ? <string>route.query.app : "psy"
 );
-const subscriptionId: Ref<string> = ref(<string>route.params.subscriptionId);
+const subs: Ref<string> = ref('all')
 loadData();
 
 watch(
 	() => app.value,
 	() => loadData()
+);
+watch(
+	() => subs.value,
+	async () => {
+		loading.value = true;
+		await getActiveSubscriptions();
+		loading.value = false;
+
+	}
 );
 
 async function loadData(): Promise<void> {
@@ -126,7 +136,7 @@ async function getPrices(): Promise<void> {
 }
 async function getActiveSubscriptions(): Promise<void> {
 	await store
-		.getActiveSubscriptions(app.value)
+		.getActiveSubscriptions(app.value, subs.value)
 		.then((r: ActiveSubscriptions) => {
 			activeSubscriptions.value = r;
 		});
@@ -169,6 +179,10 @@ function selectDate() {
 		margin-bottom: 2rem;
 
 		&__button-create {
+			margin-left: auto;
+		}
+
+		&__filter {
 			margin-left: auto;
 		}
 	}
