@@ -91,7 +91,6 @@
 
 <script setup lang="ts">
 import IconFilter from "@icons/IconFilter.vue";
-import IconTrash from "@icons/IconTrash.vue";
 import MainInfoItem from "@for-main/MainInfoItem.vue";
 import TheMainBanner from "@for-main/TheMainBanner.vue";
 import { inject, Ref, ref, watch } from "vue";
