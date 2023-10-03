@@ -34,10 +34,10 @@
 						<label for="user_creds" class="form__label">Автооплата</label>
 						<select id="sub_name" class="form__input" v-model="sub_autopayment">
 							<option value="1">
-								Включить
+								Включена
 							</option>
 							<option value="0">
-								Отключить
+								Отключена
 							</option>
 						</select>
 					</div>

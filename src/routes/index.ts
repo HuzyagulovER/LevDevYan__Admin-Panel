@@ -9,6 +9,7 @@ import ViewNotifications from "@views/ViewNotifications.vue";
 import ViewTextContent from "@views/ViewTextContent.vue";
 import ViewSubscriptions from "@views/ViewSubscriptions.vue";
 import ViewUsers from "@views/ViewUsers.vue";
+import ViewSystem from "@views/ViewSystem.vue";
 
 import ViewNotificationsCreateEdit from "@views/ViewNotificationsCreateEdit.vue";
 import CoursesCreateEditAbout from "@for-course-create/CoursesCreateEditAbout.vue";
@@ -23,6 +24,7 @@ import IconNotifications from "@add-comps/icons/IconNotifications.vue";
 import IconText from "@add-comps/icons/IconText.vue";
 import IconSubscription from "@add-comps/icons/IconSubscription.vue";
 import IconSmile from "@add-comps/icons/IconSmile.vue";
+import IconSystem from "@add-comps/icons/IconSystem.vue";
 
 import { Component } from 'vue';
 import { Store } from '../stores/store';
@@ -179,6 +181,18 @@ const routes: Array<RouteRecordRawWithMeta> = [
 			title: "Пользователи",
 			nav_icon: IconSmile,
 			nav_title: "Пользователи",
+			isNav: true,
+			variative: false,
+		},
+	},
+	{
+		path: '/system',
+		name: "System",
+		component: ViewSystem,
+		meta: {
+			title: "Система",
+			nav_icon: IconSystem,
+			nav_title: "Система",
 			isNav: true,
 			variative: false,
 		},

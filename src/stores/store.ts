@@ -205,7 +205,7 @@ export const Store = defineStore('Store', {
 				langFD.append('lang', lang)
 			}
 
-			return await axios.post(...formRequest('Courses/getCourses', langFD) as [string])
+			return await axios.post(...formRequest('Courses/getCourses', langFD) as [string, FormData])
 				.then(r => {
 					this.courses = r.data.data
 					this.loading = false
@@ -220,7 +220,7 @@ export const Store = defineStore('Store', {
 			const courseIdFD = new FormData()
 			courseIdFD.append('courses_ids', JSON.stringify([courseId]))
 
-			return await axios.post(...formRequest('Courses/getCourses', courseIdFD) as [string])
+			return await axios.post(...formRequest('Courses/getCourses', courseIdFD) as [string, FormData])
 				.then(r => {
 					this.loading = false
 					return r.data.data
@@ -327,7 +327,7 @@ export const Store = defineStore('Store', {
 
 		async getPromocodes(): Promise<void> {
 			const fd = new FormData()
-			return await axios.post(...formRequest('Promocodes/getPromocodes', fd) as [string])
+			return await axios.post(...formRequest('Promocodes/getPromocodes', fd) as [string, FormData])
 				.then(r => {
 					const promocodes: Promocodes = cloneDeep(r.data.data.promocodes)
 					for (const key in promocodes) {
@@ -347,7 +347,7 @@ export const Store = defineStore('Store', {
 		async deletePromocode(promocode: string): Promise<void> {
 			const fd = new FormData()
 			fd.append('promocode', promocode);
-			return await axios.post(...formRequest('Promocodes/deletePromocode', fd) as [string])
+			return await axios.post(...formRequest('Promocodes/deletePromocode', fd) as [string, FormData])
 				.then(r => {
 					return r.data;
 				})
@@ -387,7 +387,7 @@ export const Store = defineStore('Store', {
 			fd.append('app', app)
 			fd.append('lang', lang)
 
-			return await axios.post(...formRequest('Notifications/getAdminNotifications', fd) as [string])
+			return await axios.post(...formRequest('Notifications/getAdminNotifications', fd) as [string, FormData])
 				.then(
 					r => {
 						return r.data.data;
@@ -621,7 +621,7 @@ export const Store = defineStore('Store', {
 				contentIdFD.append('content_type', contentType)
 			}
 
-			return await axios.post(...formRequest('Content/getContent', contentIdFD) as [string])
+			return await axios.post(...formRequest('Content/getContent', contentIdFD) as [string, FormData])
 				.then(r => {
 					this.loading = false
 					this.contentList = r.data.data
@@ -636,7 +636,7 @@ export const Store = defineStore('Store', {
 			const pageNameFD = new FormData()
 			pageNameFD.append('app', pageName)
 
-			return await axios.post(...formRequest('Content/getTypes', pageNameFD) as [string])
+			return await axios.post(...formRequest('Content/getTypes', pageNameFD) as [string, FormData])
 				.then(r => {
 					this.loading = false
 					return r.data.data
@@ -765,5 +765,16 @@ export const Store = defineStore('Store', {
 				}
 			)
 		},
+
+		async getLogsInfo(): Promise<void> {
+			return await axios.post(...formRequest('Logs/getLogsSizes') as [string]).then(
+				r => {
+					return r.data.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		}
 	},
 })

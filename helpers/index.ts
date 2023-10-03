@@ -261,3 +261,21 @@ export declare type UsersTypePremium = {
 	typeApp: string
 	typePremium: string
 }
+
+export declare type Logs = {
+	total_size?: string
+	logs?: LogsInfo
+}
+export declare type LogsInfo = {
+	admin?: LogsInfoItem
+	site?: LogsInfoItem
+}
+export declare type LogsInfoItem = {
+	total_size: LogsSize
+	logs_size: LogsSize
+	is_clear_needed: boolean
+}
+export declare type LogsSize = {
+	value: string | number
+	format_value: string
+}

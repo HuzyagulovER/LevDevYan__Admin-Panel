@@ -118,7 +118,6 @@ watch(
 		loading.value = true;
 		await getActiveSubscriptions();
 		loading.value = false;
-
 	}
 );
 
