@@ -4,13 +4,22 @@
 			<div class="system__info info" v-for="(info, j) in logsInfo" :key="j">
 				<div class="info__preview">
 					<p class="info__title">{{ titles[j] }}</p>
-					<p class="info__logs" :class="{ clear: info?.is_clear_needed }">Логи <span>{{ info?.logs_size.format_value
-					}}</span></p>
-					<p class="info__all">Всего <span>{{ info?.total_size.format_value }}/{{ totalSize }}</span></p>
+					<p class="info__logs" :class="{ clear: info?.is_clear_needed }">
+						Логи
+						<span>{{ info?.logs_size.format_value }}</span>
+					</p>
+					<p class="info__all">
+						Всего
+						<span>{{ info?.total_size.format_value }}/{{ totalSize }}</span>
+					</p>
 				</div>
-				<p class="info__hint clear" v-if="info?.is_clear_needed">Пора очистить логи. Логи очищаются все старше 3х
-					месяцев</p>
-				<ButtonColored :color="'#6890F9'" class="info__button" :class="{ clear: info?.is_clear_needed }">Очистить логи
+				<p class="info__hint clear" v-if="info?.is_clear_needed">
+					Пора очистить логи. Логи очищаются все старше 3х
+					месяцев
+				</p>
+				<ButtonColored :color="'#6890F9'" class="info__button" :class="{ clear: info?.is_clear_needed }"
+					@click="clearLogs(j)">
+					Очистить логи
 				</ButtonColored>
 			</div>
 		</div>
@@ -26,7 +35,9 @@ import { inject, ref, Ref, watch } from "vue";
 import {
 	Logs,
 	LogsInfo,
-	LogsInfoItem
+	LogsInfoItem,
+	ReturnedData,
+	ReturnedError
 } from "../../helpers";
 
 const route = useRoute();
@@ -50,11 +61,19 @@ async function loadData(): Promise<void> {
 	})
 	loading.value = false;
 }
+async function clearLogs(domainId: string) {
+	await store.callPopup("Очистить логи для \"" + titles[domainId] + "\"?").then((r: boolean) => {
+		if (r) {
+			store.clearLogs(domainId).then((r: ReturnedData | ReturnedError) => {
+				if (r.success && r.data.is_deleted) loadData()
+			});
+		}
+	});
+}
 </script>
 
 <style lang="scss" scoped>
 @import "@/style.scss";
-
 
 .system {
 
@@ -112,6 +131,38 @@ async function loadData(): Promise<void> {
 
 		.clear {
 			color: $--c__red;
+		}
+
+		@media screen and (max-width: $mobile--breakpoint) {
+			&__preview {
+				display: block;
+
+				font: {
+					size: 2rem;
+				}
+			}
+
+			&__title,
+			&__logs,
+			&__all {
+				margin-bottom: 0.5rem;
+			}
+
+			&__title {
+				font: {
+					size: 2.3rem;
+				}
+			}
+
+			&__logs,
+			&__all {
+				display: flex;
+				justify-content: space-between;
+			}
+
+			&__hint {
+				font-size: 1.7rem;
+			}
 		}
 	}
 }

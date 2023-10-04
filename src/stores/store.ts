@@ -775,6 +775,18 @@ export const Store = defineStore('Store', {
 					return e.response.data
 				}
 			)
-		}
+		},
+		async clearLogs(domainId: string): Promise<void> {
+			const fd = new FormData()
+			fd.append('domain_id', domainId);
+			return await axios.post(...formRequest('Logs/clearLogs', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
 	},
 })
