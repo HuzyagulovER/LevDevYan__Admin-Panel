@@ -43,11 +43,11 @@
 
 			<div class="form__texts-top-line justify-space-between">
 				<ButtonCreate class="form__button-create" @click.prevent="createNewText">
-					Добавить текст
+					Добавить элемент
 				</ButtonCreate>
 
 				<div class="form__texts-toggler texts-toggler" :class="{ opened: opened }">
-					<p>Текст ({{ Object.keys(activeContent.texts).length }})</p>
+					<p>Элементы ({{ Object.keys(activeContent.texts).length }})</p>
 					<IconCorner class="texts-toggler__corner" @click="toggleTexts" />
 				</div>
 			</div>
@@ -56,19 +56,31 @@
 				<TransitionGroup tag="div" name="list" class="texts__container">
 					<div class="texts__text text" v-for="(text, j, i) in activeContent.texts" :key="j">
 						<div class="text__top-line">
-							<label class="form__label">Текст {{ i + 1 }}</label>
-							<InputMedia class="form__media-input" :media="activeContent.texts[j]?.media"
-								:name="'content_media_' + j" :currentError="currentError" :disabled="disabledForm"
+							<label class="form__label">Элемент {{ i + 1 }}</label>
+							<BlockMedia :text="text" :hash="(j as string)" :currentError="currentError" :disabled="disabledForm"
 								@display-media="displayMedia($event, j)" />
+							<!-- <InputMedia class="form__media-input" :media="text?.media" :name="'content_media_' + j"
+								:currentError="currentError" :disabled="disabledForm" @display-media="displayMedia($event, j)" /> -->
 						</div>
 						<div class="text__delete">
 							<IconTrash class="text__icon icon-trash" @click="confirmDeleteText(j)" />
 						</div>
-						<div>
-							<input type="text" class="form__input text__input" name="title" :disabled="disabledForm"
-								v-model="activeContent.texts[j].title" placeholder="Заголовок..." />
-							<textarea class="form__textarea text__textarea" v-model="activeContent.texts[j].text"
-								:disabled="disabledForm" placeholder="Текст..."></textarea>
+						<div class="text__inputs inputs">
+							<input type="text" class="form__input inputs__title" name="title" :disabled="disabledForm"
+								v-model="text.title" placeholder="Название" />
+							<input type="text" class="form__input inputs__author" name="author" :disabled="disabledForm"
+								v-model="text.author" placeholder="Автор" />
+							<textarea class="form__textarea inputs__description" v-model="text.text" :disabled="disabledForm"
+								placeholder="Описание"></textarea>
+							<div class="inputs__premium">
+								<p>Премиум</p>
+								<Checkbox :defaultChecked="text.is_premium ? true : false"
+									@changeState="activeContent.texts[j].is_premium = $event" />
+							</div>
+							<input type="text" class="form__input inputs__type" name="type" :disabled="disabledForm"
+								v-model="text.type" placeholder="Тип" />
+							<input type="text" class="form__input inputs__info" name="info" :disabled="disabledForm"
+								v-model="text.info" placeholder="Информация" />
 						</div>
 						<div>
 							<InputImage class="text__file-input" :image="activeContent.texts[j].image"
@@ -93,12 +105,11 @@ import OpeningList from "@add-comps/OpeningList.vue";
 import IconCorner from "@icons/IconCorner.vue";
 import ButtonColored from "@add-comps/ButtonColored.vue";
 import InputImage from "@add-comps/InputImage.vue";
-import InputMedia from "@add-comps/InputMedia.vue";
-import ButtonCreate from "@/components/add-comps/ButtonCreate.vue";
+import BlockMedia from "@add-comps/BlockMedia.vue";
+import ButtonCreate from "@add-comps/ButtonCreate.vue";
+import Checkbox from "@add-comps/Checkbox.vue";
 import { useRoute, useRouter } from "vue-router";
 import {
-	computed,
-	ComputedRef,
 	inject,
 	onMounted,
 	onUnmounted,
@@ -112,7 +123,6 @@ import {
 	ContentList,
 	ReturnedData,
 	ReturnedError,
-	ContentText,
 } from "../../helpers";
 import { cloneDeep } from "lodash";
 
@@ -134,9 +144,9 @@ const router = useRouter();
 const requiredFields: ReadonlyArray<string> = ["title", "app", "type"];
 const disabledForm: Ref<boolean> = ref(false);
 const activeContent: Ref<Content> = ref(cloneDeep(defaultContent.value));
-const page: ComputedRef<string> = computed(() => {
-	return route.path.split("/")[route.path.split("/").length - 1];
-});
+// const page: ComputedRef<string> = computed(() => {
+// 	return route.path.split("/")[route.path.split("/").length - 1];
+// });
 const currentError: Ref<string> = ref("");
 const error: Ref<Array<string>> = ref([]);
 const image: Ref<string> = ref("");
@@ -144,7 +154,6 @@ const media: Ref<string> = ref("");
 const isNew: Ref<boolean> = ref(true);
 const opened: Ref<boolean> = ref(false);
 const isImageLoaded: Ref<boolean> = ref(false);
-const isMediaLoaded: Ref<boolean> = ref(false);
 const imagesCount: Ref<number> = ref(0);
 const mediaCount: Ref<number> = ref(0);
 
@@ -183,6 +192,15 @@ onUnmounted(() => {
 	mainTitle.value = "";
 });
 
+// watch(() => activeContent.value,
+// 	() => {
+// 		console.log(activeContent.value);
+// 	},
+// 	{
+// 		deep: true
+// 	}
+// )
+
 watch(
 	() => image.value,
 	(): void => {
@@ -219,27 +237,24 @@ function displayImage(isImage: boolean, id: string | number): void {
 	isImageLoaded.value = isImage;
 	isImage ? imagesCount.value++ : imagesCount.value--;
 
-	if (id === "content_image") {
-		if (!isImage) {
+	if (!isImage) {
+		if (id === "content_image") {
 			image.value = "";
-		}
-	} else {
-		if (!isImage) {
+		} else {
 			activeContent.value.texts[id].image = "";
 		}
 	}
 }
 
 function displayMedia(isMedia: boolean, id: string | number): void {
-	isMediaLoaded.value = isMedia;
+	console.log(isMedia);
+
 	isMedia ? mediaCount.value++ : mediaCount.value--;
 
-	if (id === "content_media") {
-		if (!isMedia) {
+	if (!isMedia) {
+		if (id === "content_media") {
 			media.value = "";
-		}
-	} else {
-		if (!isMedia) {
+		} else {
 			activeContent.value.texts[id].media = "";
 		}
 	}
@@ -259,7 +274,7 @@ function contentChangeHandler(e: Event): void {
 		}
 	}
 
-	if (isMediaLoaded.value) {
+	if (mediaCount.value) {
 		for (const [name, value] of fd) {
 			if (typeof value === "object" && (value as File).size) {
 				loadedFiles.value[name] = fd.get(name);
@@ -301,7 +316,7 @@ function contentChangeHandler(e: Event): void {
 
 function returnHandler(r: ReturnedData | ReturnedError) {
 	if (r.success) {
-		router.push({ path: "/content" });
+		// router.push({ path: "/content" });
 	} else {
 		currentError.value = r.error.status;
 		setTimeout(() => {
@@ -313,10 +328,14 @@ function returnHandler(r: ReturnedData | ReturnedError) {
 }
 
 async function createNewText(): Promise<void> {
-	let hash: string = await getSHA256Hash(Date.now());
+	let hash: string = await getSHA256Hash(Date.now() + Math.random() * 10000);
 	activeContent.value.texts[hash] = {
 		title: "",
 		text: "",
+		author: "",
+		type: "",
+		info: "",
+		is_premium: 0,
 		image: "",
 		media: "",
 	};
@@ -332,7 +351,7 @@ function toggleTexts(): void {
 }
 
 async function confirmDeleteText(textId: string | number): Promise<void> {
-	await store.callPopup("Удалить этот текст?").then((r: boolean) => {
+	await store.callPopup("Удалить этот элемент?").then((r: boolean) => {
 		if (r) {
 			delete activeContent.value.texts[textId];
 		}
@@ -371,7 +390,7 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 			}
 
 			&__text+.texts__text {
-				margin-top: 1rem;
+				margin-bottom: 1.5rem;
 			}
 
 			.text {
@@ -399,8 +418,43 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 					display: flex;
 				}
 
-				&__textarea {
+				&__description {
 					margin-right: 2rem;
+				}
+
+				.inputs {
+					display: grid;
+					grid-template: auto / repeat(16, 1fr);
+					gap: 1.2rem;
+
+					&>* {
+						margin: 0 !important;
+					}
+
+					&__title,
+					&__author,
+					&__info {
+						grid-column: span 8;
+					}
+
+					&__description {
+						grid-column: span 16;
+					}
+
+					&__premium {
+						display: flex;
+						align-items: center;
+						grid-column: span 2;
+
+						p {
+							font-size: 1.4rem;
+						}
+					}
+
+					&__type {
+						grid-column: span 6;
+					}
+
 				}
 			}
 		}
@@ -465,6 +519,24 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 						position: absolute;
 						top: 0;
 						right: 0;
+					}
+
+					.inputs {
+						display: grid;
+						grid-template: auto / repeat(16, 1fr);
+						gap: 1.2rem;
+
+						&__title,
+						&__author,
+						&__info,
+						&__description {
+							grid-column: span 16;
+						}
+
+						&__premium,
+						&__type {
+							grid-column: span 8;
+						}
 					}
 				}
 			}

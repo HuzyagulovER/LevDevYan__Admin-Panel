@@ -186,7 +186,7 @@ async function getContent(): Promise<void> {
 				padding: 0.4rem 2rem;
 
 				&.js_active {
-					background-color: $--c__green;
+					background-color: $--c__dark-green;
 					border-width: 0;
 					color: $--c__white;
 				}

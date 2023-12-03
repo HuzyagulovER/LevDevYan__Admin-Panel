@@ -47,19 +47,10 @@
 			<div class="notification__play" @click="updateNotificationState('1')"
 				v-if="!notification.state || notification.repeat_times == -1"
 				:class="{ _inactive: notification.repeat_times == -1 }">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
-					<g>
-						<g>
-							<path d="M20,0A20,20,0,1,0,40,20,20,20,0,0,0,20,0ZM15.47,28.74V12l13,8.35Z" />
-						</g>
-					</g>
-				</svg>
+				<IconPlay class="play-button" />
 			</div>
 			<div class="notification__pause" v-else @click="updateNotificationState('0')">
-				<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path
-						d="M20 0C8.96 0 0 8.96 0 20C0 31.04 8.96 40 20 40C31.04 40 40 31.04 40 20C40 8.96 31.04 0 20 0ZM18 28H14V12H18V28ZM26 28H22V12H26V28Z" />
-				</svg>
+				<IconPause class="pause-button" />
 			</div>
 			<div class="notification__delete">
 				<IconTrash @click="confirmDeletingActive" class="icon-trash" />
@@ -84,6 +75,8 @@ import { computed, inject, ref, Ref, toRef, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { Notification, ReturnedData } from "../../../helpers";
 import IconTrash from "@add-comps/icons/IconTrash.vue";
+import IconPlay from "@add-comps/icons/IconPlay.vue";
+import IconPause from "@add-comps/icons/IconPause.vue";
 
 const props = defineProps<{
 	index: number;
@@ -118,10 +111,11 @@ function updateNotificationState(state: string) {
 	border: 0.25rem solid $--c__light-violet;
 	border-radius: 0.6rem;
 
-	._inactive {
-		color: $--c__grey;
-		fill: $--c__grey;
-		stroke: $--c__grey;
+	._inactive,
+	._inactive * {
+		color: $--c__grey !important;
+		fill: $--c__grey !important;
+		stroke: $--c__grey !important;
 	}
 
 	&+& {
@@ -238,7 +232,6 @@ function updateNotificationState(state: string) {
 		svg {
 			width: 100%;
 			height: 100%;
-			fill: #8b2cf5;
 			object-fit: cover;
 		}
 	}

@@ -7,10 +7,7 @@
 	}">
 		<div class="media-input__media">
 			<IconClip />
-			<a :href="media" target="_blank" v-if="media && !/blob:/i.test(media)">{{
-				/\.mp3/i.test(media) ? "Прослушать аудио" : "Просмотреть видео"
-			}}</a>
-			<p v-else-if="media && /blob:/i.test(media)">
+			<p v-if="media && /blob:/i.test(media)">
 				{{ "Файл будет загружен" }}
 			</p>
 			<p v-else-if="isLargeMedia || currentError === 'FILE_SIZE_EXCEEDED'">
@@ -31,8 +28,7 @@
 			</div>
 		</div>
 
-		<IconTrash @click="deleteImage" class="media-input__delete icon-trash"
-			v-if="(media && !/blob:/i.test(media)) || (media && /blob:/i.test(media))" />
+		<!-- <IconTrash @click="deleteImage" class="media-input__delete icon-trash" v-if="media" /> -->
 	</div>
 </template>
 

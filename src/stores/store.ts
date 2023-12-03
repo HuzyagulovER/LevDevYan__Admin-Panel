@@ -512,7 +512,6 @@ export const Store = defineStore('Store', {
 					if (r) res(additionFields)
 				})
 			})
-
 		},
 
 		async checkSessionToken() {

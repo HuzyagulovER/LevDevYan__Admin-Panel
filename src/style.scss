@@ -4,18 +4,19 @@ $file-input-color: #dbd4ff;
 $input-error-color: #ff4545;
 $input-success-color: #2ee201;
 
-$--c__blue_dark: #353B55;
-$--c__white: #FFF;
-$--c__violet: #8B2CF5;
-$--c__orange: #EB8246;
-$--c__red: #ff5b51;
-$--c__light-blue: #F6F4FF;
-$--c__grey: #999999;
-$--c__light-violet: #DBD5FF;
-$--c__blue: #4476F6;
-$--c__green: #509E82;
-$--c__light-green: #F3FFF4;
-$--c__yellow: #FBF5BB;
+$--c__blue_dark: var(--c__blue_dark);
+$--c__white: var(--c__white);
+$--c__violet: var(--c__violet);
+$--c__orange: var(--c__orange);
+$--c__red: var(--c__red);
+$--c__light-blue: var(--c__light-blue);
+$--c__grey: var(--c__grey);
+$--c__light-violet: var(--c__light-violet);
+$--c__blue: var(--c__blue);
+$--c__dark-green: var(--c__dark-green);
+$--c__green: var(--c__green);
+$--c__light-green: var(--c__light-green);
+$--c__yellow: var(--c__yellow);
 
 .form {
 	display: flex;

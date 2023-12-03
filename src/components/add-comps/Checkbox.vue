@@ -23,8 +23,6 @@ const checked: Ref<boolean> = ref(false);
 checked.value = clone(defaultChecked as boolean);
 
 function changeState() {
-	console.log("Checkbox:" + checked.value);
-
 	emit("changeState", +checked.value);
 }
 </script>

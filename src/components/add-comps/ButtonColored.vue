@@ -18,7 +18,7 @@ const props = defineProps<{
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: #31ac71;
+	background-color: $--c__green;
 	border: 0;
 	color: $--c__white;
 	font-size: 1.6rem;

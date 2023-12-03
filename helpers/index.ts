@@ -124,6 +124,10 @@ export declare type Content = {
 export declare type ContentText = {
 	title: string
 	text: string
+	author: string
+	type: string
+	info: string
+	is_premium: number | string
 	image: string
 	media?: string
 }

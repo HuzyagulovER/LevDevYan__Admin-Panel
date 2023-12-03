@@ -12,7 +12,8 @@
 	--c__grey: #999999;
 	--c__light-violet: #DBD5FF;
 	--c__blue: #4476F6;
-	--c__green: #509E82;
+	--c__dark-green: #509E82;
+	--c__green: #31AC71;
 	--c__light-green: #F3FFF4;
 	--c__yellow: #FBF5BB;
 
@@ -190,4 +191,9 @@ body.apple p {
 
 .justify-space-between {
 	justify-content: space-between;
+}
+
+.play-button,
+.pause-button {
+	fill: var(--c__violet);
 }
