@@ -26,7 +26,7 @@ export function clearVariable(variable: any): any {
 
 export const maxFileSize: number = 1048576;
 export const maxFileSizeText: string = formatBytes(maxFileSize);
-export const maxMediaSize: number = 1048576 * 20;
+export const maxMediaSize: number = 1048576 * 200;
 export const maxMediaSizeText: string = formatBytes(maxMediaSize);
 
 function formatBytes(bytes: number, decimals: number = 2) {
