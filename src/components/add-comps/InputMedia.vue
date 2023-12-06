@@ -33,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import IconTrash from "@icons/IconTrash.vue";
 import IconClip from "@icons/IconClip.vue";
 import { ref, Ref } from "@vue/reactivity";
 import { inject, watch } from "@vue/runtime-core";

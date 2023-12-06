@@ -1,39 +1,50 @@
 <template>
 	<div class="media-preview">
 		<div class="media-preview__media">
-			<div v-if="/\.mp3/i.test(media)">
-				<IconPlay class="play-button" />
-				<p>Прослушать аудио</p>
+			<div class="media-preview__container" v-if="/\.mp3/i.test(media)">
+				<IconPlay v-if="isPaused" class="media-preview__play play-button" @click="toggleAudio(true)" />
+				<IconPause v-else class="media-preview__pause pause-button" @click="toggleAudio(false)" />
+				<p>Аудио / {{ file_size }} / <span :title="media">{{ media.split("/").slice(-1)[0].slice(0, maxFilenameLength)
+					+ "..." }}</span></p>
+				<audio controls ref="audio" v-show="false">
+					<source :src="media" type="audio/mp3">
+				</audio>
 			</div>
 			<div v-else>
-				<a :href="media" target="_blank">Просмотреть видео</a>
+				<p><a :href="media" target="_blank">Просмотреть видео</a> / {{ file_size }} / <span :title="media">{{
+					media.split("/").slice(-1)[0].slice(0, maxFilenameLength) + "..." }}</span></p>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import IconTrash from "@icons/IconTrash.vue";
 import IconPlay from "@icons/IconPlay.vue";
-import { ref, Ref } from "@vue/reactivity";
+import IconPause from "@icons/IconPause.vue";
+import { ref, Ref, ComputedRef, computed } from "@vue/reactivity";
 import { inject, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 
 const props = defineProps<{
 	media?: string;
+	file_size?: string
 }>();
-const emit = defineEmits(["displayMedia"]);
-const store = <StoreGeneric>inject("Store");
-const { acceptedMediaExtensions, fileErrorStatuses } = storeToRefs(store);
-const isLargeFile: any = inject("isLargeFile");
-const maxMediaSize: any = inject("maxMediaSize");
-const maxMediaSizeText: any = inject("maxMediaSizeText");
-const isAcceptedExtension: any = inject("isAcceptedExtension");
 
-let isLargeMedia: Ref<boolean> = ref(false);
-let isInvalidExtension: Ref<boolean> = ref(false);
-let media: Ref<string> = ref("");
-let formMedia: Ref = ref();
+const emit = defineEmits(["displayMedia"]),
+	store = <StoreGeneric>inject("Store"),
+	{ acceptedMediaExtensions, fileErrorStatuses } = storeToRefs(store),
+	isLargeFile: any = inject("isLargeFile"),
+	maxMediaSize: any = inject("maxMediaSize"),
+	isAcceptedExtension: any = inject("isAcceptedExtension"),
+	maxFilenameLength: number = 30;
+
+let isLargeMedia: Ref<boolean> = ref(false),
+	isInvalidExtension: Ref<boolean> = ref(false),
+	media: Ref<string> = ref(""),
+	formMedia: Ref = ref(),
+	audio: Ref = ref(),
+	isPaused: Ref<boolean> = ref(true);
+
 
 media.value = props.media ?? '';
 
@@ -43,6 +54,7 @@ watch(
 		media.value = props.media ?? '';
 	}
 );
+
 
 function displayMedia(e: Event): void {
 	if (isLargeFile(e, maxMediaSize)) {
@@ -76,6 +88,16 @@ function deleteImage() {
 		formMedia.value = "";
 	emit("displayMedia", false);
 }
+
+function toggleAudio(param: boolean): void {
+	if (param) {
+		audio.value.play().then((): void => isPaused.value = audio.value?.paused)
+	} else {
+		audio.value.pause()
+		isPaused.value = audio.value?.paused
+	}
+
+}
 </script>
 
 <style scoped lang="scss">
@@ -87,12 +109,8 @@ function deleteImage() {
 	box-sizing: content-box;
 
 	&__container {
-		width: 100%;
-		height: 100%;
 		display: flex;
-		justify-content: center;
 		align-items: center;
-		flex-direction: column;
 	}
 
 	&__media {
@@ -109,17 +127,18 @@ function deleteImage() {
 		}
 	}
 
-	svg {
+	&__play,
+	&__pause {
 		width: 2rem;
 		height: 2rem;
-		fill: #7b61ff;
 		margin-right: 0.5rem;
+		cursor: pointer;
 	}
 
 	p,
-	a {
-		text-align: center;
-		color: #7b61ff;
+	a,
+	span {
+		color: $--c__violet;
 		line-height: 1.5rem;
 
 		font: {
@@ -128,59 +147,52 @@ function deleteImage() {
 		}
 	}
 
-	input {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		opacity: 0;
-		cursor: pointer;
-
-		&::-webkit-file-upload-button {
-			display: none;
-		}
+	p span {
+		cursor: help;
 	}
 
-	&._error {
-		// background-color: rgba($color: $input-error-color, $alpha: 0.23);
-
-		p {
-			color: $input-error-color;
-		}
-
-		svg {
-			fill: $input-error-color;
-		}
+	a:hover {
+		color: $--c__orange;
 	}
 
-	&__delete {
-		opacity: 0;
-		transition: var(--transition-03);
-	}
+	// input {
+	// 	position: absolute;
+	// 	top: 0;
+	// 	left: 0;
+	// 	width: 100%;
+	// 	height: 100%;
+	// 	opacity: 0;
+	// 	cursor: pointer;
 
-	&:hover &__delete {
-		opacity: 1;
-	}
+	// 	&::-webkit-file-upload-button {
+	// 		display: none;
+	// 	}
+	// }
 
-	@media screen and (max-width: $mobile--breakpoint) {
-		border-width: 0.3rem;
-		width: auto;
+	// &._error {
+	// 	// background-color: rgba($color: $input-error-color, $alpha: 0.23);
 
-		a,
-		p {
-			font-size: 1.3rem;
-		}
+	// 	p {
+	// 		color: $input-error-color;
+	// 	}
 
-		svg {
-			width: 1.8rem;
-			height: 1.8rem;
-		}
+	// 	svg {
+	// 		fill: $input-error-color;
+	// 	}
+	// }
+	// @media screen and (max-width: $mobile--breakpoint) {
+	// 	border-width: 0.3rem;
+	// 	width: auto;
 
-		&__delete {
-			opacity: 1;
-			transition: unset;
-		}
-	}
+	// 	a,
+	// 	p {
+	// 		font-size: 1.3rem;
+	// 	}
+
+	// 	svg {
+	// 		width: 1.8rem;
+	// 		height: 1.8rem;
+	// 	}
+	// }
 }
 </style>

@@ -130,6 +130,7 @@ export declare type ContentText = {
 	is_premium: number | string
 	image: string
 	media?: string
+	file_size?: string
 }
 export declare type ContentList = { [key: string]: Content } | {}
 

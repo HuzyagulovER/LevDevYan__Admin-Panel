@@ -316,7 +316,7 @@ function contentChangeHandler(e: Event): void {
 
 function returnHandler(r: ReturnedData | ReturnedError) {
 	if (r.success) {
-		// router.push({ path: "/content" });
+		router.push({ path: "/content" });
 	} else {
 		currentError.value = r.error.status;
 		setTimeout(() => {
