@@ -381,6 +381,16 @@ function viewJson(is_view: boolean): void {
 		typePremium: (selectedUser.value as User).typePremium,
 		sys_notifications_state: (selectedUser.value as User).sys_notifications_state,
 		open_app: (selectedUser.value as User).open_app,
+
+		app: (selectedUser.value as User).app,
+		phone_model: (selectedUser.value as User).phone_model,
+		lang: (selectedUser.value as User).lang,
+		timezone: (selectedUser.value as User).timezone,
+		level: (selectedUser.value as User).level,
+		active_course: (selectedUser.value as User).active_course,
+		completed_courses: (selectedUser.value as User).completed_courses,
+		premium_app: (selectedUser.value as User).premium_app,
+		versions: (selectedUser.value as User).versions,
 	} : {}
 }
 </script>
@@ -543,7 +553,7 @@ function viewJson(is_view: boolean): void {
 
 			&-transparent {
 				background-color: transparent;
-				color: var(--c__black);
+				color: $--c__black;
 
 				svg {
 					fill: $--c__grey;

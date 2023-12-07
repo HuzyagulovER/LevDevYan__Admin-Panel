@@ -192,8 +192,3 @@ body.apple p {
 .justify-space-between {
 	justify-content: space-between;
 }
-
-.play-button,
-.pause-button {
-	fill: var(--c__violet);
-}
