@@ -33,7 +33,6 @@ let media: Ref<string> = ref(""),
 
 media.value = props.text.media ?? '';
 file_size.value = props.text.file_size ?? '';
-console.log(props.text);
 
 watch(
 	() => props.text.media,

@@ -42,7 +42,6 @@ function changeState() {
 	position: relative;
 	border: 0.2rem solid #929292;
 	transition: var(--transition-03);
-	cursor: pointer;
 
 	&__background {
 		position: absolute;
@@ -59,6 +58,7 @@ function changeState() {
 		height: 100%;
 		opacity: 0;
 		z-index: 4;
+		cursor: pointer;
 	}
 
 	svg {

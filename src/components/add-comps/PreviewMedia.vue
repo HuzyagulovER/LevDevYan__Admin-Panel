@@ -6,13 +6,16 @@
 				<IconPause v-else class="media-preview__pause pause-button" @click="toggleAudio(false)" />
 				<p>Аудио / {{ file_size }} / <span :title="media">{{ media.split("/").slice(-1)[0].slice(0, maxFilenameLength)
 					+ "..." }}</span></p>
-				<audio controls ref="audio" v-show="false">
+				<audio controls ref="audio" v-show="false" @ended="isPaused = true">
 					<source :src="media" type="audio/mp3">
 				</audio>
 			</div>
 			<div v-else>
-				<p><a :href="media" target="_blank">Просмотреть видео</a> / {{ file_size }} / <span :title="media">{{
-					media.split("/").slice(-1)[0].slice(0, maxFilenameLength) + "..." }}</span></p>
+				<p>
+					<a :href="media" target="_blank">Просмотреть видео</a>
+					/ {{ file_size }} /
+					<span :title="media">{{ media.split("/").slice(-1)[0].slice(0, maxFilenameLength) + "..." }}</span>
+				</p>
 			</div>
 		</div>
 	</div>
@@ -54,7 +57,6 @@ watch(
 		media.value = props.media ?? '';
 	}
 );
-
 
 function displayMedia(e: Event): void {
 	if (isLargeFile(e, maxMediaSize)) {
