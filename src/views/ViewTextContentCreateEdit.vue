@@ -53,8 +53,10 @@
 			</div>
 
 			<OpeningList class="form__texts texts" :isOpen="opened">
-				<TransitionGroup tag="div" name="list" class="texts__container">
-					<div class="texts__text text" v-for="(text, j, i) in activeContent.texts" :key="j">
+				<TransitionGroup tag="div" name="list" class="texts__container" @drop="onDrop($event)" @dragover.prevent
+					@dragenter.prevent>
+					<div class="texts__text text" v-for="(text, j, i) in activeContent.texts" :key="j" draggable="true"
+						@dragstart="onDragStart($event, { ...text, id: <string>j })">
 						<div class="text__top-line">
 							<label class="form__label">Элемент {{ i + 1 }}</label>
 							<BlockMedia :text="text" :hash="(j as string)" :currentError="currentError" :disabled="disabledForm"
@@ -123,6 +125,7 @@ import {
 	ContentList,
 	ReturnedData,
 	ReturnedError,
+	ContentText
 } from "../../helpers";
 import { cloneDeep } from "lodash";
 
@@ -356,6 +359,22 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 			delete activeContent.value.texts[textId];
 		}
 	});
+}
+
+function onDragStart(e: DragEvent, text: ContentText & { id: string }) {
+	console.log(e);
+	(e.dataTransfer as DataTransfer).dropEffect = "move";
+	(e.dataTransfer as DataTransfer).effectAllowed = "move";
+	(e.dataTransfer as DataTransfer).setData("textId", text.id)
+}
+function onDrop(e: DragEvent) {
+	console.log(e);
+	const textId: string = (e.dataTransfer as DataTransfer).getData("textId")
+	console.log(textId);
+
+	// activeContent.value.texts = activeContent.value.texts.reduce((acc, item) => {
+	// 	acc[]
+	// })
 }
 </script>
 

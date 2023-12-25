@@ -21,7 +21,7 @@
 			</p>
 			<div v-show="!media && !(!!currentError || isLargeMedia || isInvalidExtension)
 					">
-				<p>Прикрепить аудио или видео (.mp3/.mp4)</p>
+				<p class="media-input__grey">Прикрепить аудио или видео (.mp3/.mp4)</p>
 
 				<input :id="name" type="file" :accept="acceptedMediaExtensions.join(',')" :name="name" :disabled="disabled"
 					@change="displayMedia($event)" ref="formMedia" />
@@ -193,6 +193,10 @@ function deleteImage() {
 
 	&:hover &__delete {
 		opacity: 1;
+	}
+
+	&__grey {
+		color: $--c__grey !important;
 	}
 
 	@media screen and (max-width: $mobile--breakpoint) {

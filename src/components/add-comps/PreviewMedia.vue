@@ -4,8 +4,9 @@
 			<div class="media-preview__container" v-if="/\.mp3/i.test(media)">
 				<IconPlay v-if="isPaused" class="media-preview__play play-button" @click="toggleAudio(true)" />
 				<IconPause v-else class="media-preview__pause pause-button" @click="toggleAudio(false)" />
-				<p>Аудио / {{ file_size }} / <span :title="media">{{ media.split("/").slice(-1)[0].slice(0, maxFilenameLength)
-					+ "..." }}</span></p>
+				<p>Аудио / {{ file_size }} / <span class="media-preview__help" :title="media">{{
+					media.split("/").slice(-1)[0].slice(0, maxFilenameLength)
+					+ "..." }}</span> / <span class="media-preview__grey">Время: </span> {{ playtime_string }}</p>
 				<audio controls ref="audio" v-show="false" @ended="isPaused = true">
 					<source :src="media" type="audio/mp3">
 				</audio>
@@ -15,6 +16,7 @@
 					<a :href="media" target="_blank">Просмотреть видео</a>
 					/ {{ file_size }} /
 					<span :title="media">{{ media.split("/").slice(-1)[0].slice(0, maxFilenameLength) + "..." }}</span>
+					/ <span class="media-preview__grey">Время: </span> {{ playtime_string }}
 				</p>
 			</div>
 		</div>
@@ -31,6 +33,7 @@ import { StoreGeneric, storeToRefs } from "pinia";
 const props = defineProps<{
 	media?: string;
 	file_size?: string
+	playtime_string?: string
 }>();
 
 const emit = defineEmits(["displayMedia"]),
@@ -39,7 +42,7 @@ const emit = defineEmits(["displayMedia"]),
 	isLargeFile: any = inject("isLargeFile"),
 	maxMediaSize: any = inject("maxMediaSize"),
 	isAcceptedExtension: any = inject("isAcceptedExtension"),
-	maxFilenameLength: number = 30;
+	maxFilenameLength: number = 20;
 
 let isLargeMedia: Ref<boolean> = ref(false),
 	isInvalidExtension: Ref<boolean> = ref(false),
@@ -149,8 +152,12 @@ function toggleAudio(param: boolean): void {
 		}
 	}
 
-	p span {
+	&__help {
 		cursor: help;
+	}
+
+	&__grey {
+		color: $--c__grey !important;
 	}
 
 	a:hover {

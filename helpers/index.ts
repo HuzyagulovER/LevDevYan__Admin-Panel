@@ -131,6 +131,7 @@ export declare type ContentText = {
 	image: string
 	media?: string
 	file_size?: string
+	playtime_string?: string
 }
 export declare type ContentList = { [key: string]: Content } | {}
 
