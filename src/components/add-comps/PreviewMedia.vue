@@ -4,7 +4,7 @@
 			<div class="media-preview__container" v-if="/\.mp3/i.test(media)">
 				<IconPlay v-if="isPaused" class="media-preview__play play-button" @click="toggleAudio(true)" />
 				<IconPause v-else class="media-preview__pause pause-button" @click="toggleAudio(false)" />
-				<p>Аудио / {{ file_size }} / <span class="media-preview__help" :title="media">{{
+				<p>Аудио / {{ media_size }} / <span class="media-preview__help" :title="media">{{
 					media.split("/").slice(-1)[0].slice(0, maxFilenameLength)
 					+ "..." }}</span> / <span class="media-preview__grey">Время: </span> {{ playtime }}</p>
 				<audio controls ref="audio" v-show="false" @ended="isPaused = true">
@@ -14,7 +14,7 @@
 			<div v-else>
 				<p>
 					<a :href="media" target="_blank">Просмотреть видео</a>
-					/ {{ file_size }} /
+					/ {{ media_size }} /
 					<span :title="media">{{ media.split("/").slice(-1)[0].slice(0, maxFilenameLength) + "..." }}</span>
 					/ <span class="media-preview__grey">Время: </span> {{ playtime }}
 				</p>
@@ -32,7 +32,7 @@ import { StoreGeneric, storeToRefs } from "pinia";
 
 const props = defineProps<{
 	media?: string;
-	file_size?: string
+	media_size?: string
 	playtime?: string
 }>();
 
