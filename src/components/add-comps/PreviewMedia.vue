@@ -6,7 +6,7 @@
 				<IconPause v-else class="media-preview__pause pause-button" @click="toggleAudio(false)" />
 				<p>Аудио / {{ file_size }} / <span class="media-preview__help" :title="media">{{
 					media.split("/").slice(-1)[0].slice(0, maxFilenameLength)
-					+ "..." }}</span> / <span class="media-preview__grey">Время: </span> {{ playtime_string }}</p>
+					+ "..." }}</span> / <span class="media-preview__grey">Время: </span> {{ playtime }}</p>
 				<audio controls ref="audio" v-show="false" @ended="isPaused = true">
 					<source :src="media" type="audio/mp3">
 				</audio>
@@ -16,7 +16,7 @@
 					<a :href="media" target="_blank">Просмотреть видео</a>
 					/ {{ file_size }} /
 					<span :title="media">{{ media.split("/").slice(-1)[0].slice(0, maxFilenameLength) + "..." }}</span>
-					/ <span class="media-preview__grey">Время: </span> {{ playtime_string }}
+					/ <span class="media-preview__grey">Время: </span> {{ playtime }}
 				</p>
 			</div>
 		</div>
@@ -33,7 +33,7 @@ import { StoreGeneric, storeToRefs } from "pinia";
 const props = defineProps<{
 	media?: string;
 	file_size?: string
-	playtime_string?: string
+	playtime?: string
 }>();
 
 const emit = defineEmits(["displayMedia"]),

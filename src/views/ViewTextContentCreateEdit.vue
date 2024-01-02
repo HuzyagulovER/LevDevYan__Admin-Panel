@@ -306,6 +306,12 @@ function contentChangeHandler(e: Event): void {
 
 	pushContent.app = pushContent.app.toLowerCase();
 
+	for (const key in pushContent.texts) {
+		delete pushContent.texts[key].file_size
+		delete pushContent.texts[key].playtime
+	}
+	console.log(pushContent);
+
 	if (isNew.value) {
 		store
 			.addContent(pushContent)

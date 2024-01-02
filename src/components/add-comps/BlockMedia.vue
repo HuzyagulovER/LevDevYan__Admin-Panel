@@ -1,6 +1,6 @@
 <template>
 	<div class="media-block">
-		<PreviewMedia :media="media" :file_size="file_size" :playtime_string="playtime_string" v-show="media" />
+		<PreviewMedia :media="media" :file_size="file_size" :playtime="playtime" v-show="media" />
 		<InputMedia :media="media" :name="'content_media_' + hash" :currentError="currentError" :disabled="disabled"
 			@display-media="displayMedia($event)" v-show="!media" />
 		<IconTrash @click="deleteImage" class="media-block__delete icon-trash" v-show="media" />
@@ -29,19 +29,19 @@ const store = <StoreGeneric>inject("Store");
 
 let media: Ref<string> = ref(props.text.media ?? ""),
 	file_size: Ref<string> = ref(props.text.file_size ?? ''),
-	playtime_string: Ref<string> = ref(props.text.playtime_string ?? ''),
+	playtime: Ref<string> = ref(props.text.playtime ?? ''),
 	formMedia: Ref = ref();
 
 // media.value = props.text.media ?? '';
 // file_size.value = props.text.file_size ?? '';
-// playtime_string.value = props.text.playtime_string ?? '';
+// playtime.value = props.text.playtime ?? '';
 
 watch(
 	() => props.text,
 	() => {
 		media.value = props.text.media ?? '';
 		file_size.value = props.text.file_size ?? '';
-		playtime_string.value = props.text.playtime_string ?? '';
+		playtime.value = props.text.playtime ?? '';
 	},
 	{
 		deep: true
