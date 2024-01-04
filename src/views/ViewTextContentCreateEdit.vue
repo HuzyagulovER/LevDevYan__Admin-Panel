@@ -153,7 +153,6 @@ const activeContent: Ref<Content> = ref(cloneDeep(defaultContent.value));
 const currentError: Ref<string> = ref("");
 const error: Ref<Array<string>> = ref([]);
 const image: Ref<string> = ref("");
-const media: Ref<string> = ref("");
 const isNew: Ref<boolean> = ref(true);
 const opened: Ref<boolean> = ref(false);
 const isImageLoaded: Ref<boolean> = ref(false);
@@ -177,6 +176,7 @@ if (route.params.contentId === "new") {
 			if (Array.isArray(r)) {
 				router.replace({ path: "/content" });
 			}
+
 			activeContent.value = <Content>(
 				r[route.params.contentId as keyof ContentList]
 			);
@@ -250,16 +250,11 @@ function displayImage(isImage: boolean, id: string | number): void {
 }
 
 function displayMedia(isMedia: boolean, id: string | number): void {
-	console.log(isMedia);
-
-	isMedia ? mediaCount.value++ : mediaCount.value--;
+	if (isMedia) mediaCount.value++
+	// isMedia ? mediaCount.value++ : mediaCount.value--;
 
 	if (!isMedia) {
-		if (id === "content_media") {
-			media.value = "";
-		} else {
-			activeContent.value.texts[id].media = "";
-		}
+		activeContent.value.texts[id].media = "";
 	}
 }
 
@@ -310,7 +305,6 @@ function contentChangeHandler(e: Event): void {
 		delete pushContent.texts[key].media_size
 		delete pushContent.texts[key].playtime
 	}
-	console.log(pushContent);
 
 	if (isNew.value) {
 		store
@@ -415,13 +409,14 @@ function onDrop(e: DragEvent) {
 			}
 
 			&__text+.texts__text {
-				margin-bottom: 1.5rem;
+				margin-bottom: 2.5rem;
 			}
 
 			.text {
 				display: grid;
 				grid-template: auto / 4fr 1fr;
 				gap: 0.5rem 2rem;
+				position: relative;
 
 				&__top-line {
 					display: flex;
@@ -480,6 +475,17 @@ function onDrop(e: DragEvent) {
 						grid-column: span 6;
 					}
 
+				}
+
+				&::before {
+					content: "";
+					position: absolute;
+					width: calc(100% + 1.6rem);
+					height: calc(100% + 1.6rem);
+					top: -0.8rem;
+					left: -0.8rem;
+					background-color: var(--c__white);
+					z-index: -1;
 				}
 			}
 		}

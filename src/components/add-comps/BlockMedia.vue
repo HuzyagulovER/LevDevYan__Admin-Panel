@@ -3,7 +3,7 @@
 		<PreviewMedia :media="media" :media_size="media_size" :playtime="playtime" v-show="media" />
 		<InputMedia :media="media" :name="'content_media_' + hash" :currentError="currentError" :disabled="disabled"
 			@display-media="displayMedia($event)" v-show="!media" />
-		<IconTrash @click="deleteImage" class="media-block__delete icon-trash" v-show="media" />
+		<IconTrash @click="deleteMedia" class="media-block__delete icon-trash" v-show="media" />
 	</div>
 </template>
 
@@ -49,11 +49,10 @@ watch(
 );
 
 function displayMedia(isMedia: boolean): void {
-	console.log(isMedia);
 	emit("displayMedia", isMedia);
 }
 
-function deleteImage() {
+function deleteMedia() {
 	media.value = "";
 	if (formMedia.value && formMedia.value.files && formMedia.value.files.length)
 		formMedia.value = "";
