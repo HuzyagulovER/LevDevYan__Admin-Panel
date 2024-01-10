@@ -53,44 +53,44 @@
 			</div>
 
 			<OpeningList class="form__texts texts" :isOpen="opened">
-				<TransitionGroup tag="div" name="list" class="texts__container" @drop="onDrop($event)" @dragover.prevent
-					@dragenter.prevent>
-					<div class="texts__text text" v-for="(text, j, i) in activeContent.texts" :key="j" draggable="true"
-						@dragstart="onDragStart($event, { ...text, id: <string>j })">
-						<div class="text__top-line">
-							<label class="form__label">Элемент {{ i + 1 }}</label>
-							<BlockMedia :text="text" :hash="(j as string)" :currentError="currentError" :disabled="disabledForm"
-								@display-media="displayMedia($event, j)" />
-							<!-- <InputMedia class="form__media-input" :media="text?.media" :name="'content_media_' + j"
+				<Container @drop="onDrop" class="texts__container" lock-axis="y" drag-handle-selector=".form__label">
+					<TransitionGroup name="list">
+						<Draggable class="texts__text text" v-for="(j, i) in textsKeys" :key="j">
+							<div class="text__top-line">
+								<label class="form__label">Элемент {{ textsKeys.length - i }}</label>
+								<BlockMedia :text="activeContent.texts[j]" :hash="(j as string)" :currentError="currentError"
+									:disabled="disabledForm" @display-media="displayMedia($event, j)" />
+								<!-- <InputMedia class="form__media-input" :media="text?.media" :name="'content_media_' + j"
 								:currentError="currentError" :disabled="disabledForm" @display-media="displayMedia($event, j)" /> -->
-						</div>
-						<div class="text__delete">
-							<IconTrash class="text__icon icon-trash" @click="confirmDeleteText(j)" />
-						</div>
-						<div class="text__inputs inputs">
-							<input type="text" class="form__input inputs__title" name="title" :disabled="disabledForm"
-								v-model="text.title" placeholder="Название" />
-							<input type="text" class="form__input inputs__author" name="author" :disabled="disabledForm"
-								v-model="text.author" placeholder="Автор" />
-							<textarea class="form__textarea inputs__description" v-model="text.text" :disabled="disabledForm"
-								placeholder="Описание"></textarea>
-							<div class="inputs__premium">
-								<p>Премиум</p>
-								<Checkbox :defaultChecked="text.is_premium ? true : false"
-									@changeState="activeContent.texts[j].is_premium = $event" />
 							</div>
-							<input type="text" class="form__input inputs__type" name="type" :disabled="disabledForm"
-								v-model="text.type" placeholder="Тип" />
-							<input type="text" class="form__input inputs__info" name="info" :disabled="disabledForm"
-								v-model="text.info" placeholder="Информация" />
-						</div>
-						<div>
-							<InputImage class="text__file-input" :image="activeContent.texts[j].image"
-								:name="'content_image_' + j" :currentError="currentError" :disabled="disabledForm"
-								@display-image="displayImage($event, j)" />
-						</div>
-					</div>
-				</TransitionGroup>
+							<div class="text__delete">
+								<IconTrash class="text__icon icon-trash" @click="confirmDeleteText(j)" />
+							</div>
+							<div class="text__inputs inputs">
+								<input type="text" class="form__input inputs__title" name="title" :disabled="disabledForm"
+									v-model="activeContent.texts[j].title" placeholder="Название" />
+								<input type="text" class="form__input inputs__author" name="author" :disabled="disabledForm"
+									v-model="activeContent.texts[j].author" placeholder="Автор" />
+								<textarea class="form__textarea inputs__description" v-model="activeContent.texts[j].text"
+									:disabled="disabledForm" placeholder="Описание"></textarea>
+								<div class="inputs__premium">
+									<p>Премиум</p>
+									<Checkbox :defaultChecked="activeContent.texts[j].is_premium ? true : false"
+										@changeState="activeContent.texts[j].is_premium = $event" />
+								</div>
+								<input type="text" class="form__input inputs__type" name="type" :disabled="disabledForm"
+									v-model="activeContent.texts[j].type" placeholder="Тип" />
+								<input type="text" class="form__input inputs__info" name="info" :disabled="disabledForm"
+									v-model="activeContent.texts[j].info" placeholder="Информация" />
+							</div>
+							<div>
+								<InputImage class="text__file-input" :image="activeContent.texts[j].image"
+									:name="'content_image_' + j" :currentError="currentError" :disabled="disabledForm"
+									@display-image="displayImage($event, j)" />
+							</div>
+						</Draggable>
+					</TransitionGroup>
+				</Container>
 			</OpeningList>
 
 			<div class="form__container justify-end">
@@ -118,20 +118,26 @@ import {
 	ref,
 	Ref,
 	watch,
+	ComputedRef,
+	computed,
 } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import {
 	Content,
+	ContentTexts,
 	ContentList,
 	ReturnedData,
 	ReturnedError,
 	ContentText
 } from "../../helpers";
 import { cloneDeep } from "lodash";
+// @ts-ignore
+import { Container, Draggable } from "vue-dndrop";
 
 const store = <StoreGeneric>inject("Store");
 const clearVariable = <Function>inject("clearVariable");
 const getSHA256Hash = <Function>inject("getSHA256Hash");
+// const reverseObject = <Function>inject("reverseObject");
 const {
 	defaultContent,
 	loading,
@@ -150,6 +156,7 @@ const activeContent: Ref<Content> = ref(cloneDeep(defaultContent.value));
 // const page: ComputedRef<string> = computed(() => {
 // 	return route.path.split("/")[route.path.split("/").length - 1];
 // });
+const textsKeys: ComputedRef<string[]> = computed((): string[] => Object.keys(activeContent.value.texts).reverse());
 const currentError: Ref<string> = ref("");
 const error: Ref<Array<string>> = ref([]);
 const image: Ref<string> = ref("");
@@ -361,21 +368,45 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 	});
 }
 
-function onDragStart(e: DragEvent, text: ContentText & { id: string }) {
-	console.log(e);
-	(e.dataTransfer as DataTransfer).dropEffect = "move";
-	(e.dataTransfer as DataTransfer).effectAllowed = "move";
-	(e.dataTransfer as DataTransfer).setData("textId", text.id)
+function onDrop(dropResult: any): void {
+	activeContent.value.texts = applyDrag(activeContent.value.texts, dropResult)
 }
-function onDrop(e: DragEvent) {
-	console.log(e);
-	const textId: string = (e.dataTransfer as DataTransfer).getData("textId")
-	console.log(textId);
 
-	// activeContent.value.texts = activeContent.value.texts.reduce((acc, item) => {
-	// 	acc[]
-	// })
-}
+const applyDrag = (texts: ContentTexts, dragResult: any): ContentTexts => {
+	const { removedIndex, addedIndex }: { removedIndex: number, addedIndex: number } = dragResult;
+	if (removedIndex === null && addedIndex === null) return texts;
+
+	const result: ContentTexts = {};
+
+	textsKeys.value.forEach((el: string, key: number): void => {
+		if (key > removedIndex && key > addedIndex || key < removedIndex && key < addedIndex) {
+			result[el as keyof ContentTexts] = texts[el as keyof ContentTexts];
+		}
+		else if (key >= removedIndex && key < addedIndex) {
+			result[textsKeys.value[key + 1] as keyof ContentTexts] = texts[textsKeys.value[key + 1] as keyof ContentTexts]
+		}
+		else if (key > addedIndex && key <= removedIndex) {
+			result[textsKeys.value[key - 1] as keyof ContentTexts] = texts[textsKeys.value[key - 1] as keyof ContentTexts]
+		}
+		else if (key === addedIndex) {
+			result[textsKeys.value[removedIndex] as keyof ContentTexts] = texts[textsKeys.value[removedIndex] as keyof ContentTexts]
+		}
+	});
+
+	return <ContentTexts>reverseObject(result);
+};
+
+function reverseObject(object: { [key: string | number]: any }): { [key: string | number]: any } {
+	console.log(object);
+
+	const keys: Array<string | number> = Object.keys(object).reverse(),
+		newObject: { [key: string | number]: any } = {}
+	keys.forEach((el: string | number): void => {
+		newObject[el] = cloneDeep(object[el])
+	})
+	console.log(newObject);
+	return newObject
+};
 </script>
 
 <style scoped lang="scss">
@@ -403,13 +434,10 @@ function onDrop(e: DragEvent) {
 			width: 100%;
 			margin-top: 2rem;
 
-			&__container {
-				display: flex;
-				flex-direction: column-reverse;
-			}
+			&__container {}
 
 			&__text+.texts__text {
-				margin-bottom: 2.5rem;
+				margin-top: 2.5rem;
 			}
 
 			.text {
@@ -426,6 +454,7 @@ function onDrop(e: DragEvent) {
 
 					.form__label {
 						width: auto;
+						cursor: move;
 					}
 				}
 
@@ -484,8 +513,10 @@ function onDrop(e: DragEvent) {
 					height: calc(100% + 1.6rem);
 					top: -0.8rem;
 					left: -0.8rem;
-					background-color: var(--c__white);
+					background-color: $--c__white;
 					z-index: -1;
+					box-shadow: 0px 0px 10px 0px $--c__grey;
+					border-radius: 0.5rem;
 				}
 			}
 		}

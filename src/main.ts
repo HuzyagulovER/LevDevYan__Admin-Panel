@@ -4,6 +4,7 @@ import App from './App.vue'
 import { createPinia } from "pinia";
 import router from './routes';
 import { Store } from './stores/store';
+import { cloneDeep } from 'lodash';
 
 export function clearVariable(variable: any): any {
 	switch (typeof variable) {
@@ -73,6 +74,18 @@ export const getSHA256Hash = async (input: any) => {
 		.map((item) => item.toString(16).padStart(2, "0"))
 		.join("");
 	return hash;
+};
+
+export function reverseObject(object: { [key: string | number]: any }): { [key: string | number]: any } {
+	console.log(object);
+
+	const keys: Array<string | number> = Object.keys(object).reverse(),
+		newObject: { [key: string | number]: any } = {}
+	keys.forEach((el: string | number): void => {
+		newObject[el] = cloneDeep(object[el])
+	})
+	console.log(newObject);
+	return newObject
 };
 
 const app = createApp(App)

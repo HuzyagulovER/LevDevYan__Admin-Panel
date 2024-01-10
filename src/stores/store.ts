@@ -51,15 +51,6 @@ function copyFormData(formData: FormData): FormData {
 	return newFormData;
 }
 
-function object_reverse(object: { [key: string]: {} }): { [key: string]: {} } {
-	let objectKeys: Array<string> = Object.keys(object).reverse()
-	let newObject: typeof object = {};
-	objectKeys.forEach((key) => {
-		newObject[key] = cloneDeep(object[key])
-	});
-	return newObject;
-}
-
 const monthNames: ReadonlyArray<string> = [
 	"января",
 	"ферваля",
@@ -192,7 +183,8 @@ export const Store = defineStore('Store', {
 				app: "",
 				type: "",
 				lang: "",
-				texts: {}
+				texts: {},
+				order: 1
 			}
 		}
 	),
@@ -696,6 +688,21 @@ export const Store = defineStore('Store', {
 			const fd = new FormData()
 			fd.append('content_ids', JSON.stringify(contentIds));
 			return await axios.post(...formRequest('Content/deleteContent', fd) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
+					return e.response.data
+				}
+			)
+		},
+		async updateContentOrder(oldContentKeysOrder: string[], newContentKeysOrder: string[]): Promise<void> {
+			const fd = new FormData();
+
+			fd.append("old_content_keys_order", JSON.stringify(oldContentKeysOrder))
+			fd.append("new_content_keys_order", JSON.stringify(newContentKeysOrder))
+
+			return await axios.post(...formRequest('Content/updateContentOrder', fd) as [string, FormData]).then(
 				r => {
 					return r.data
 				},

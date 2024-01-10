@@ -59,11 +59,8 @@ function confirmDeleteContent() {
 	padding: 2.3rem;
 	border: 0.25rem solid $--c__light-violet;
 	border-radius: 1.8rem;
+	position: relative;
 	// height: 13.5rem;
-
-	&+& {
-		margin-top: 1.7rem;
-	}
 
 	&__container {
 		display: flex;

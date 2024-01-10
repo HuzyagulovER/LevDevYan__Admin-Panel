@@ -119,8 +119,10 @@ export declare type Content = {
 	app: string
 	lang: string
 	type: string
-	texts: { [key: string]: ContentText }
+	texts: ContentTexts
+	order: number
 }
+export declare type ContentTexts = { [key: string]: ContentText }
 export declare type ContentText = {
 	title: string
 	text: string

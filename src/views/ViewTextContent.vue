@@ -27,10 +27,16 @@
 			<img src="@images/Courses__Empty-Courses.png" alt="" width="281" height="255" />
 			<p>Контента еще нет...</p>
 		</div>
-		<TransitionGroup tag="div" :name="transitionName" v-else>
-			<ContentItem v-for="(content, j) in contentList" :key="j" :contentId="(<unknown>j as string)" :content="content"
-				@confirm-delete-content="confirmDeleteContent" />
-		</TransitionGroup>
+		<Container @drop="onDrop" class="content__container" lock-axis="y" drag-handle-selector=".content__drag-handle"
+			v-else>
+			<TransitionGroup :name="transitionName">
+				<Draggable v-for="(content, j) in contentList" :key="j" class="content__draggable">
+					<ContentItem :contentId="(<unknown>j as string)" :content="content"
+						@confirm-delete-content="confirmDeleteContent" />
+					<div class="content__drag-handle">☰</div>
+				</Draggable>
+			</TransitionGroup>
+		</Container>
 	</section>
 </template>
 
@@ -49,18 +55,20 @@ import {
 	computed,
 } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { cloneDeep } from "lodash";
 import { useRoute, useRouter } from "vue-router";
 import { useCookies } from "vue3-cookies";
+import { Content, ContentList, ReturnedData, ReturnedError } from "../../helpers";
+import { cloneDeep } from "lodash";
+// @ts-ignore
+import { Container, Draggable } from "vue-dndrop";
 
 const store = <StoreGeneric>inject("Store");
-const { contentList, loading, languages } = storeToRefs(store);
+const { contentList, loading, updateContent } = storeToRefs(store);
 const route = useRoute();
 const router = useRouter();
 const { cookies } = useCookies();
 
-const isEmpty: Ref<boolean> = ref(false);
-const popup: Ref<boolean> = ref(false);
+const contentKeys: ComputedRef<string[]> = computed(() => Object.keys(<ContentList>contentList.value))
 const pageName: Ref = toRef(route, "name");
 const lang: Ref<string> = ref(cookies.get(`${pageName.value}Lang`));
 const transitionName: Ref<string> = ref("list");
@@ -114,6 +122,51 @@ async function getContent(): Promise<void> {
 	})
 	store.getContent(app.value, lang.value, null, route.query.type);
 }
+
+async function onDrop(dropResult: any): Promise<void> {
+	const { removedIndex, addedIndex }: { removedIndex: number, addedIndex: number } = dropResult;
+	const oldContentKeysOrder: string[] = cloneDeep(contentKeys.value)
+	contentList.value = applyDrag(contentList.value, dropResult)
+
+	loading.value = true
+	await store.updateContentOrder(
+		oldContentKeysOrder.slice(
+			Math.min(removedIndex, addedIndex),
+			Math.max(removedIndex, addedIndex) + 1
+		),
+		Object.keys(contentList.value).slice(
+			Math.min(removedIndex, addedIndex),
+			Math.max(removedIndex, addedIndex) + 1
+		)
+	).then(async (): Promise<void> => {
+		await getContent()
+		loading.value = false
+	})
+
+}
+
+const applyDrag = (contentList: ContentList, dragResult: any): ContentList => {
+	const { removedIndex, addedIndex }: { removedIndex: number, addedIndex: number } = dragResult;
+	if (removedIndex === null && addedIndex === null) return contentList;
+
+	const result: ContentList = {};
+
+	contentKeys.value.forEach((el: string, key: number): void => {
+		if (key > removedIndex && key > addedIndex || key < removedIndex && key < addedIndex) {
+			result[el as keyof ContentList] = contentList[el as keyof ContentList];
+		}
+		else if (key >= removedIndex && key < addedIndex) {
+			result[contentKeys.value[key + 1] as keyof ContentList] = contentList[contentKeys.value[key + 1] as keyof ContentList]
+		}
+		else if (key > addedIndex && key <= removedIndex) {
+			result[contentKeys.value[key - 1] as keyof ContentList] = contentList[contentKeys.value[key - 1] as keyof ContentList]
+		}
+		else if (key === addedIndex) {
+			result[contentKeys.value[removedIndex] as keyof ContentList] = contentList[contentKeys.value[removedIndex] as keyof ContentList]
+		}
+	});
+	return result
+};
 </script>
 
 <style scoped lang="scss">
@@ -192,6 +245,24 @@ async function getContent(): Promise<void> {
 				}
 			}
 		}
+	}
+
+	&__draggable {
+		position: relative;
+
+		&+& {
+			margin-top: 1.7rem;
+		}
+	}
+
+	&__drag-handle {
+		position: absolute;
+		top: 2.3rem;
+		left: 2.3rem;
+		transform: translate(-50%, -50%);
+		color: $--c__violet;
+		font-weight: bold;
+		cursor: move;
 	}
 
 	@media screen and (max-width: $mobile--breakpoint) {
