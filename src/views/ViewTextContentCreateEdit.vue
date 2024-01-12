@@ -128,7 +128,6 @@ import {
 	ContentList,
 	ReturnedData,
 	ReturnedError,
-	ContentText
 } from "../../helpers";
 import { cloneDeep } from "lodash";
 // @ts-ignore
@@ -156,6 +155,9 @@ const activeContent: Ref<Content> = ref(cloneDeep(defaultContent.value));
 // const page: ComputedRef<string> = computed(() => {
 // 	return route.path.split("/")[route.path.split("/").length - 1];
 // });
+const app: ComputedRef<string> = computed(() =>
+	route.params.app ? <string>route.params.app : "psy"
+);
 const textsKeys: ComputedRef<string[]> = computed((): string[] => Object.keys(activeContent.value.texts).reverse());
 const currentError: Ref<string> = ref("");
 const error: Ref<Array<string>> = ref([]);
@@ -165,6 +167,8 @@ const opened: Ref<boolean> = ref(false);
 const isImageLoaded: Ref<boolean> = ref(false);
 const imagesCount: Ref<number> = ref(0);
 const mediaCount: Ref<number> = ref(0);
+
+console.log(route);
 
 if (route.params.contentId === "new") {
 	mainTitle.value = "Создание контента";
@@ -240,6 +244,16 @@ watch(
 			default:
 				error.value = [];
 		}
+	}
+);
+
+watch(
+	() => route.query,
+	() => {
+		console.log(route.query);
+	},
+	{
+		deep: true
 	}
 );
 

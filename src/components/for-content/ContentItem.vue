@@ -34,9 +34,8 @@
 
 <script setup lang="ts">
 import IconTrash from "@icons/IconTrash.vue";
-import { inject, ref, Ref } from "@vue/runtime-core";
+import { inject } from "@vue/runtime-core";
 import { StateTree, StoreGeneric, storeToRefs } from "pinia";
-import { useRoute } from "vue-router";
 import { Content } from "../../../helpers";
 
 const store = <StoreGeneric>inject("Store");
@@ -60,6 +59,7 @@ function confirmDeleteContent() {
 	border: 0.25rem solid $--c__light-violet;
 	border-radius: 1.8rem;
 	position: relative;
+	background-color: $--c__white;
 	// height: 13.5rem;
 
 	&__container {

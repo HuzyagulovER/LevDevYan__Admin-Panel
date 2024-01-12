@@ -53,17 +53,18 @@ import {
 	watch,
 	ComputedRef,
 	computed,
+	onUnmounted,
 } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { useCookies } from "vue3-cookies";
-import { Content, ContentList, ReturnedData, ReturnedError } from "../../helpers";
+import { ContentList } from "../../helpers";
 import { cloneDeep } from "lodash";
 // @ts-ignore
 import { Container, Draggable } from "vue-dndrop";
 
 const store = <StoreGeneric>inject("Store");
-const { contentList, loading, updateContent } = storeToRefs(store);
+const { contentList, loading } = storeToRefs(store);
 const route = useRoute();
 const router = useRouter();
 const { cookies } = useCookies();
@@ -91,10 +92,16 @@ watch(
 	() => app.value,
 	async () => {
 		transitionName.value = "disabled-list";
+		console.log(contentList);
+		console.log(app.value);
 
 		getContent()
 	}
 );
+
+onUnmounted(() => {
+	console.log('unmounted');
+});
 
 async function changeLang(newLang: string) {
 	lang.value = newLang;
