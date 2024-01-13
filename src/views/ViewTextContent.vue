@@ -3,7 +3,7 @@
 		<div class="content__top-line top-line">
 			<ButtonsPages :additionLinksNumber="1">
 				<RouterLink class="buttons-pages__link-other" :to="{ query: { app: 'other' } }"
-					:class="{ js_active: route.query.app === 'other' }">
+					:class="{ js_active: app === 'other' }">
 					Другое
 				</RouterLink>
 			</ButtonsPages>
@@ -16,8 +16,8 @@
 		<div class="content__types types">
 			<ul class="types__list list">
 				<li v-for="contentType in contentTypes">
-					<RouterLink class="list__link" :to="{ query: { app: route.query.app, type: contentType } }"
-						:class="{ js_active: route.query.type === contentType }">
+					<RouterLink class="list__link" :to="{ query: { app: app, type: contentType } }"
+						:class="{ js_active: type === contentType, hidden: hidden }">
 						{{ contentType.slice(0, 1).toUpperCase() + contentType.slice(1) }}
 					</RouterLink>
 				</li>
@@ -32,8 +32,8 @@
 			<TransitionGroup :name="transitionName">
 				<Draggable v-for="(content, j) in contentList" :key="j" class="content__draggable">
 					<ContentItem :contentId="(<unknown>j as string)" :content="content"
-						@confirm-delete-content="confirmDeleteContent" />
-					<div class="content__drag-handle">☰</div>
+						@confirm-delete-content="confirmDeleteContent" :class="{ hidden: hidden }" />
+					<div class="content__drag-handle" :class="{ hidden: hidden }">☰</div>
 				</Draggable>
 			</TransitionGroup>
 		</Container>
@@ -53,7 +53,6 @@ import {
 	watch,
 	ComputedRef,
 	computed,
-	onUnmounted,
 } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
@@ -75,37 +74,53 @@ const lang: Ref<string> = ref(cookies.get(`${pageName.value}Lang`));
 const transitionName: Ref<string> = ref("list");
 const app: ComputedRef<string> = computed(() =>
 	route.query.app ? <string>route.query.app : "psy"
+)
+// const type: Ref<string> = ref('');
+const type: ComputedRef<string> = computed(() =>
+	route.query.type ? <string>route.query.type : contentTypes.value[0]
 );
 const contentTypes: Ref<string[]> = ref([]);
+const hidden: Ref<boolean> = ref(false)
 
-getContent()
+getTypes().then(() => {
+	getContent()
+})
 
 watch(
-	() => route.query.type,
-	async () => {
+	() => type.value,
+	() => {
 		transitionName.value = "disabled-list";
-		await store.getContent(app.value, lang.value, null, route.query.type);
+		getContent()
 	}
 );
 
 watch(
 	() => app.value,
-	async () => {
+	() => {
 		transitionName.value = "disabled-list";
-		console.log(contentList);
-		console.log(app.value);
 
-		getContent()
+		if (route.name === "Content") {
+			hidden.value = true
+			getTypes().then(() => hidden.value = false)
+		}
 	}
 );
 
-onUnmounted(() => {
-	console.log('unmounted');
-});
+async function getContent(): Promise<void> {
+	console.log(contentList.value);
+	contentList.value = {}
+	store.getContent(app.value, lang.value, null, type.value)
+}
+
+async function getTypes(): Promise<string[]> {
+	return await store.getTypes(app.value).then((r: string[]): string[] => {
+		contentTypes.value = r
+		return r
+	})
+}
 
 async function changeLang(newLang: string) {
 	lang.value = newLang;
-
 	getContent()
 }
 
@@ -117,17 +132,6 @@ async function confirmDeleteContent(contentId: string): Promise<void> {
 			});
 		}
 	});
-}
-
-async function getContent(): Promise<void> {
-	await store.getTypes(app.value).then((r: string[]) => {
-		contentTypes.value = r
-
-		if (contentTypes.value.length && !route.query.type) {
-			router.replace({ query: { app: route.query.app, type: contentTypes.value[0] } })
-		}
-	})
-	store.getContent(app.value, lang.value, null, route.query.type);
 }
 
 async function onDrop(dropResult: any): Promise<void> {
@@ -183,6 +187,10 @@ const applyDrag = (contentList: ContentList, dragResult: any): ContentList => {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
+
+	.hidden {
+		visibility: hidden;
+	}
 
 	.top-line {
 		display: flex;

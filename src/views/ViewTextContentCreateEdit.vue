@@ -168,8 +168,6 @@ const isImageLoaded: Ref<boolean> = ref(false);
 const imagesCount: Ref<number> = ref(0);
 const mediaCount: Ref<number> = ref(0);
 
-console.log(route);
-
 if (route.params.contentId === "new") {
 	mainTitle.value = "Создание контента";
 	onMounted(() => {
@@ -244,16 +242,6 @@ watch(
 			default:
 				error.value = [];
 		}
-	}
-);
-
-watch(
-	() => route.query,
-	() => {
-		console.log(route.query);
-	},
-	{
-		deep: true
 	}
 );
 
@@ -340,7 +328,8 @@ function contentChangeHandler(e: Event): void {
 
 function returnHandler(r: ReturnedData | ReturnedError) {
 	if (r.success) {
-		router.push({ path: "/content" });
+		router.back()
+		router.push({ path: "/content" })
 	} else {
 		currentError.value = r.error.status;
 		setTimeout(() => {

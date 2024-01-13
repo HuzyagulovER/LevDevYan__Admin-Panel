@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import IconTrash from "@icons/IconTrash.vue";
 import { inject } from "@vue/runtime-core";
-import { StateTree, StoreGeneric, storeToRefs } from "pinia";
+import { StoreGeneric, storeToRefs } from "pinia";
 import { Content } from "../../../helpers";
 
 const store = <StoreGeneric>inject("Store");
