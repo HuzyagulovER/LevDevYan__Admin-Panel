@@ -190,6 +190,9 @@ export const Store = defineStore('Store', {
 	),
 
 	actions: {
+		getAppByName(appName: string): string {
+			return Object.keys(this.apps)[Object.values(this.apps).indexOf(appName) ?? 0]
+		},
 		async getCourses(lang: string | undefined): Promise<void> {
 			this.loading = true
 			const langFD = new FormData()

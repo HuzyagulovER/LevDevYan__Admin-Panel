@@ -328,8 +328,8 @@ function contentChangeHandler(e: Event): void {
 
 function returnHandler(r: ReturnedData | ReturnedError) {
 	if (r.success) {
-		router.back()
-		router.push({ path: "/content" })
+		// router.back()
+		router.push({ path: "/content", query: { app: store.getAppByName(activeContent.value.app), type: activeContent.value.type } })
 	} else {
 		currentError.value = r.error.status;
 		setTimeout(() => {
