@@ -616,7 +616,6 @@ export const Store = defineStore('Store', {
 				.then(r => {
 					this.loading = false
 					this.contentList = r.data.data
-					console.log(r.data.data);
 
 					return r.data.data
 				})

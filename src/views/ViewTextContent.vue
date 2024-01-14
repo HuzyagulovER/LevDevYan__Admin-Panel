@@ -15,9 +15,9 @@
 		<LanguageChoice @return-lang="changeLang" :isCookie="true" />
 		<div class="content__types types">
 			<ul class="types__list list">
-				<li v-for="contentType in contentTypes">
+				<li v-for="contentType in  contentTypes ">
 					<RouterLink class="list__link" :to="{ query: { app: app, type: contentType } }"
-						:class="{ js_active: type === contentType, hidden: hidden }">
+						:class="{ js_active: type === contentType, hidden: hiddenTypes }">
 						{{ contentType.slice(0, 1).toUpperCase() + contentType.slice(1) }}
 					</RouterLink>
 				</li>
@@ -30,10 +30,10 @@
 		<Container @drop="onDrop" class="content__container" lock-axis="y" drag-handle-selector=".content__drag-handle"
 			v-else>
 			<TransitionGroup :name="transitionName">
-				<Draggable v-for="(content, j) in contentList" :key="j" class="content__draggable">
+				<Draggable v-for="( content, j ) in  contentList " :key="j" class="content__draggable">
 					<ContentItem :contentId="(<unknown>j as string)" :content="content"
-						@confirm-delete-content="confirmDeleteContent" :class="{ hidden: hidden }" />
-					<div class="content__drag-handle" :class="{ hidden: hidden }">☰</div>
+						@confirm-delete-content="confirmDeleteContent" :class="{ hidden: hiddenContent }" />
+					<div class="content__drag-handle" :class="{ hidden: hiddenContent }">☰</div>
 				</Draggable>
 			</TransitionGroup>
 		</Container>
@@ -75,22 +75,31 @@ const transitionName: Ref<string> = ref("list");
 const app: ComputedRef<string> = computed(() =>
 	route.query.app ? <string>route.query.app : "psy"
 )
-// const type: Ref<string> = ref('');
-const type: ComputedRef<string> = computed(() =>
-	route.query.type ? <string>route.query.type : contentTypes.value[0]
-);
+const type: Ref<string> = ref(<string>route.query.type);
 const contentTypes: Ref<string[]> = ref([]);
-const hidden: Ref<boolean> = ref(false)
+const hiddenTypes: Ref<boolean> = ref(false)
+const hiddenContent: Ref<boolean> = ref(false)
 
-getTypes().then(() => {
-	getContent()
+getTypes().then(async (): Promise<void> => {
+	type.value = type.value ?? contentTypes.value[0]
+	await getContent().then((): void => {
+
+	})
 })
+
+watch(
+	() => route.query.type,
+	() => {
+		transitionName.value = "disabled-list";
+		type.value = <string>route.query.type
+	}
+);
 
 watch(
 	() => type.value,
 	() => {
 		transitionName.value = "disabled-list";
-		getContent()
+		if (type.value) getContent()
 	}
 );
 
@@ -100,21 +109,24 @@ watch(
 		transitionName.value = "disabled-list";
 
 		if (route.name === "Content") {
-			hidden.value = true
-			getTypes().then(() => hidden.value = false)
+			getTypes().then(() => {
+				router.replace({ query: { app: app.value, type: contentTypes.value[0] } })
+			})
 		}
 	}
 );
 
 async function getContent(): Promise<void> {
-	console.log(contentList.value);
 	contentList.value = {}
-	store.getContent(app.value, lang.value, null, type.value)
+	store.getContent(app.value, lang.value, null, type.value).then(() => hiddenContent.value = false)
 }
 
 async function getTypes(): Promise<string[]> {
+	hiddenTypes.value = true
+	hiddenContent.value = true
 	return await store.getTypes(app.value).then((r: string[]): string[] => {
 		contentTypes.value = r
+		hiddenTypes.value = false
 		return r
 	})
 }
