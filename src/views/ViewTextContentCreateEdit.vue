@@ -204,15 +204,6 @@ onUnmounted(() => {
 	mainTitle.value = "";
 });
 
-// watch(() => activeContent.value,
-// 	() => {
-// 		console.log(activeContent.value);
-// 	},
-// 	{
-// 		deep: true
-// 	}
-// )
-
 watch(
 	() => image.value,
 	(): void => {
@@ -328,7 +319,8 @@ function contentChangeHandler(e: Event): void {
 
 function returnHandler(r: ReturnedData | ReturnedError) {
 	if (r.success) {
-		// router.back()
+		console.log(store.getAppByName(activeContent.value.app));
+
 		router.push({ path: "/content", query: { app: store.getAppByName(activeContent.value.app), type: activeContent.value.type } })
 	} else {
 		currentError.value = r.error.status;

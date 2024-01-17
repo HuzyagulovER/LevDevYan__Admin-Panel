@@ -6,6 +6,12 @@ import { cloneDeep } from 'lodash';
 import { clearVariable } from '../main';
 import { watch } from 'vue';
 
+const api: { [key: string]: string } = {
+	psy: "/v1/",
+	avocado: "/v1/",
+	optimind: "https://optimind.levdevyan.com/v1/",
+}
+
 const api_base: string = '/v1/'
 const { cookies } = useCookies();
 
@@ -72,7 +78,11 @@ export const Store = defineStore('Store', {
 		{
 			monthNames: monthNames,
 			activeApp: 'psy',
-			apps: { psy: 'PSY', avocado: 'Avocado' },
+			apps: {
+				psy: 'PSY',
+				avocado: 'Avocado',
+				// optimind: 'Optimind',
+			},
 			OS: {
 				android: "Android",
 				apple: "Apple",
@@ -191,7 +201,7 @@ export const Store = defineStore('Store', {
 
 	actions: {
 		getAppByName(appName: string): string {
-			return Object.keys(this.apps)[Object.values(this.apps).indexOf(appName) ?? 0]
+			return Object.keys(this.apps)[Object.values(this.apps).indexOf(appName)] ?? 'other'
 		},
 		async getCourses(lang: string | undefined): Promise<void> {
 			this.loading = true
@@ -450,7 +460,7 @@ export const Store = defineStore('Store', {
 		},
 
 		async signIn(creadentials: FormData): Promise<void> {
-			return await axios.post(api_base + "signIn", creadentials).then(
+			return await axios.post(...formRequest('signIn', creadentials) as [string, FormData]).then(
 				r => {
 					return r.data
 				},

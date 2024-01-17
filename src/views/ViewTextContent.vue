@@ -81,10 +81,8 @@ const hiddenTypes: Ref<boolean> = ref(false)
 const hiddenContent: Ref<boolean> = ref(false)
 
 getTypes().then(async (): Promise<void> => {
-	type.value = type.value ?? contentTypes.value[0]
-	await getContent().then((): void => {
-
-	})
+	type.value = type.value && contentTypes.value.includes(type.value) ? type.value : contentTypes.value[0]
+	await getContent()
 })
 
 watch(
@@ -138,12 +136,17 @@ async function changeLang(newLang: string) {
 
 async function confirmDeleteContent(contentId: string): Promise<void> {
 	await store.callPopup("Удалить этот контент?").then((r: boolean) => {
+		loading.value = true
 		if (r) {
 			store.deleteContent([contentId]).then(() => {
-				store.getContent(app.value, lang.value, null, type.value);
-			});
+				getTypes().then(() => {
+					contentTypes.value.includes(type.value)
+						? getContent()
+						: router.replace({ query: { app: app.value, type: contentTypes.value[0] } })
+				})
+			})
 		}
-	});
+	})
 }
 
 async function onDrop(dropResult: any): Promise<void> {
