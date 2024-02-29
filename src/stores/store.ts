@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import { useCookies, globalCookiesConfig } from 'vue3-cookies';
-import { Course, Promocode, Promocodes, Notifications, CourseToPost, Content, Price, State, PopupAdditionFields, StringObject, ReturnedData, ReturnedError } from "../../helpers";
+import { Course, Promocode, Promocodes, Notifications, CourseToPost, Content, Price, State, PopupAdditionFields, StringObject } from "../../helpers";
 import { cloneDeep } from 'lodash';
 import { clearVariable } from '../main';
 import { watch } from 'vue';
 
 const api: { [key: string]: string } = {
-	psy_avocado: "/v1/",
+	psy: "/v1/",
+	avocado: "/v1/",
 	optimind: "https://optimind.levdevyan.com/v1/",
 }
 
@@ -35,29 +36,16 @@ function getObjectFromFormData(formData: FormData) {
 	return obj
 }
 
-function formRequest(uriName: string, dataObj?: FormData, contentActiveApp?: string): Array<string | FormData | AxiosRequestConfig> {
+function formRequest(uriName: string, dataObj?: FormData): Array<string | FormData> {
 	if (!dataObj) {
 		dataObj = new FormData();
 	}
 	let newDataObj = copyFormData(dataObj);
-	newDataObj.append("psy_avocado_token", cookies.get("psy_avocado_token"))
-
-	const return_array: Array<string | FormData | AxiosRequestConfig> = [
-		(api[contentActiveApp as string] ?? api['psy_avocado']) + uriName,
-		newDataObj,
-		{
-			headers: {
-				'Access-Control-Allow-Origin': '*',
-				'Cors': 'no-cors'
-			}
-		}
+	newDataObj.append("session_token", cookies.get("session_token"))
+	return [
+		api_base + uriName,
+		newDataObj
 	]
-
-	if (contentActiveApp === 'optimind' && cookies.get("optimind_token")) {
-		((return_array[2] as AxiosRequestConfig).headers as { [keys: string]: string })['Authorization'] = 'Bearer ' + cookies.get("optimind_token")
-	}
-
-	return return_array;
 }
 
 function copyFormData(formData: FormData): FormData {
@@ -83,6 +71,7 @@ const monthNames: ReadonlyArray<string> = [
 	"ноября",
 	"декабря",
 ];
+
 
 export const Store = defineStore('Store', {
 	state: (): State => (
@@ -206,9 +195,7 @@ export const Store = defineStore('Store', {
 				lang: "",
 				texts: {},
 				order: 1
-			},
-
-			contentActiveApp: ''
+			}
 		}
 	),
 
@@ -472,35 +459,16 @@ export const Store = defineStore('Store', {
 			)
 		},
 
-		async signIn(creadentials: FormData): Promise<ReturnedData | ReturnedError> {
-			return await axios.post(...formRequest('signIn', creadentials) as [string, FormData])
-				.then(
-					r => {
-						return r.data
-					}
-				)
-				.then(async (r: ReturnedData): Promise<ReturnedData | ReturnedError> => {
-					return await axios.post(...formRequest('Users/signIn', creadentials, 'optimind') as [string, FormData]).then(
-						rr => {
-							const tokens_answer: ReturnedData = {
-								data: {
-									psy_avocado_token: r.data.session_token,
-									optimind_token: rr.data.data.optimind_token,
-								},
-								success: r.success && rr.data.success
-							}
-							return tokens_answer
-						},
-						ee => {
-							console.log(ee);
-							return ee.response.data
-						}
-					)
-				})
-				.catch(e => {
+		async signIn(creadentials: FormData): Promise<void> {
+			return await axios.post(...formRequest('signIn', creadentials) as [string, FormData]).then(
+				r => {
+					return r.data
+				},
+				e => {
 					console.log(e);
 					return e.response.data
-				})
+				}
+			)
 		},
 
 		async callPopup(text: string, additionFields?: StringObject): Promise<boolean> {

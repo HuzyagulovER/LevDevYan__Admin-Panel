@@ -209,7 +209,6 @@ export declare type State = {
 	commonInfo: AllUsersInfo
 	defaultContent: Content
 	contentList: ContentList
-	contentActiveApp: string
 }
 
 export declare type PopupAdditionFields = {

@@ -93,8 +93,7 @@ let activeNavPage: ComputedRef<string> = computed(() => {
 async function confirmSignOut() {
 	await store.callPopup("Вы уверены, что хотите выйти?").then((r: boolean) => {
 		if (r) {
-			cookies.remove("psy_avocado_token");
-			cookies.remove("optimind_token");
+			cookies.remove("session_token");
 			router.push("/sign-in");
 		}
 	});

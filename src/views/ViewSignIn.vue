@@ -77,8 +77,7 @@ async function signIn(e: Event) {
 			}, 2000);
 			return;
 		}
-		cookies.set("psy_avocado_token", r.data.psy_avocado_token);
-		cookies.set("optimind_token", r.data.optimind_token);
+		cookies.set("session_token", r.data.session_token);
 		router.push("/");
 	});
 }
