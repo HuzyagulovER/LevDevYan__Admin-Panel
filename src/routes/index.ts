@@ -229,7 +229,7 @@ router.beforeEach(async (to, from, next) => {
 			return
 		}
 
-		if (!cookies.get("session_token")) {
+		if (!cookies.get("psy_avocado_token")) {
 			if (to.path !== '/sign-in') {
 				next({ path: '/sign-in' })
 				return
@@ -239,7 +239,7 @@ router.beforeEach(async (to, from, next) => {
 
 		}
 
-		if (cookies.get("session_token")) {
+		if (cookies.get("psy_avocado_token")) {
 			store.loading = true
 			await store.checkSessionToken().then(
 				(r: ReturnedError | ReturnedData) => {
@@ -251,7 +251,7 @@ router.beforeEach(async (to, from, next) => {
 						throw new Error(r.error.status);
 					}
 					if (!r.data.is_valid) {
-						cookies.remove("session_token")
+						cookies.remove("psy_avocado_token")
 						next({ path: '/sign-in' })
 						return
 					}
