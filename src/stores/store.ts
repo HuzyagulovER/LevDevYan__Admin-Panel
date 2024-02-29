@@ -491,6 +491,7 @@ export const Store = defineStore('Store', {
 			})
 		},
 
+
 		clearPopup() {
 			this.popup = cloneDeep(clearVariable(this.popup))
 		},
