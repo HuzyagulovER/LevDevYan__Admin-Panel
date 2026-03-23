@@ -1,7 +1,7 @@
 <template>
 	<section class="users">
 		<div class="users__top-line top-line">
-			<div class="top-line__info info" v-for="(info, j) in appsInfo" :key="j">
+			<div class="top-line__info info" v-for="(info, j) in usersCounters" :key="j">
 				<p class="info__title">{{ apps[j] }}</p>
 				<p class="info__value">{{ info }}</p>
 			</div>
@@ -19,7 +19,7 @@
 					</ButtonColored>
 				</div>
 				<div class="buttons__container" v-else>
-					<ButtonColored class="buttons__button button" @click="addSubscription()">
+					<ButtonColored class="buttons__button button" @click="setSubscription()">
 						<IconPencil />
 						Управление подпиской
 					</ButtonColored>
@@ -53,20 +53,20 @@
 							<p class="item__value">{{ getDateFromString((selectedUser as User).registration_date) }}</p>
 						</li>
 						<li class="user__item item"
-							v-if="open_app.psy !== '-' || (selectedUser as User).typePremium.psy.status !== 'inactive'">
+							v-if="open_app.psy !== '-' || (getPremium('psy') && getPremium('psy')?.status !== 'inactive')">
 							<p class="item__title">Подписка PSY</p>
 							<p class="item__value">
-								{{ (selectedUser as User).typePremium.psy.subscriptionDurationText }}
+								{{ getPremium('psy')?.subscriptionDurationText }}
 							</p>
-							<IconPencil class="item__edit" @click="addSubscription({ app: 'psy' })" />
+							<IconPencil class="item__edit" @click="setSubscription({ app: 'psy' })" />
 						</li>
 						<li class="user__item item"
-							v-if="open_app.avocado !== '-' || (selectedUser as User).typePremium.avocado.status !== 'inactive'">
+							v-if="open_app.avocado !== '-' || (getPremium('avocado') && getPremium('avocado')?.status !== 'inactive')">
 							<p class="item__title">Подписка Avocado</p>
 							<p class="item__value">
-								{{ (selectedUser as User).typePremium.avocado.subscriptionDurationText }}
+								{{ getPremium('avocado')?.subscriptionDurationText }}
 							</p>
-							<IconPencil class="item__edit" @click="addSubscription({ app: 'avocado' })" />
+							<IconPencil class="item__edit" @click="setSubscription({ app: 'avocado' })" />
 						</li>
 						<li class="user__item item">
 							<p class="item__title">Уведомления</p>
@@ -124,27 +124,21 @@ import PopupSearchUser from "@add-comps/PopupSearchUser.vue";
 import { useRoute, useRouter } from "vue-router";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref, Ref, watch } from "vue";
-import { User, NumberObject, PopupAdditionFields, ReturnedError, ReturnedData, StringObject, NumberOrStringObject, Prices, UsersTypePremium, UsersTypePremiums } from "../../helpers";
-import { cloneDeep } from "lodash";
+import { User, PopupAdditionFields, ReturnedError, ReturnedData, StringObject, NumberOrStringObject, Prices, UsersTypePremium, UsersTypePremiums } from "../../helpers";
 import { clearVariable } from "../main";
 
 const route = useRoute();
 const router = useRouter();
 const store = <StoreGeneric>inject("Store");
-const { loading, commonInfo, apps, monthNames } = storeToRefs(store);
+const { loading, apps, monthNames } = storeToRefs(store);
 
-const user_creds: ComputedRef<string | undefined> = computed((): string | undefined => route.query.creds as string | undefined)
-const sub_app: Ref<string> = ref('')
+const user_identifier: ComputedRef<string | undefined> = computed((): string | undefined => route.query.identifier as string | undefined)
 const json: Ref<User | {}> = ref({})
 const isJson: ComputedRef<boolean> = computed(() => Object.keys(json.value).length > 0)
 
 const selectedUser: Ref<User | {}> = ref({})
+const usersCounters: Ref<StringObject | {}> = ref({})
 const isUser: ComputedRef<boolean> = computed((): boolean => Object.keys(selectedUser.value).length !== 0)
-const appsInfo: ComputedRef<NumberObject> = computed(() => {
-	let info: NumberObject = cloneDeep(commonInfo.value.users);
-	delete info.all_users;
-	return info;
-})
 const error: Ref<string> = ref('')
 
 const open_app: ComputedRef<StringObject> = computed((): StringObject => {
@@ -154,41 +148,42 @@ const open_app: ComputedRef<StringObject> = computed((): StringObject => {
 	}
 })
 
-getUsersData()
+getUsersCounters()
 
-if (user_creds.value) {
-	getUser(user_creds.value)
+if (user_identifier.value) {
+	getUser(user_identifier.value)
 }
 
-watch(() => user_creds.value,
+watch(() => user_identifier.value,
 	() => {
-		if (user_creds.value) {
-			getUser(user_creds.value as string)
+		if (user_identifier.value) {
+			getUser(user_identifier.value as string)
 		} else {
 			selectedUser.value = {}
 		}
 	}
 )
 
-function getUsersData(): void {
-	loading.value = true;
-	store.getUsersData({
-		users: "all",
-		subs: "all",
-	}).then((): void => {
-		loading.value = false;
-	});
+function getPremium(type: keyof UsersTypePremiums): UsersTypePremium | null {
+  return (selectedUser.value as User).typePremium[type as keyof UsersTypePremiums] ?? null;
 }
-async function confirmDeletingUser(addition_data?: {
-	[key: string]: string;
-}): Promise<void> {
+
+function getUsersCounters(): void {
+	loading.value = true;
+  store.getUsersCounters()
+      .then((data: StringObject): void => {
+        usersCounters.value = data;
+        loading.value = false;
+      });
+}
+
+async function confirmDeletingUser(addition_data?: StringObject): Promise<void> {
 	await store
-		.callPopupWithData("", { type: "user_delete", creds: user_creds.value, ...addition_data })
+		.callPopupWithData("", { type: "user_delete", identifier: user_identifier.value, ...addition_data })
 		.then((r: PopupAdditionFields): void => {
-			if (Object.hasOwn(r, "user_creds")) {
-				store.deleteUser(r["user_creds" as keyof PopupAdditionFields]).then(
+			if (Object.hasOwn(r, "user_identifier")) {
+				store.deleteUser(r["user_identifier" as keyof PopupAdditionFields]).then(
 					async (r: boolean): Promise<void> => {
-						console.log(r);
 						await store.clearPopup();
 						store.callInfoPopup(
 							'Пользователь удален',
@@ -196,13 +191,12 @@ async function confirmDeletingUser(addition_data?: {
 								isSuccess: true
 							}
 						)
-						if (user_creds.value) {
-							getUser(user_creds.value)
+						if (user_identifier.value) {
+							getUser(user_identifier.value)
 						}
 					},
 					async (e: ReturnedError): Promise<void> => {
 						error.value = e.error.status
-						console.log(e);
 						await store.clearPopup();
 						store.callInfoPopup(
 							'Пользователь не удален',
@@ -218,29 +212,31 @@ async function confirmDeletingUser(addition_data?: {
 			}
 		});
 }
+
 async function searchUser(addition_data?: {
 	[key: string]: string;
 }): Promise<void> {
 	await store
 		.callPopupWithData("", { type: "search_user", ...addition_data })
 		.then((r: PopupAdditionFields): void => {
-			if (Object.hasOwn(r, "user_creds")) {
+			if (Object.hasOwn(r, "user_identifier")) {
 				router.push({
 					name: "Users",
 					query: {
-						creds: r['user_creds' as keyof PopupAdditionFields] as string | number
+            identifier: r['user_identifier' as keyof PopupAdditionFields] as string | number
 					}
 				})
 				// loading.value = true
-				// getUser(r["user_creds" as keyof PopupAdditionFields])
+				// getUser(r["user_identifier" as keyof PopupAdditionFields])
 			}
 		});
 }
+
 function getUser(data: string | number) {
 	loading.value = true
 	store.getUser(data).then(
 		(r: ReturnedError | ReturnedData): void => {
-			selectedUser.value = (r as ReturnedData).data.user
+			selectedUser.value = (r as ReturnedData).data
 			store.clearPopup();
 			loading.value = false
 		},
@@ -270,17 +266,18 @@ function getDateFromString(init_date: string | number): string {
 		return day + ' ' + month + ' ' + year
 	} else return '-'
 }
+
 function clearUser(): void {
 	router.push({ name: "Users" })
 }
 
-async function addSubscription(addition_data?: {
+async function setSubscription(addition_data?: {
 	[key: string]: string;
 }): Promise<void> {
-	const prices: Prices = await store.getPrices("both");
+	const prices: Prices = await store.getPrices();
 	let add_data: {
 		[key: string]: string | UsersTypePremiums
-	} = {};
+	};
 	add_data = { ...addition_data };
 	if (selectedUser.value && addition_data) add_data.subs = (selectedUser.value as User).typePremium;
 
@@ -288,15 +285,15 @@ async function addSubscription(addition_data?: {
 		.callPopupWithData("", {
 			type: "add_subscription",
 			prices,
-			creds: user_creds.value ? (selectedUser.value as User).email : null,
-			autopayment: user_creds.value ? (selectedUser.value as User).typePremium[(addition_data as StringObject)['app'] as keyof UsersTypePremiums].autopayment : null,
+      identifier: user_identifier.value ? (selectedUser.value as User).email : null,
+			autopayment: user_identifier.value ? (selectedUser.value as User).typePremium[(addition_data as StringObject)['app'] as keyof UsersTypePremiums].autopayment : null,
 			...add_data,
 		})
 		.then((r: PopupAdditionFields): void => {
 			loading.value = true
 
-			if (Object.hasOwn(r, "creds")) {
-				store.addSubscription().then(
+			if (Object.hasOwn(r, "identifier")) {
+				store.setSubscription().then(
 					async (r: boolean): Promise<void> => {
 						loading.value = false
 						await store.clearPopup();
@@ -306,8 +303,8 @@ async function addSubscription(addition_data?: {
 								isSuccess: true
 							}
 						).then((): void => {
-							if (user_creds.value) {
-								getUser(user_creds.value as string)
+							if (user_identifier.value) {
+								getUser(user_identifier.value as string)
 							}
 						})
 					},
@@ -321,7 +318,7 @@ async function addSubscription(addition_data?: {
 								isSuccess: false
 							}
 						)
-						// addSubscription({
+						// setSubscription({
 						// 	error: e.response.data.error.status
 						// });
 					}
@@ -334,12 +331,12 @@ async function toggleNotifications(addition_data?: StringObject): Promise<void> 
 	await store
 		.callPopupWithData("", {
 			type: "toggle_notifications",
-			creds: user_creds.value,
-			sys_notifications: user_creds.value ? (selectedUser.value as User).sys_notifications_state : null,
+      identifier: user_identifier.value,
+			sys_notifications: user_identifier.value ? (selectedUser.value as User).sys_notifications_state : null,
 			...addition_data,
 		})
 		.then((r: PopupAdditionFields): void => {
-			if (Object.hasOwn(r, "creds")) {
+			if (Object.hasOwn(r, "identifier")) {
 				loading.value = true
 				store.toggleNotifications().then(
 					async (r: boolean): Promise<void> => {
@@ -351,8 +348,8 @@ async function toggleNotifications(addition_data?: StringObject): Promise<void> 
 								isSuccess: !!r
 							}
 						).then((): void => {
-							if (user_creds.value) {
-								getUser(user_creds.value as string)
+							if (user_identifier.value) {
+								getUser(user_identifier.value as string)
 							}
 						})
 					},

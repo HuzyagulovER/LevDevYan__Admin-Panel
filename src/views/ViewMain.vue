@@ -46,7 +46,7 @@
 				<div class="info__courses">
 					<div class="info__container">
 						<p class="info__title">Курсы</p>
-						<Filter :init-value="filters.courses" @on-change-value="filters.courses = $event" />
+<!--						<Filter :init-value="filters.courses" @on-change-value="filters.courses = $event" />-->
 					</div>
 					<div class="info__container">
 						<div class="info__wrapper">
@@ -79,40 +79,26 @@ import { StringObject } from "../../helpers";
 const store = <StoreGeneric>inject("Store");
 const { loading, commonInfo } = storeToRefs(store);
 
-const selections: Array<StringObject> = [
-	{
-		text: "Все",
-		value: "all",
-	},
-	{
-		text: "Android",
-		value: "android",
-	},
-	{
-		text: "Apple",
-		value: "apple",
-	},
-];
 const filters: Ref<StringObject> = ref({
-	users: "all",
-	subs: "all",
-	courses: "all",
+	users: "",
+	subs: "",
+	courses: "",
 });
 
-getUsersData();
+getMainCounters();
 
 watch(
 	() => filters.value,
 	() => {
-		getUsersData();
+		getMainCounters();
 	},
 	{
 		deep: true,
 	}
 );
-function getUsersData(): void {
+function getMainCounters(): void {
 	loading.value = true;
-	store.getUsersData(filters.value).then((): void => {
+	store.getMainCounters(filters.value).then((): void => {
 		loading.value = false;
 	});
 }

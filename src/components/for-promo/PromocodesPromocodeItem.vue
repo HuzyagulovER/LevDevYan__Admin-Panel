@@ -58,11 +58,11 @@ const emit = defineEmits(["confirmDeleting", "changePromocodeState"]);
 const promo: Ref<Promocode> = ref({ ...props.promocode });
 
 function confirmDeleting() {
-	emit("confirmDeleting", props.promocode.promocode);
+	emit("confirmDeleting", props.promocode.id);
 }
 
 function changePromocodeState(state: boolean): void {
-	emit("changePromocodeState", props.promocode.promocode, state);
+	emit("changePromocodeState", props.promocode.id, state);
 }
 </script>
 

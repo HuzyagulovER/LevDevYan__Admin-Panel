@@ -1,10 +1,10 @@
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 import './style.css'
 import App from './App.vue'
-import { createPinia } from "pinia";
+import {createPinia} from "pinia";
 import router from './routes';
-import { Store } from './stores/store';
-import { cloneDeep } from 'lodash';
+import {Store} from '@stores/store';
+import {cloneDeep, isArray, isNull} from 'lodash';
 
 export function clearVariable(variable: any): any {
 	switch (typeof variable) {
@@ -18,7 +18,13 @@ export function clearVariable(variable: any): any {
 			return false
 
 		case 'object':
-			return (Array.isArray(variable)) ? [] : Object.keys(variable).reduce((acc: any, val: any) => {
+			if (isNull(variable)) {
+				return null;
+			}
+			if (isArray(variable)) {
+				return [];
+			}
+			return Object.keys(variable).reduce((acc: any, val: any) => {
 				acc[val] = clearVariable(variable[val])
 				return acc
 			}, {})
@@ -45,7 +51,7 @@ function formatBytes(bytes: number, decimals: number = 2) {
 export function isLargeFile(e: Event & {
 	currentTarget: HTMLInputElement
 }, maxSize: number = maxFileSize) {
-	return (e.currentTarget.files && e.currentTarget.files[0].size > maxSize) ? true : false
+	return !!(e.currentTarget.files && e.currentTarget.files[0].size > maxSize)
 }
 
 export function isAcceptedExtension(e: Event & {
@@ -70,10 +76,9 @@ export const getSHA256Hash = async (input: any) => {
 	const textAsBuffer = new TextEncoder().encode(input);
 	const hashBuffer = await window.crypto.subtle.digest("SHA-256", textAsBuffer);
 	const hashArray = Array.from(new Uint8Array(hashBuffer));
-	const hash = hashArray
+	return hashArray
 		.map((item) => item.toString(16).padStart(2, "0"))
 		.join("");
-	return hash;
 };
 
 export function reverseObject(object: { [key: string | number]: any }): { [key: string | number]: any } {

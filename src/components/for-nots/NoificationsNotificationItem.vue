@@ -2,27 +2,27 @@
 	<div class="notification">
 		<div class="notification__container">
 			<div class="notification__image" v-if="notification.image">
-				<img :src="notification.image" alt="Notification image" />
+				<img :src="notification.image as string" alt="Notification image" />
 			</div>
 
 			<p class="notification__empty-image" v-else>Без<br />изображения</p>
 			<div class="notification__wrapper">
 				<div class="notification__time">
 					<p>
-						{{ notification.time.substring(0, notification.time.length - 3) }}
+						{{ notification.time }}
 					</p>
 				</div>
-				<div class="notification__date" v-if="notification.date !== '0000-00-00'">
+				<div class="notification__date" v-if="notification.date">
 					<p>{{ notification.date }}</p>
 				</div>
 				<div class="notification__type" v-if="notification.type">
 					<p>{{ notification.type }}</p>
 				</div>
-				<div class="notification__lang" v-if="notification.lang">
-					<p>{{ languages[notification.lang] }}</p>
+				<div class="notification__lang" v-if="notification.language">
+					<p>{{ languages[notification.language] }}</p>
 				</div>
-				<div class="notification__premium-app-type" v-if="notification.premium_app_type">
-					<p>{{ premiumAppTypes[notification.premium_app_type] }}</p>
+				<div class="notification__premium-app-type">
+					<p>{{ store.getPremiumAvaliabilityText(notification.premium_availability) }}</p>
 				</div>
 				<div class="notification__os" v-if="notification.os">
 					<p>{{ OS[notification.os] }}</p>
@@ -32,9 +32,9 @@
 				</div>
 			</div>
 			<div class="notification__repeat repeat">
-				<p class="repeat__repeat-times">
+				<p class="repeat__repeat-times" :class="{infinite: !isNotificationCompleted && isNull(notificationsLeftToComplete) }">
 					{{
-						notification.repeat_times == -1 ? "x" : notification.repeat_times
+            isNotificationCompleted ? "X" : (!isNull(notificationsLeftToComplete) ? notificationsLeftToComplete : '∞')
 					}}
 				</p>
 				<div class="repeat__img">
@@ -44,12 +44,12 @@
 					</svg>
 				</div>
 			</div>
-			<div class="notification__play" @click="updateNotificationState('1')"
-				v-if="!notification.state || notification.repeat_times == -1"
-				:class="{ _inactive: notification.repeat_times == -1 }">
+			<div class="notification__play" @click="isNotificationCompleted ? null : updateNotificationActive(true)"
+				v-if="!notification.is_active || isNotificationCompleted"
+				:class="{ _inactive: isNotificationCompleted }">
 				<IconPlay class="play-button" />
 			</div>
-			<div class="notification__pause" v-else @click="updateNotificationState('0')">
+			<div class="notification__pause" v-else @click="updateNotificationActive(false)">
 				<IconPause class="pause-button" />
 			</div>
 			<div class="notification__delete">
@@ -59,10 +59,10 @@
 		<div class="notification__container">
 			<div class="notification__texts">
 				<p class="notification__title">{{ notification.title }}</p>
-				<p class="notification__body">{{ notification.body }}</p>
+				<p class="notification__body">{{ notification.text }}</p>
 			</div>
 			<div class="notification__edit">
-				<RouterLink class="buttons__button" :to="`/notifications/create-edit/${props.notification.notification_id}/`">
+				<RouterLink class="buttons__button" :to="`/notifications/create-edit/${props.notification.id}/`">
 					Редактировать
 				</RouterLink>
 			</div>
@@ -71,12 +71,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, Ref, toRef, watch } from "@vue/runtime-core";
+import { computed, inject } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { Notification, ReturnedData } from "../../../helpers";
 import IconTrash from "@add-comps/icons/IconTrash.vue";
 import IconPlay from "@add-comps/icons/IconPlay.vue";
 import IconPause from "@add-comps/icons/IconPause.vue";
+import {isNull} from "lodash";
+import {ComputedRef} from "@vue/reactivity";
 
 const props = defineProps<{
 	index: number;
@@ -85,21 +87,29 @@ const props = defineProps<{
 const emit = defineEmits(["confirmDeletingActive"]);
 
 const store = <StoreGeneric>inject("Store");
-const { notifications, languages, premiumAppTypes, OS } = storeToRefs(store);
+const { languages, OS } = storeToRefs(store);
+
+const isNotificationCompleted: ComputedRef<boolean> = computed((): boolean => {
+  return props.notification.count_completed === props.notification.count_total && !isNull(props.notification.count_total)
+});
+const notificationsLeftToComplete: ComputedRef<number | null> = computed((): number | null => {
+  if (!isNull(props.notification.count_total) && !isNull(props.notification.count_completed)) {
+    return props.notification.count_total - props.notification.count_completed;
+  }
+
+  return null;
+});
 
 function confirmDeletingActive() {
-	emit("confirmDeletingActive", props.notification.notification_id);
+	emit("confirmDeletingActive", props.notification.id);
 }
 
-function updateNotificationState(state: string) {
-	if (props.notification.repeat_times != -1) {
-		let fd = new FormData();
-		fd.append("state", state);
-		fd.append("notification_id", props.notification.notification_id as string);
-		store.updateNotification(fd).then((r: ReturnedData) => {
-			if (r.data.is_updated) props.notification.state = +state;
-		});
-	}
+function updateNotificationActive(is_active: boolean) {
+  store.updateNotification({
+    is_active: is_active
+  }).then((r: ReturnedData) => {
+    if (r.data.is_updated) props.notification.is_active = is_active;
+  });
 }
 </script>
 
@@ -206,9 +216,9 @@ function updateNotificationState(state: string) {
 	}
 
 	&__image {
-		width: 5rem;
+		width: 6rem;
 		height: 5rem;
-		margin: 0 3rem 1.8rem 0;
+		margin: 0 2rem 1.8rem 0;
 
 		img {
 			width: 100%;
@@ -219,6 +229,7 @@ function updateNotificationState(state: string) {
 
 	&__empty-image {
 		margin: 0 2rem 1.8rem 0;
+    width: 6rem;
 	}
 
 	&__pause,
@@ -254,9 +265,13 @@ function updateNotificationState(state: string) {
 		}
 
 		&__repeat-times {
-			font-size: 1.5rem;
+			font-size: 2rem;
 			margin-right: 1rem;
 			margin-left: 1rem;
+
+      &.infinite {
+        font-size: 2.5rem;
+      }
 		}
 	}
 

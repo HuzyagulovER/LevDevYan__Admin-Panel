@@ -92,8 +92,8 @@ function getPromocodes(): void {
 	});
 }
 
-async function confirmDeletingActive(index: string) {
-	deletePromocode.value = index;
+async function confirmDeletingActive(id: string) {
+	deletePromocode.value = id;
 	await store.callPopup("Удалить этот промокод?").then((r: boolean) => {
 		store
 			.deletePromocode(deletePromocode.value)
@@ -107,11 +107,11 @@ async function confirmDeletingActive(index: string) {
 }
 
 async function changePromocodeState(
-	promocode: string,
+	id: string,
 	newPromocodeState: boolean
 ) {
 	store
-		.updatePromocode(promocode, { sended: newPromocodeState ? 1 : 0 })
+		.updatePromocode(id, { sended: newPromocodeState })
 		.then((r: ReturnedData | ReturnedError) => {
 			if (r.success && r.data.is_updated) {
 				getPromocodes();

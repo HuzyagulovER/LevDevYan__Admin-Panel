@@ -18,28 +18,28 @@
 		<div class="subscriptions__block settings">
 			<p class="subscriptions__subtitle subtitle">Настройки</p>
 			<div class="subscriptions__wrapper">
-				<SubscriptionsItem class="subscriptions__item item" :color="'#F3FCFF'" v-for="(price, j) in prices" :key="j">
-					<p class="item__name">{{ price['name' as keyof Price] }}</p>
-					<p class="item__value">{{ price['price' as keyof Price] }} <span>&#x20bd;</span></p>
+				<SubscriptionsItem class="subscriptions__item item" :color="'#F3FCFF'" v-for="(price, key) in prices as {[key: string]: Price}" :key="key">
+					<p class="item__name">{{ price.name }}</p>
+					<p class="item__value">{{ price.price }} <span>&#x20bd;</span></p>
 					<div class="item__second-price">
-						<p :class="{ strikethrough: price['strikethrough' as keyof Price] }"
-							v-if="price['second_price_visibility' as keyof Price]">
+						<p :class="{ strikethrough: price.strikethrough }"
+							v-if="price.second_price_visibility">
 							{{
-								price['price_divison' as keyof Price] > 1
+                price.is_divide && !isNull(price.price_divison)
 								? Math.floor(
-									(price['price' as keyof Price] as number)
+									(price.price as number)
 									/
-									(price['price_divison' as keyof Price] as number)
+									(price.price_divison as number)
 								)
-								: price['second_price' as keyof Price]
+								: price.second_price
 							}}
 							<span>
-								&#x20bd;<span v-if="price['second_price_per_month' as keyof Price]">/мес</span></span>
+								&#x20bd;<span v-if="price.second_price_per_month">/мес</span></span>
 						</p>
 						<p class="empty" v-else>Текста нет</p>
 					</div>
 					<div class="item__icon">
-						<RouterLink :to="'/subscription-edit/' + app + '/' + price['id' as keyof Price]">
+						<RouterLink :to="'/subscription-edit/' + app + '/' + price.id">
 							<IconPencil />
 						</RouterLink>
 					</div>
@@ -62,9 +62,9 @@
 						<p class="item__value">
 							{{ scheduleSubscriptionType['price' as keyof ScheduleSubscriptionType] }} <span>&#x20bd;</span>
 						</p>
-						<p class="item__user-email">{{ (<unknown>scheduleSubscription as ScheduleSubscriptionTypeUser).email }}
+						<p class="item__user-email">{{ (scheduleSubscription as ScheduleSubscriptionTypeUser).email }}
 						</p>
-						<p class="item__user-id">id: {{ (<unknown>scheduleSubscription as ScheduleSubscriptionTypeUser).id }}</p>
+						<p class="item__user-id">id: {{ (scheduleSubscription as ScheduleSubscriptionTypeUser).id }}</p>
 						<p class="item__pay-number">платеж X</p>
 					</div>
 				</div>
@@ -93,6 +93,7 @@ import {
 	ScheduleSubscriptionType,
 	ScheduleSubscriptionTypeUser,
 } from "../../helpers";
+import {isNull} from "lodash";
 
 const route = useRoute();
 const store = <StoreGeneric>inject("Store");
@@ -105,7 +106,7 @@ const date: Ref<string> = ref(dateForm());
 const app: ComputedRef<string> = computed(() =>
 	route.query.app ? <string>route.query.app : "psy"
 );
-const subs: Ref<string> = ref('all')
+const subs: Ref<string> = ref('')
 loadData();
 
 watch(
@@ -129,7 +130,7 @@ async function loadData(): Promise<void> {
 	loading.value = false;
 }
 async function getPrices(): Promise<void> {
-	await store.getPrices(app.value).then((r: Prices) => {
+	await store.getPricesByApp(app.value).then((r: Prices) => {
 		prices.value = r;
 	});
 }

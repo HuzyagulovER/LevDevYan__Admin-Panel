@@ -24,7 +24,7 @@ const filterValue: Ref<string> = ref(props.initValue);
 const selections: Array<StringObject> = [
 	{
 		text: "Все",
-		value: "all",
+		value: "",
 	},
 	{
 		text: "Android",

@@ -92,13 +92,16 @@ function displayImage(e: Event): void {
 		}, 3000);
 	}
 
+  let event = false;
+
 	if ((e as any).currentTarget.files.length) {
 		image.value = URL.createObjectURL((e as any).currentTarget.files[0]);
-		emit("displayImage", true);
+    event = true;
 	} else {
 		image.value = "";
-		emit("displayImage", false);
 	}
+
+  emit("displayImage", [event, image.value]);
 }
 
 function deleteImage() {

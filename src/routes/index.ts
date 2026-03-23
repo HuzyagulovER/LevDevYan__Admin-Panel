@@ -27,7 +27,7 @@ import IconSmile from "@add-comps/icons/IconSmile.vue";
 import IconSystem from "@add-comps/icons/IconSystem.vue";
 
 import { Component } from 'vue';
-import { Store } from '../stores/store';
+import { Store } from '@stores/store';
 import { ReturnedError, ReturnedData } from '../../helpers';
 import { useCookies } from 'vue3-cookies';
 
@@ -121,7 +121,7 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		},
 	},
 	{
-		path: '/notifications/create-edit/:notificationId',
+		path: '/notifications/create-edit/:id',
 		name: "NotificationsCreateEdit",
 		component: ViewNotificationsCreateEdit,
 		meta: {
@@ -239,30 +239,30 @@ router.beforeEach(async (to, from, next) => {
 
 		}
 
-		if (cookies.get("session_token")) {
-			store.loading = true
-			await store.checkSessionToken().then(
-				(r: ReturnedError | ReturnedData) => {
+		// if (cookies.get("session_token")) {
+		// 	store.loading = true
+		// 	await store.checkSessionToken().then(
+		// 		(r: ReturnedError | ReturnedData) => {
 					let title = <HTMLElement>document.querySelector('head title')
-					title.innerText = <string>(to.meta.title || default_title)
-					store.loading = false
-
-					if (!r.success) {
-						throw new Error(r.error.status);
-					}
-					if (!r.data.is_valid) {
-						cookies.remove("session_token")
-						next({ path: '/sign-in' })
-						return
-					}
+					title.innerText = <string>((to.meta.title || default_title) + ' (TESTING)')
+		// 			store.loading = false
+		//
+		// 			if (!r.success) {
+		// 				throw new Error(r.error.status);
+		// 			}
+		// 			if (!r.data.is_valid) {
+		// 				cookies.remove("session_token")
+		// 				next({ path: '/sign-in' })
+		// 				return
+		// 			}
 					if (to.path === '/sign-in') {
 						next({ path: '/' })
 					} else {
 						next()
 					}
-				}
-			)
-		}
+		// 		}
+		// 	)
+		// }
 	} catch (error) {
 		console.log(error);
 		// next({ path: '/sign-in' })

@@ -11,7 +11,7 @@ export declare type Course = {
 export declare type Courses = { [key: string]: Course } | Array<null>
 
 export declare interface Promocode {
-	id?: number | string,
+	id?: string,
 	promocode: string,
 	value: string,
 	type: string,
@@ -20,22 +20,22 @@ export declare interface Promocode {
 export declare type Promocodes = { [key: string]: Promocode } | {}
 
 export declare interface Notification {
-	id?: number | string,
-	lang: string,
+	id?: string,
+	language: string,
 	title: string,
-	body?: string,
+	text?: string,
 	type?: string,
 	time: string,
 	date?: string,
 	app: string,
-	state?: boolean | number,
-	repeat_times: number,
-	notification_id?: string,
-	premium_app_type: string,
-	days_without_subscription?: number,
-	days_without_open_app?: number,
-	image?: string
-	os?: string
+	is_active?: boolean,
+	count_total: number | null,
+	count_completed: number | null,
+    premium_availability: boolean | null,
+	days_without_premium?: number | null,
+	days_since_last_visit?: number | null,
+	image?: string | Blob | null
+	os?: string | null
 	info?: string
 	is_test?: boolean
 }
@@ -139,17 +139,20 @@ export declare type ContentList = { [key: string]: Content } | {}
 
 export declare type Price = {
 	id: string
+	tag: string
 	name: string
 	price: number
-	second_price: number
-	second_price_visibility: number
+	second_price: number | null
+	second_price_visibility: boolean
 	text_1: string
-	text_1_visibility: number
+	text_1_visibility: boolean
 	text_2: string
-	text_2_visibility: number
-	strikethrough: number | boolean
-	second_price_per_month: number | boolean
-	price_divison: number
+	text_2_visibility: boolean
+	strikethrough: boolean
+	second_price_per_month: boolean
+	readonly price_divison: number | null
+	is_divide: boolean
+	duration_timestamp: string | null
 }
 export declare type Prices = { [key: string]: Price } | {}
 
@@ -195,7 +198,6 @@ export declare type State = {
 	courses: Courses,
 	currentTime: string,
 	promocodes: Promocodes,
-	notifications: Notifications,
 	loadedFiles: { [key: string]: File },
 	defaultCourse: Course,
 	defaultDayItem: CourseDay,

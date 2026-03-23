@@ -13,9 +13,9 @@
 			<p>Уведомлений еще нет...</p>
 		</div>
 		<TransitionGroup tag="div" :name="transitionName">
-			<NoificationsNotificationItem v-for="(notification, j) in nots" :key="notification?.notification_id" :index="j"
-				:notification="(notification as Notification)" class="notifications__notification"
-				@confirm-deleting-active="deleteNotification" />
+			<NoificationsNotificationItem v-for="(notification, j) in notifications" :key="notification?.id" :index="j"
+                                    :notification="notification as Notification" class="notifications__notification"
+                                    @confirm-deleting-active="deleteNotification" />
 		</TransitionGroup>
 	</section>
 </template>
@@ -39,12 +39,12 @@ import { useRoute } from "vue-router";
 import { useCookies } from "vue3-cookies";
 
 const store = <StoreGeneric>inject("Store");
-const { notifications, loading, languages } = storeToRefs(store);
+const { loading, languages } = storeToRefs(store);
 const route = useRoute();
 const { cookies } = useCookies();
 
 let isEmpty: Ref<boolean> = ref(false);
-const nots: Ref<Notifications> = ref([]);
+const notifications: Ref<Notifications> = ref([]);
 let popup: Ref<boolean> = ref(false);
 let deleteNotificationId: Ref<string> = ref("");
 let transitionName: Ref<string> = ref("list");
@@ -57,9 +57,9 @@ const language = function (): string {
 };
 
 watch(
-	() => nots.value,
+	() => notifications.value,
 	() => {
-		isEmpty.value = !nots.value.length && !loading.value;
+		isEmpty.value = !notifications.value.length && !loading.value;
 	},
 	{
 		deep: true,
@@ -70,7 +70,7 @@ watch(
 	() => route.query.app,
 	() => {
 		transitionName.value = "disabled-list";
-		nots.value = [];
+		notifications.value = [];
 		getNotifications(
 			(route.query.app ? route.query.app : "psy") as string,
 			language()
@@ -84,29 +84,15 @@ getNotifications(
 );
 
 function getNotifications(app: string, lang: string): void {
-	store.getNotifications(app, lang).then(() => {
-		nots.value = cloneDeep(notifications.value);
+	store.getNotifications(app, lang).then((r: Notifications) => {
+		notifications.value = cloneDeep(r);
 	});
 }
 
-function getAppNotifications(app: string | undefined) {
-	let allNotifications = cloneDeep(notifications.value);
-	let appNotifications = allNotifications.filter(
-		(notification: Notification) => {
-			return app === undefined
-				? notification.app === "psy"
-				: notification.app === app;
-		}
-	);
-	return appNotifications;
-}
-
-async function deleteNotification(notification_id: string) {
+async function deleteNotification(notificationId: string) {
 	await store.callPopup("Удалить это уведомление?").then((r: boolean) => {
 		if (r) {
-			let fd = new FormData();
-			fd.append("notification_id", notification_id);
-			store.deleteNotification(fd).then((r: ReturnedData | ReturnedError) => {
+			store.deleteNotification(notificationId).then((r: ReturnedData | ReturnedError) => {
 				if (r.success && r.data.is_deleted) {
 					getNotifications(
 						(route.query.app ? route.query.app : "psy") as string,

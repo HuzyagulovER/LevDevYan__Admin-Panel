@@ -5,8 +5,8 @@
 				<div class="popup-search-user__container">
 					<p class="popup-search-user__text">Поиск пользователя</p>
 					<div class="popup-search-user__input">
-						<label for="user_creds" class="form__label">Почта или ID</label>
-						<input id="user_creds" type="text" ref="user_creds" class="form__input" :class="{
+						<label for="user_identifier" class="form__label">Почта или ID</label>
+						<input id="user_identifier" type="text" ref="user_identifier" class="form__input" :class="{
 							_err: popup.additionFields.error === 'INVALID_ARGUMENT',
 						}" />
 					</div>
@@ -34,7 +34,7 @@ const store = <StoreGeneric>inject("Store");
 const { popup } = storeToRefs(store);
 
 let disabled: Ref<boolean> = ref(false);
-let user_creds: Ref<HTMLInputElement | null> = ref(null);
+let user_identifier: Ref<HTMLInputElement | null> = ref(null);
 
 function confirm(ans: boolean) {
 	if (!disabled.value) {
@@ -42,7 +42,7 @@ function confirm(ans: boolean) {
 		popup.value.answer = ans;
 		popup.value.isReturned = true;
 		popup.value.additionFields = merge(popup.value.additionFields, {
-			user_creds: (user_creds.value as HTMLInputElement).value,
+			user_identifier: (user_identifier.value as HTMLInputElement).value,
 		});
 		setTimeout(() => {
 			disabled.value = false;

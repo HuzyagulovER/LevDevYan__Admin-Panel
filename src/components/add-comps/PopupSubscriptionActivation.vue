@@ -5,13 +5,13 @@
 				<div class="popup-user-add-sub__container">
 					<p class="popup-user-add-sub__text">Включение подписки</p>
 					<div class="popup-user-add-sub__input">
-						<label for="user_creds" class="form__label">Почта или ID</label>
-						<input id="user_creds" type="text" v-model="user_creds" class="form__input" :class="{
+						<label for="user_identifier" class="form__label">Почта или ID</label>
+						<input id="user_identifier" type="text" v-model="user_identifier" class="form__input" :class="{
 							_err: popup.additionFields.error === 'INVALID_ARGUMENT',
 						}" :disabled="disabled" />
 					</div>
 					<div class="popup-user-add-sub__input">
-						<label for="user_creds" class="form__label">Приложение</label>
+						<label for="user_identifier" class="form__label">Приложение</label>
 						<select id="sub_app" class="form__input" v-model="sub_app" :disabled="disabled">
 							<option v-for="sub in apps" :value="sub.toLowerCase()" :key="sub">
 								{{ sub }}
@@ -19,19 +19,19 @@
 						</select>
 					</div>
 					<div class="popup-user-add-sub__input">
-						<label for="user_creds" class="form__label">Тип подписки</label>
-						<select id="sub_name" class="form__input" v-model="sub_type">
+						<label for="user_identifier" class="form__label">Тип подписки</label>
+						<select id="sub_name" class="form__input" v-model="premium_id">
 							<option value="">Без изменений {{ currentsSubName ? "(" + currentsSubName + ")" : '' }}</option>
-							<option value="none">
+							<option value="null">
 								Отключить
 							</option>
-							<option v-for="_type in popup.additionFields.prices[sub_app]" :value="_type.id" :key="_type.id">
-								{{ _type.name }}
+							<option v-for="premium in popup.additionFields.prices[sub_app]" :value="premium.id" :key="premium.id">
+								{{ premium.name }}
 							</option>
 						</select>
 					</div>
-					<div class="popup-user-add-sub__input" v-if="popup.additionFields.autopayment && sub_type === ''">
-						<label for="user_creds" class="form__label">Автооплата</label>
+					<div class="popup-user-add-sub__input" v-if="popup.additionFields.autopayment && premium_id === ''">
+						<label for="user_identifier" class="form__label">Автооплата</label>
 						<select id="sub_name" class="form__input" v-model="sub_autopayment">
 							<option value="1">
 								Включена
@@ -66,9 +66,9 @@ const { popup, apps } = storeToRefs(store);
 
 const disabled: Ref<boolean> = ref(false);
 const disable: Ref<boolean> = ref(false);
-const user_creds: Ref<string> = ref("");
+const user_identifier: Ref<string> = ref("");
 const sub_app: Ref<string> = ref("");
-const sub_type: Ref<string> = ref("");
+const premium_id: Ref<string> = ref("");
 const sub_autopayment: Ref<string> = ref("");
 const currentsSubName: Ref<string> = ref("")
 
@@ -78,10 +78,10 @@ watch(
 		if (popup.value.additionFields.app) {
 			sub_app.value = popup.value.additionFields.app
 		}
-		if (popup.value.additionFields.creds) {
-			user_creds.value = popup.value.additionFields.creds
+		if (popup.value.additionFields.identifier) {
+			user_identifier.value = popup.value.additionFields.identifier
 		}
-		if (sub_app.value && user_creds.value) {
+		if (sub_app.value && user_identifier.value) {
 			sub_autopayment.value = popup.value.additionFields.autopayment
 			disabled.value = true
 			let typePremium = popup.value.additionFields.subs[sub_app.value].typePremium
@@ -91,14 +91,14 @@ watch(
 	{ deep: true }
 )
 
-watch(() => sub_type.value,
+watch(() => premium_id.value,
 	() => {
 		console.log(popup.value.additionFields);
-		console.log(sub_type.value);
+		console.log(premium_id.value);
 		console.log("");
 
 		sub_autopayment.value =
-			(sub_type.value === "")
+			(premium_id.value === "")
 				? popup.value.additionFields.autopayment
 				: ''
 	})
@@ -110,17 +110,16 @@ function confirm(ans: boolean): void {
 		popup.value.isReturned = true;
 
 		popup.value.additionFields = merge(popup.value.additionFields, {
-			creds: user_creds.value,
-			app: sub_app.value,
-			type: sub_type.value,
+			identifier: user_identifier.value,
+			id: premium_id.value,
 			autopayment: sub_autopayment.value
 		});
 		setTimeout(() => {
 			disabled.value = false;
 
-			user_creds.value = '';
+			user_identifier.value = '';
 			sub_app.value = "";
-			sub_type.value = "";
+			premium_id.value = "";
 			sub_autopayment.value = ""
 		}, 1000);
 	}
