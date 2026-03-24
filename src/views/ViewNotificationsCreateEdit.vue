@@ -236,6 +236,7 @@ const notification: Ref<Notification> = ref({
   info: "",
   is_test: false,
   image: null,
+  is_active: false,
 });
 
 const disabledForm: Ref<boolean> = ref(false);
@@ -279,10 +280,24 @@ if (!isNew.value) {
   console.log(notification.value);
 }
 
-function displayImage(isImage: boolean): void {
-  isImageLoaded.value = <boolean>isImage;
-  if (!isImage) {
+function displayImage(data: boolean | [boolean, string]): void {
+  if (Array.isArray(data)) {
+    isImageLoaded.value = data[0];
+    if (data[0]) {
+      image.value = data[1];
+      // Получаем файл из input элемента
+      const inputElement = document.getElementById('input_image') as HTMLInputElement;
+      if (inputElement && inputElement.files && inputElement.files.length > 0) {
+        newImage.value = inputElement.files[0];
+      }
+    } else {
+      image.value = "";
+      newImage.value = null;
+    }
+  } else {
+    isImageLoaded.value = false;
     image.value = "";
+    newImage.value = null;
   }
 }
 
@@ -313,19 +328,25 @@ function notificationChangeHandler(e: Event): void {
     return;
   }
 
-  if (!isImageLoaded.value) {
-    notification.value.image = newImage.value
+  const dataToSend = cloneDeep(notification.value);
+
+  if (newImage.value) {
+    dataToSend.image = newImage.value;
+  } else if (!image.value) {
+    dataToSend.image = null;
+  } else {
+    delete dataToSend.image;
   }
 
   loading.value = true;
 
   if (isNew.value) {
     store
-        .createNotification(notification.value)
+        .createNotification(dataToSend)
         .then((r: ReturnedData | ReturnedError) => returnHandler(r));
   } else {
     store
-        .updateNotification(notification.value.id, notification.value)
+        .updateNotification(notification.value.id, dataToSend)
         .then((r: ReturnedData | ReturnedError) => returnHandler(r));
   }
 }

@@ -105,9 +105,12 @@ function confirmDeletingActive() {
 }
 
 function updateNotificationActive(is_active: boolean) {
-  store.updateNotification({
-    is_active: is_active
-  }).then((r: ReturnedData) => {
+  store.updateNotification(
+      props.notification.id,
+      {
+        is_active: is_active
+      }
+  ).then((r: ReturnedData) => {
     if (r.data.is_updated) props.notification.is_active = is_active;
   });
 }
@@ -246,6 +249,21 @@ function updateNotificationActive(is_active: boolean) {
 			object-fit: cover;
 		}
 	}
+
+  &__pause,
+  &__play {
+    svg {
+      width: 2.1rem;
+      height: 2.1rem;
+    }
+  }
+
+  &__pause,
+  &__play,
+  &__delete,
+  .repeat__img {
+    padding: 0.1rem;
+  }
 
 	.repeat {
 		display: flex;

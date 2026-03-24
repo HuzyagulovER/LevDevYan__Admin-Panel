@@ -42,6 +42,7 @@ axiosInstance.interceptors.request.use((config: AxiosRequestConfig) => {
 
     if (config.method && ['PUT', 'PATCH'].includes(config.method.toUpperCase())) {
         config.params._method = config.method;
+        config.method = 'POST';
     }
 
     return config;
@@ -73,8 +74,11 @@ function objectToFormData<T extends Record<string, any>>(obj: T): FormData {
         if (isNull(value)) {
             value = ''
         }
+        if (!(value instanceof Blob)) {
+            value = String(value)
+        }
 
-        formData.append(key, String(value));
+        formData.append(key, value)
     });
 
     return formData;
@@ -495,11 +499,9 @@ export const Store = defineStore('Store', {
             return await axiosInstance.get(url('notifications', id))
                 .then(
                     r => {
-                        console.log(r.data.data)
                         return r.data.data;
                     },
                     e => {
-                        console.log(e);
                         if (!e.response.data.success) throw new Error("There is error in notifications getting.")
                     })
                 .catch(e => {
@@ -507,7 +509,25 @@ export const Store = defineStore('Store', {
                 });
         },
         async createNotification(data: Notification): Promise<void> {
-            return await axiosInstance.post(url('notifications'), data).then(
+            // const formData = new FormData();
+            //
+            // Object.entries(data).forEach(([key, value]) => {
+            //     if (key === 'image' && value instanceof Blob) {
+            //         formData.append(key, value);
+            //     } else if (isBoolean(value)) {
+            //         formData.append(key, String(Number(value)));
+            //     } else if (isNull(value)) {
+            //         formData.append(key, '');
+            //     } else {
+            //         formData.append(key, String(value));
+            //     }
+            // });
+
+            return await axiosInstance.post(url('notifications'), objectToFormData(data), {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(
                 r => {
                     return r.data
                 },
@@ -527,11 +547,31 @@ export const Store = defineStore('Store', {
             )
         },
         async updateNotification(id: string, data: Notification): Promise<void> {
-            return await axiosInstance.put(url('notifications', id), data).then(
+            // const formData = new FormData();
+            //
+            // Object.entries(data).forEach(([key, value]) => {
+            //     if (key === 'image' && value instanceof Blob) {
+            //         formData.append(key, value);
+            //     } else if (isBoolean(value)) {
+            //         formData.append(key, String(Number(value)));
+            //     } else if (isNull(value)) {
+            //         formData.append(key, '');
+            //     } else {
+            //         formData.append(key, String(value));
+            //     }
+            // });
+
+            return await axiosInstance.post(url('notifications', id), objectToFormData(data), {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(
                 r => {
+                    console.log(r)
                     return r.data
                 },
                 e => {
+                    console.log(e)
                     return e.response.data
                 }
             )
