@@ -224,6 +224,8 @@ router.beforeEach(async (to, from, next) => {
 	try {
 		const store = Store()
 
+		store.clearLoadedFiles();
+
 		if (IS_DEV) {
 			next();
 			return
@@ -236,7 +238,6 @@ router.beforeEach(async (to, from, next) => {
 			} else {
 				next()
 			}
-
 		}
 
 		// if (cookies.get("session_token")) {

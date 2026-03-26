@@ -12,7 +12,7 @@
 				Создать контент
 			</ButtonCreate>
 		</div>
-		<LanguageChoice @return-lang="changeLang" :isCookie="true" />
+		<LanguageChoice @return-lang="changeLanguage" :isCookie="true" />
 		<div class="content__types types">
 			<ul class="types__list list">
 				<li v-for="contentType in  contentTypes ">
@@ -30,8 +30,8 @@
 		<Container @drop="onDrop" class="content__container" lock-axis="y" drag-handle-selector=".content__drag-handle"
 			v-else>
 			<TransitionGroup :name="transitionName">
-				<Draggable v-for="( content, j ) in  contentList " :key="j" class="content__draggable">
-					<ContentItem :contentId="(<unknown>j as string)" :content="content"
+				<Draggable v-for="content in contentList" :key="content.id" class="content__draggable">
+					<ContentItem :content="content"
 						@confirm-delete-content="confirmDeleteContent" :class="{ hidden: hiddenContent }" />
 					<div class="content__drag-handle" :class="{ hidden: hiddenContent }">☰</div>
 				</Draggable>
@@ -57,32 +57,35 @@ import {
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { useCookies } from "vue3-cookies";
-import { ContentList } from "../../helpers";
+import {Content, ContentList} from "../../helpers";
 import { cloneDeep } from "lodash";
 // @ts-ignore
 import { Container, Draggable } from "vue-dndrop";
 
 const store = <StoreGeneric>inject("Store");
-const { contentList, loading } = storeToRefs(store);
+const { loading } = storeToRefs(store);
 const route = useRoute();
 const router = useRouter();
 const { cookies } = useCookies();
 
-const contentKeys: ComputedRef<string[]> = computed(() => Object.keys(<ContentList>contentList.value))
 const pageName: Ref = toRef(route, "name");
-const lang: Ref<string> = ref(cookies.get(`${pageName.value}Lang`));
+
+const contentList: Ref<ContentList> = ref({});
+const language: Ref<string> = ref(cookies.get(`${pageName.value}Lang`));
 const transitionName: Ref<string> = ref("list");
-const app: ComputedRef<string> = computed(() =>
-	route.query.app ? <string>route.query.app : "psy"
-)
 const type: Ref<string> = ref(<string>route.query.type);
 const contentTypes: Ref<string[]> = ref([]);
 const hiddenTypes: Ref<boolean> = ref(false)
 const hiddenContent: Ref<boolean> = ref(false)
 
+const contentKeys: ComputedRef<string[]> = computed(() => Object.keys(<ContentList>contentList.value))
+const app: ComputedRef<string> = computed(() =>
+    route.query.app ? <string>route.query.app : "psy"
+)
+
 getTypes().then(async (): Promise<void> => {
 	type.value = type.value && contentTypes.value.includes(type.value) ? type.value : contentTypes.value[0]
-	await getContent()
+	await getContents()
 })
 
 watch(
@@ -97,7 +100,7 @@ watch(
 	() => type.value,
 	() => {
 		transitionName.value = "disabled-list";
-		if (type.value) getContent()
+		if (type.value) getContents()
 	}
 );
 
@@ -114,9 +117,15 @@ watch(
 	}
 );
 
-async function getContent(): Promise<void> {
-	contentList.value = {}
-	store.getContent(app.value, lang.value, null, type.value).then(() => hiddenContent.value = false)
+async function getContents(): Promise<void> {
+  store.getContents({
+    app: app.value,
+    language: language.value,
+    type: type.value
+  }).then((r: ContentList) => {
+    hiddenContent.value = false
+    contentList.value = r
+  })
 }
 
 async function getTypes(): Promise<string[]> {
@@ -129,19 +138,19 @@ async function getTypes(): Promise<string[]> {
 	})
 }
 
-async function changeLang(newLang: string) {
-	lang.value = newLang;
-	getContent()
+async function changeLanguage(newLang: string) {
+	language.value = newLang;
+	await getContents()
 }
 
-async function confirmDeleteContent(contentId: string): Promise<void> {
+async function confirmDeleteContent(id: string): Promise<void> {
 	await store.callPopup("Удалить этот контент?").then((r: boolean) => {
 		loading.value = true
 		if (r) {
-			store.deleteContent([contentId]).then(() => {
+			store.deleteContent(id).then(() => {
 				getTypes().then(() => {
 					contentTypes.value.includes(type.value)
-						? getContent()
+						? getContents()
 						: router.replace({ query: { app: app.value, type: contentTypes.value[0] } })
 				})
 			})
@@ -165,7 +174,7 @@ async function onDrop(dropResult: any): Promise<void> {
 			Math.max(removedIndex, addedIndex) + 1
 		)
 	).then(async (): Promise<void> => {
-		await getContent()
+		await getContents()
 		loading.value = false
 	})
 

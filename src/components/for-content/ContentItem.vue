@@ -16,14 +16,12 @@
 				</p>
 				<p class="info__title"><span>Название</span>: {{ content.title }}</p>
 				<p class="info__type"><span>Тип</span>: {{ content.type }}</p>
-				<p class="info__text">
-					<span>Текст</span>: {{ Object.keys(content.texts).length }}
-				</p>
+				<p class="info__text"><span>Текст</span>: {{ content.texts }}</p>
 			</div>
 			<div class="content-item__buttons buttons">
 				<div class="buttons__wrapper">
 					<IconTrash class="buttons__delete icon-trash" @click="confirmDeleteContent" />
-					<RouterLink class="buttons__button" :to="`/content/create-edit/${contentId}`">
+					<RouterLink class="buttons__button" :to="`/content/create-edit/${content.id}`">
 						Редактировать
 					</RouterLink>
 				</div>
@@ -36,18 +34,17 @@
 import IconTrash from "@icons/IconTrash.vue";
 import { inject } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { Content } from "../../../helpers";
+import {Content, ContentPreview} from "../../../helpers";
 
 const store = <StoreGeneric>inject("Store");
 const props = defineProps<{
-	contentId: string;
-	content: Content;
+	content: ContentPreview;
 }>();
 const emit = defineEmits(["confirmDeleteContent"]);
 const { apps } = storeToRefs(store);
 
 function confirmDeleteContent() {
-	emit("confirmDeleteContent", props.contentId);
+	emit("confirmDeleteContent", props.content.id);
 }
 </script>
 
@@ -73,11 +70,10 @@ function confirmDeleteContent() {
 		justify-content: center;
 		align-items: center;
 		aspect-ratio: 26/11;
-		height: 7rem;
+    height: 12rem;
 		width: 18rem;
 		overflow: hidden;
 		border-radius: 0.8rem;
-		margin-bottom: 1rem;
 
 		&__image {
 			width: 100%;

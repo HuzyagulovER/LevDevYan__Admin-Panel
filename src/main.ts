@@ -4,7 +4,7 @@ import App from './App.vue'
 import {createPinia} from "pinia";
 import router from './routes';
 import {Store} from '@stores/store';
-import {cloneDeep, isArray, isNull} from 'lodash';
+import {assign, cloneDeep, isArray, isNull, isObject, isSet, isUndefined} from 'lodash';
 
 export function clearVariable(variable: any): any {
 	switch (typeof variable) {
@@ -93,6 +93,23 @@ export function reverseObject(object: { [key: string | number]: any }): { [key: 
 	return newObject
 };
 
+export function flattenObject(obj: { [key: string]: any }, keyName?: string): { [key: string]: any } {
+	console.log(obj)
+    let flattendObj: { [key: string]: any } = {};
+
+    Object.keys(obj).forEach((key: string) => {
+        let newKey = isUndefined(keyName) ? key : `${keyName}[${key}]`;
+        if (isObject(obj[key])) {
+            // calling the function again
+			flattendObj = assign(flattendObj, flattenObject(obj[key], newKey));
+        } else {
+            flattendObj[newKey] = obj[key];
+        }
+    });
+
+    return flattendObj;
+}
+
 const app = createApp(App)
 app
 	.use(createPinia())
@@ -100,6 +117,7 @@ app
 	.provide('clearVariable', clearVariable)
 	.provide('getSHA256Hash', getSHA256Hash)
 	.provide('isLargeFile', isLargeFile)
+	.provide('flattenObject', flattenObject)
 	.provide('maxFileSize', maxFileSize)
 	.provide('maxFileSizeText', maxFileSizeText)
 	.provide('maxMediaSize', maxMediaSize)

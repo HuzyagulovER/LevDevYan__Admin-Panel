@@ -1,8 +1,8 @@
 <template>
 	<section class="content-create-edit">
-		<form class="content-create-edit__form form" @submit.prevent="contentChangeHandler">
-			<InputImage class="form__file-input" :image="image" :name="'content_image'" :currentError="currentError"
-				:disabled="disabledForm" @display-image="displayImage($event, 'content_image')" />
+		<form class="content-create-edit__form form" @submit.prevent="contentSaveHandler">
+			<InputImage class="form__file-input" :image="image" :name="'main'" :currentError="currentError"
+				:disabled="disabledForm" @display-image="displayContentImage($event)" />
 
 			<label for="input_title" class="form__label">Название</label>
 			<input id="input_title" type="text" class="form__input" :class="{ _error: error.includes('title') }" name="title"
@@ -29,8 +29,8 @@
 
 			<label for="input_lang" class="form__label">Язык</label>
 			<div class="select-container">
-				<select id="input_lang" name="lang" class="form__input" :class="{ _error: error.includes('lang') }"
-					v-model="activeContent.lang" :disabled="disabledForm">
+				<select id="input_lang" name="language" class="form__input" :class="{ _error: error.includes('language') }"
+					v-model="activeContent.language" :disabled="disabledForm">
 					<option v-for="(language, j) in languages" :key="j" :value="j">
 						{{ language }}
 					</option>
@@ -55,38 +55,41 @@
 			<OpeningList class="form__texts texts" :isOpen="opened">
 				<Container @drop="onDrop" class="texts__container" lock-axis="y" drag-handle-selector=".form__label">
 					<TransitionGroup name="list">
-						<Draggable class="texts__text text" v-for="(j, i) in textsKeys" :key="j">
+						<Draggable class="texts__text text" v-for="(id, i) in textsKeys" :key="id">
 							<div class="text__top-line">
 								<label class="form__label">Элемент {{ textsKeys.length - i }}</label>
-								<BlockMedia :text="activeContent.texts[j]" :hash="(j as string)" :currentError="currentError"
-									:disabled="disabledForm" @display-media="displayMedia($event, j)" />
+								<BlockMedia :text="activeContent.texts[id]" :hash="id" :currentError="currentError"
+									:disabled="disabledForm" @display-media="displayMedia($event, id)" />
 								<!-- <InputMedia class="form__media-input" :media="text?.media" :name="'content_media_' + j"
 								:currentError="currentError" :disabled="disabledForm" @display-media="displayMedia($event, j)" /> -->
 							</div>
 							<div class="text__delete">
-								<IconTrash class="text__icon icon-trash" @click="confirmDeleteText(j)" />
+								<IconTrash class="text__icon icon-trash" @click="confirmDeleteText(id)" />
 							</div>
 							<div class="text__inputs inputs">
 								<input type="text" class="form__input inputs__title" name="title" :disabled="disabledForm"
-									v-model="activeContent.texts[j].title" placeholder="Название" />
+									v-model="activeContent.texts[id].title" placeholder="Название" />
 								<input type="text" class="form__input inputs__author" name="author" :disabled="disabledForm"
-									v-model="activeContent.texts[j].author" placeholder="Автор" />
-								<textarea class="form__textarea inputs__description" v-model="activeContent.texts[j].text"
-									:disabled="disabledForm" placeholder="Описание"></textarea>
+									v-model="activeContent.texts[id].author" placeholder="Автор" />
+                <textarea class="form__textarea inputs__description"
+                          name="description"
+                          v-model="activeContent.texts[id].description as string"
+                          :disabled="disabledForm"
+                          placeholder="Описание"></textarea>
 								<div class="inputs__premium">
 									<p>Премиум</p>
-									<Checkbox :defaultChecked="activeContent.texts[j].is_premium ? true : false"
-										@changeState="activeContent.texts[j].is_premium = $event" />
+									<Checkbox :defaultChecked="activeContent.texts[id].is_premium"
+										@changeState="activeContent.texts[id].is_premium = $event" />
 								</div>
 								<input type="text" class="form__input inputs__type" name="type" :disabled="disabledForm"
-									v-model="activeContent.texts[j].type" placeholder="Тип" />
+									v-model="activeContent.texts[id].type" placeholder="Тип" />
 								<input type="text" class="form__input inputs__info" name="info" :disabled="disabledForm"
-									v-model="activeContent.texts[j].info" placeholder="Информация" />
+									v-model="activeContent.texts[id].info" placeholder="Информация" />
 							</div>
 							<div>
-								<InputImage class="text__file-input" :image="activeContent.texts[j].image"
-									:name="'content_image_' + j" :currentError="currentError" :disabled="disabledForm"
-									@display-image="displayImage($event, j)" />
+								<InputImage class="text__file-input" :image="activeContent.texts[id].image as string"
+									:name="id" :currentError="currentError" :disabled="disabledForm"
+									@display-image="displayTextImage($event, id)" />
 							</div>
 						</Draggable>
 					</TransitionGroup>
@@ -110,55 +113,67 @@ import InputImage from "@add-comps/InputImage.vue";
 import BlockMedia from "@add-comps/BlockMedia.vue";
 import ButtonCreate from "@add-comps/ButtonCreate.vue";
 import Checkbox from "@add-comps/Checkbox.vue";
-import { useRoute, useRouter } from "vue-router";
-import {
-	inject,
-	onMounted,
-	onUnmounted,
-	ref,
-	Ref,
-	watch,
-	ComputedRef,
-	computed,
-} from "@vue/runtime-core";
-import { StoreGeneric, storeToRefs } from "pinia";
-import {
-	Content,
-	ContentTexts,
-	ContentList,
-	ReturnedData,
-	ReturnedError,
-} from "../../helpers";
-import { cloneDeep } from "lodash";
+import {useRoute, useRouter} from "vue-router";
+import {computed, ComputedRef, inject, onMounted, onUnmounted, ref, Ref, watch,} from "@vue/runtime-core";
+import {StoreGeneric, storeToRefs} from "pinia";
+import {Content, ContentText, ContentTexts, NumberObject, ReturnedData, ReturnedError,} from "../../helpers";
+import {assign, cloneDeep, isArray} from "lodash";
 // @ts-ignore
-import { Container, Draggable } from "vue-dndrop";
+import {Container, Draggable} from "vue-dndrop";
 
 const store = <StoreGeneric>inject("Store");
 const clearVariable = <Function>inject("clearVariable");
 const getSHA256Hash = <Function>inject("getSHA256Hash");
-// const reverseObject = <Function>inject("reverseObject");
 const {
-	defaultContent,
 	loading,
 	mainTitle,
 	languages,
 	apps,
-	loadedFiles,
 	activeApp,
 } = storeToRefs(store);
 const route = useRoute();
 const router = useRouter();
+const defaultContent = <Content>{
+  id: "",
+  title: "",
+  image: "",
+  app: "",
+  type: "",
+  language: "",
+  texts: {},
+  order: 1
+};
+const defaultContentText = <ContentText>{
+  title: "",
+  description: "",
+  author: "",
+  type: "",
+  info: "",
+  is_premium: false,
+  image: "",
+  media: "",
+  order: 1,
+};
 
 const requiredFields: ReadonlyArray<string> = ["title", "app", "type"];
 const disabledForm: Ref<boolean> = ref(false);
-const activeContent: Ref<Content> = ref(cloneDeep(defaultContent.value));
-// const page: ComputedRef<string> = computed(() => {
-// 	return route.path.split("/")[route.path.split("/").length - 1];
-// });
+const activeContent: Ref<Content> = ref(cloneDeep(defaultContent));
 const app: ComputedRef<string> = computed(() =>
 	route.params.app ? <string>route.params.app : "psy"
 );
-const textsKeys: ComputedRef<string[]> = computed((): string[] => Object.keys(activeContent.value.texts).reverse());
+const textsKeys: ComputedRef<string[]> = computed((): string[] => {
+  let textKeys: NumberObject = {};
+  for (const textId in activeContent.value.texts) {
+    textKeys[textId] = activeContent.value.texts[textId].order;
+  }
+
+  textKeys = Object.fromEntries(Object.entries(textKeys).sort(([, a], [, b]) => b - a));
+
+  return Object.keys(textKeys);
+});
+const textsCount: ComputedRef<number> = computed(() => {
+  return textsKeys.value.length;
+});
 const currentError: Ref<string> = ref("");
 const error: Ref<Array<string>> = ref([]);
 const image: Ref<string> = ref("");
@@ -176,29 +191,29 @@ if (route.params.contentId === "new") {
 
 	activeContent.value.app =
 		activeApp.value !== "" ? apps.value[activeApp.value] : activeApp.value;
+
+  loading.value = false;
 } else {
 	isNew.value = false;
 	mainTitle.value = "Редактирование контента";
 	store
-		.getContent("", "", route.params.contentId)
-		.then((r: ContentList | Array<null>) => {
+		.getContent(route.params.contentId)
+		.then((r: Content | Array<null>) => {
 			if (Array.isArray(r)) {
 				router.replace({ path: "/content" });
 			}
 
-			activeContent.value = <Content>(
-				r[route.params.contentId as keyof ContentList]
-			);
+			activeContent.value = <Content>r;
 
 			if (apps.value[activeContent.value.app]) {
 				activeContent.value.app = apps.value[activeContent.value.app];
 			}
 
-			image.value = activeContent.value.image;
+			image.value = activeContent.value.image as string;
+
+      loading.value = false;
 		});
 }
-
-loading.value = false;
 
 onUnmounted(() => {
 	mainTitle.value = "";
@@ -225,9 +240,9 @@ watch(
 			case "DUPLICATE_ENTRY":
 				error.value.push("title");
 				error.value.push("app");
-				error.value.push("lang");
+				error.value.push("language");
 				error.value.push("type");
-				error.value.push("content_image");
+				error.value.push("main");
 				break;
 
 			default:
@@ -236,20 +251,25 @@ watch(
 	}
 );
 
-function displayImage(isImage: boolean, id: string | number): void {
+function displayContentImage(isImage: boolean): void {
 	isImageLoaded.value = isImage;
 	isImage ? imagesCount.value++ : imagesCount.value--;
 
 	if (!isImage) {
-		if (id === "content_image") {
-			image.value = "";
-		} else {
-			activeContent.value.texts[id].image = "";
-		}
-	}
+    image.value = "";
+  }
 }
 
-function displayMedia(isMedia: boolean, id: string | number): void {
+function displayTextImage(data: boolean | [boolean, string], id: string): void {
+	isImageLoaded.value = isArray(data) ? data[0] : data;
+  isImageLoaded.value ? imagesCount.value++ : imagesCount.value--;
+
+	if (!isImageLoaded.value) {
+    activeContent.value.texts[id].image = "";
+  }
+}
+
+function displayMedia(isMedia: boolean, id: string): void {
 	if (isMedia) mediaCount.value++
 	// isMedia ? mediaCount.value++ : mediaCount.value--;
 
@@ -258,27 +278,11 @@ function displayMedia(isMedia: boolean, id: string | number): void {
 	}
 }
 
-function contentChangeHandler(e: Event): void {
+function contentSaveHandler(e: Event): void {
 	const fd: FormData = new FormData(e.target as HTMLFormElement);
 
 	disabledForm.value = true;
 	loading.value = true;
-
-	if (isImageLoaded.value) {
-		for (const [name, value] of fd) {
-			if (typeof value === "object" && (value as File).size) {
-				loadedFiles.value[name] = fd.get(name);
-			}
-		}
-	}
-
-	if (mediaCount.value) {
-		for (const [name, value] of fd) {
-			if (typeof value === "object" && (value as File).size) {
-				loadedFiles.value[name] = fd.get(name);
-			}
-		}
-	}
 
 	requiredFields.forEach((field) => {
 		if (
@@ -298,7 +302,6 @@ function contentChangeHandler(e: Event): void {
 	}
 
 	const pushContent: Content = cloneDeep(activeContent.value);
-
 	pushContent.app = pushContent.app.toLowerCase();
 
 	for (const key in pushContent.texts) {
@@ -311,6 +314,17 @@ function contentChangeHandler(e: Event): void {
 			.addContent(pushContent)
 			.then((r: ReturnedData | ReturnedError) => returnHandler(r));
 	} else {
+    if (pushContent.image) {
+      delete pushContent.image;
+    }
+    for (const key in pushContent.texts) {
+      if (pushContent.texts[key].image) {
+        delete pushContent.texts[key].image
+      }
+      if (pushContent.texts[key].media) {
+        delete pushContent.texts[key].media
+      }
+    }
 		store.updateContent(pushContent).then((r: ReturnedData | ReturnedError) => {
 			returnHandler(r);
 		});
@@ -319,8 +333,6 @@ function contentChangeHandler(e: Event): void {
 
 function returnHandler(r: ReturnedData | ReturnedError) {
 	if (r.success) {
-		console.log(store.getAppByName(activeContent.value.app));
-
 		router.push({ path: "/content", query: { app: store.getAppByName(activeContent.value.app), type: activeContent.value.type } })
 	} else {
 		currentError.value = r.error.status;
@@ -334,21 +346,12 @@ function returnHandler(r: ReturnedData | ReturnedError) {
 
 async function createNewText(): Promise<void> {
 	let hash: string = await getSHA256Hash(Date.now() + Math.random() * 10000);
-	activeContent.value.texts[hash] = {
-		title: "",
-		text: "",
-		author: "",
-		type: "",
-		info: "",
-		is_premium: 0,
-		image: "",
-		media: "",
-	};
+	activeContent.value.texts[hash] = assign(cloneDeep(defaultContentText), {order: textsCount.value});
 	opened.value = true;
 }
 
-function changeLang(lang: string) {
-	activeContent.value.lang = lang;
+function changeLang(language: string) {
+	activeContent.value.language = language;
 }
 
 function toggleTexts(): void {
@@ -364,44 +367,26 @@ async function confirmDeleteText(textId: string | number): Promise<void> {
 }
 
 function onDrop(dropResult: any): void {
-	activeContent.value.texts = applyDrag(activeContent.value.texts, dropResult)
+  const {removedIndex, addedIndex}: { removedIndex: number, addedIndex: number } = dropResult;
+  const result: ContentTexts = cloneDeep(activeContent.value.texts);
+
+  if (removedIndex !== addedIndex) {
+    const addedOrderNumber: number = result[textsKeys.value[addedIndex]].order;
+    result[textsKeys.value[addedIndex]].order = result[textsKeys.value[removedIndex]].order;
+    result[textsKeys.value[removedIndex]].order = addedOrderNumber;
+
+    activeContent.value.texts = result;
+  }
 }
 
-const applyDrag = (texts: ContentTexts, dragResult: any): ContentTexts => {
-	const { removedIndex, addedIndex }: { removedIndex: number, addedIndex: number } = dragResult;
-	if (removedIndex === null && addedIndex === null) return texts;
-
-	const result: ContentTexts = {};
-
-	textsKeys.value.forEach((el: string, key: number): void => {
-		if (key > removedIndex && key > addedIndex || key < removedIndex && key < addedIndex) {
-			result[el as keyof ContentTexts] = texts[el as keyof ContentTexts];
-		}
-		else if (key >= removedIndex && key < addedIndex) {
-			result[textsKeys.value[key + 1] as keyof ContentTexts] = texts[textsKeys.value[key + 1] as keyof ContentTexts]
-		}
-		else if (key > addedIndex && key <= removedIndex) {
-			result[textsKeys.value[key - 1] as keyof ContentTexts] = texts[textsKeys.value[key - 1] as keyof ContentTexts]
-		}
-		else if (key === addedIndex) {
-			result[textsKeys.value[removedIndex] as keyof ContentTexts] = texts[textsKeys.value[removedIndex] as keyof ContentTexts]
-		}
-	});
-
-	return <ContentTexts>reverseObject(result);
-};
-
 function reverseObject(object: { [key: string | number]: any }): { [key: string | number]: any } {
-	console.log(object);
-
 	const keys: Array<string | number> = Object.keys(object).reverse(),
 		newObject: { [key: string | number]: any } = {}
 	keys.forEach((el: string | number): void => {
 		newObject[el] = cloneDeep(object[el])
 	})
-	console.log(newObject);
 	return newObject
-};
+}
 </script>
 
 <style scoped lang="scss">

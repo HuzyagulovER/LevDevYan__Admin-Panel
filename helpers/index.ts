@@ -115,27 +115,32 @@ export declare type Content = {
 	id: string
 	content_id?: string
 	title: string
-	image: string
+	image?: string
 	app: string
-	lang: string
+	language: string
 	type: string
 	texts: ContentTexts
 	order: number
 }
+export declare type ContentPreview = Content & {
+	type: number
+}
 export declare type ContentTexts = { [key: string]: ContentText }
 export declare type ContentText = {
-	title: string
-	text: string
-	author: string
-	type: string
-	info: string
-	is_premium: number | string
-	image: string
-	media?: string
+	id: string
+	title: string | null
+	description: string | null
+	author: string | null
+	type: string | null
+	info: string | null
+	is_premium: boolean
+	image?: string | null
+	media?: string | null
+	order: number
 	media_size?: string
 	playtime?: string
 }
-export declare type ContentList = { [key: string]: Content } | {}
+export declare type ContentList = { [key: number]: ContentPreview } | {}
 
 export declare type Price = {
 	id: string
@@ -198,6 +203,8 @@ export declare type State = {
 	courses: Courses,
 	currentTime: string,
 	promocodes: Promocodes,
+	loadedMedia: { [key: string]: File },
+	loadedImages: { [key: string]: File },
 	loadedFiles: { [key: string]: File },
 	defaultCourse: Course,
 	defaultDayItem: CourseDay,
@@ -209,8 +216,6 @@ export declare type State = {
 	acceptedMediaExtensions: Array<string>
 	defaultLang: string,
 	commonInfo: AllUsersInfo
-	defaultContent: Content
-	contentList: ContentList
 }
 
 export declare type PopupAdditionFields = {

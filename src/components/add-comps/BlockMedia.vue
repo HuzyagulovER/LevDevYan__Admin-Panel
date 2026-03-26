@@ -1,7 +1,7 @@
 <template>
 	<div class="media-block">
 		<PreviewMedia :media="media" :media_size="media_size" :playtime="playtime" v-show="media" />
-		<InputMedia :media="media" :name="'content_media_' + hash" :currentError="currentError" :disabled="disabled"
+		<InputMedia :media="media" :name="hash" :currentError="currentError" :disabled="disabled"
 			@display-media="displayMedia($event)" v-show="!media" />
 		<IconTrash @click="deleteMedia" class="media-block__delete icon-trash" v-show="media" />
 	</div>

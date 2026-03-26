@@ -11,10 +11,10 @@ import {
     Price,
     State,
     PopupAdditionFields,
-    StringObject, Notification,
+    StringObject, Notification, ContentList,
 } from "../../helpers";
-import {cloneDeep, isBoolean, isEmpty, isNull} from 'lodash';
-import {clearVariable} from '../main';
+import {cloneDeep, isArray, isBoolean, isEmpty, isNull, isObject} from 'lodash';
+import {clearVariable, flattenObject} from '../main';
 import {watch} from 'vue';
 import {useRouter} from 'vue-router';
 
@@ -73,6 +73,9 @@ function objectToFormData<T extends Record<string, any>>(obj: T): FormData {
         }
         if (isNull(value)) {
             value = ''
+        }
+        if (isObject(value) || isArray(value)) {
+            value = JSON.stringify(value)
         }
         if (!(value instanceof Blob)) {
             value = String(value)
@@ -174,6 +177,8 @@ export const Store = defineStore('Store', {
             courses: {},
             currentTime: '',
             promocodes: {},
+            loadedMedia: {},
+            loadedImages: {},
             loadedFiles: {},
 
             defaultCourse: {
@@ -252,18 +257,6 @@ export const Store = defineStore('Store', {
                     avocado: 0,
                 },
             },
-
-            contentList: {},
-            defaultContent: {
-                id: "",
-                title: "",
-                image: "",
-                app: "",
-                type: "",
-                lang: "",
-                texts: {},
-                order: 1
-            }
         }
     ),
 
@@ -509,20 +502,6 @@ export const Store = defineStore('Store', {
                 });
         },
         async createNotification(data: Notification): Promise<void> {
-            // const formData = new FormData();
-            //
-            // Object.entries(data).forEach(([key, value]) => {
-            //     if (key === 'image' && value instanceof Blob) {
-            //         formData.append(key, value);
-            //     } else if (isBoolean(value)) {
-            //         formData.append(key, String(Number(value)));
-            //     } else if (isNull(value)) {
-            //         formData.append(key, '');
-            //     } else {
-            //         formData.append(key, String(value));
-            //     }
-            // });
-
             return await axiosInstance.post(url('notifications'), objectToFormData(data), {
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -547,20 +526,6 @@ export const Store = defineStore('Store', {
             )
         },
         async updateNotification(id: string, data: Notification): Promise<void> {
-            // const formData = new FormData();
-            //
-            // Object.entries(data).forEach(([key, value]) => {
-            //     if (key === 'image' && value instanceof Blob) {
-            //         formData.append(key, value);
-            //     } else if (isBoolean(value)) {
-            //         formData.append(key, String(Number(value)));
-            //     } else if (isNull(value)) {
-            //         formData.append(key, '');
-            //     } else {
-            //         formData.append(key, String(value));
-            //     }
-            // });
-
             return await axiosInstance.post(url('notifications', id), objectToFormData(data), {
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -600,6 +565,107 @@ export const Store = defineStore('Store', {
         getPremiumAvaliabilityText(label: string): string | undefined {
             return Object.hasOwn(this.premiumAppTypes, label) ? this.premiumAppTypes[label] : undefined;
         },
+
+        async getContents(data: Object): Promise<ContentList> {
+            this.loading = true
+
+            return await axiosInstance.get(url('content'), { params: data })
+                .then(r => {
+                    return r.data.data
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                })
+                .finally(() => this.loading = false)
+        },
+        async getContent(id: string): Promise<Content> {
+            this.loading = true
+
+            return await axiosInstance.get(url('content', id))
+                .then(r => {
+                    return r.data.data
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                })
+                .finally(() => this.loading = false)
+        },
+        async getTypes(app: string): Promise<string[]> {
+            this.loading = true
+
+            return await axiosInstance.get(url('content/types'), { params: { app: app }})
+                .then(r => {
+                    return r.data.data
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                })
+                .finally(() => this.loading = false)
+        },
+        async addContent(content: Content): Promise<void> {
+            return await axiosInstance.post(url('content'), this.createContentFormData(content), {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(
+                r => {
+                    this.loadedFiles = {}
+                    return r.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
+        async deleteContent(id: string): Promise<void> {
+            return await axiosInstance.delete(url('content', id)).then(
+                r => {
+                    return r.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
+        async updateContent(content: Content): Promise<void> {
+            return await axiosInstance.post(url('content', content.id), this.createContentFormData(content), {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(
+                r => {
+                    this.loadedFiles = {}
+                    return r.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
+        createContentFormData (content: Content): FormData {
+            const fd: FormData = objectToFormData(flattenObject(content));
+
+            if (Object.keys(this.loadedMedia).length) {
+                for (const key in this.loadedMedia) {
+                    fd.append(`media[${key}]`, this.loadedMedia[key]);
+                }
+            }
+            if (Object.keys(this.loadedImages).length) {
+                for (const key in this.loadedImages) {
+                    fd.append(`images[${key}]`, this.loadedImages[key]);
+                }
+            }
+
+            return fd;
+        },
+
+        clearLoadedFiles() {
+            this.loadedMedia = {};
+            this.loadedImages = {};
+        },
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
 
 
         getAppByName(appName: string): string {
@@ -752,20 +818,6 @@ export const Store = defineStore('Store', {
             })
         },
 
-
-        // async checkSessionToken() {
-        // 	return await axiosInstance.post(...formRequest('checkSessionToken') as [string]).then(
-        // 		r => {
-        // 			return r.data
-        // 		},
-        // 		e => {
-        // 			console.log(e);
-        // 			return e.response.data
-        // 		}
-        // 	)
-        // },
-
-
         async toggleNotifications(): Promise<void> {
             const fd = new FormData()
             fd.append('identifier', this.popup.additionFields['identifier' as keyof PopupAdditionFields] as string);
@@ -782,107 +834,6 @@ export const Store = defineStore('Store', {
         },
 
 
-        async getContent(pageName: string, lang: string, contentId: string | null, contentType?: string): Promise<void> {
-            this.loading = true
-            const contentIdFD = new FormData()
-            if (pageName) {
-                contentIdFD.append('app', pageName)
-            }
-            if (lang) {
-                contentIdFD.append('lang', lang)
-            }
-            if (contentId) {
-                contentIdFD.append('content_ids', JSON.stringify([contentId]))
-            }
-            if (contentType) {
-                contentIdFD.append('content_type', contentType)
-            }
-
-            return await axiosInstance.post(...formRequest('Content/getContent', contentIdFD) as [string, FormData])
-                .then(r => {
-                    this.loading = false
-                    this.contentList = r.data.data
-
-                    return r.data.data
-                })
-                .catch(e => {
-                    console.error(`${e.name}: ${e.message}`);
-                })
-        },
-        async getTypes(pageName: string): Promise<string[]> {
-            this.loading = true
-            const pageNameFD = new FormData()
-            pageNameFD.append('app', pageName)
-
-            return await axiosInstance.post(...formRequest('Content/getTypes', pageNameFD) as [string, FormData])
-                .then(r => {
-                    this.loading = false
-                    return r.data.data
-                })
-                .catch(e => {
-                    console.error(`${e.name}: ${e.message}`);
-                })
-        },
-        async addContent(content: Content): Promise<void> {
-            const newContent: Content = cloneDeep(content)
-            const fd = new FormData();
-
-            for (const key in newContent) {
-                fd.append(key, JSON.stringify(newContent[key as keyof Content]))
-            }
-
-            if (Object.keys(this.loadedFiles).length) {
-                for (const key in this.loadedFiles) {
-                    fd.append(key, this.loadedFiles[key]);
-                }
-            }
-
-            return await axiosInstance.post(...formRequest('Content/createContent', fd) as [string, FormData]).then(
-                r => {
-                    this.loadedFiles = {}
-                    return r.data
-                },
-                e => {
-                    return e.response.data
-                }
-            )
-        },
-        async updateContent(content: Content): Promise<void> {
-            const updateContent: Content = cloneDeep(content)
-            const fd = new FormData();
-
-            for (const key in updateContent) {
-                fd.append(key, JSON.stringify(updateContent[key as keyof Content]))
-            }
-
-            if (Object.keys(this.loadedFiles).length) {
-                for (const key in this.loadedFiles) {
-                    fd.append(key, this.loadedFiles[key]);
-                }
-            }
-
-            return await axiosInstance.post(...formRequest('Content/updateContent', fd) as [string, FormData]).then(
-                r => {
-                    this.loadedFiles = {}
-                    return r.data
-                },
-                e => {
-                    return e.response.data
-                }
-            )
-        },
-        async deleteContent(contentIds: Array<string>): Promise<void> {
-            const fd = new FormData()
-            fd.append('content_ids', JSON.stringify(contentIds));
-            return await axiosInstance.post(...formRequest('Content/deleteContent', fd) as [string, FormData]).then(
-                r => {
-                    return r.data
-                },
-                e => {
-                    return e.response.data
-                }
-            )
-        },
         async updateContentOrder(oldContentKeysOrder: string[], newContentKeysOrder: string[]): Promise<void> {
             const fd = new FormData();
 

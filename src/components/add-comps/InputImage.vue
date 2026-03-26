@@ -46,7 +46,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(["displayImage"]);
 const store = <StoreGeneric>inject("Store");
-const { acceptedImageExtensions, fileErrorStatuses } = storeToRefs(store);
+const { acceptedImageExtensions, fileErrorStatuses, loadedImages } = storeToRefs(store);
 const isLargeFile: any = inject("isLargeFile");
 const maxFileSizeText: any = inject("maxFileSizeText");
 const isAcceptedExtension: any = inject("isAcceptedExtension");
@@ -94,11 +94,13 @@ function displayImage(e: Event): void {
 
   let event = false;
 
-	if ((e as any).currentTarget.files.length) {
-		image.value = URL.createObjectURL((e as any).currentTarget.files[0]);
+	if (formImage.value.files.length) {
+		image.value = URL.createObjectURL(formImage.value.files[0]);
     event = true;
+    loadedImages.value[props.name] = formImage.value.files[0] as File;
 	} else {
 		image.value = "";
+    delete loadedImages.value[props.name];
 	}
 
   emit("displayImage", [event, image.value]);

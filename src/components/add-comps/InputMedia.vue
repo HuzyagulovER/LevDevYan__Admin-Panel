@@ -46,7 +46,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(["displayMedia"]);
 const store = <StoreGeneric>inject("Store");
-const { acceptedMediaExtensions, fileErrorStatuses } = storeToRefs(store);
+const { acceptedMediaExtensions, fileErrorStatuses, loadedMedia } = storeToRefs(store);
 const isLargeFile: any = inject("isLargeFile");
 const maxMediaSize: any = inject("maxMediaSize");
 const maxMediaSizeText: any = inject("maxMediaSizeText");
@@ -93,13 +93,18 @@ function displayMedia(e: Event): void {
 		}, 3000);
 	}
 
-	if ((e as any).currentTarget.files.length) {
-		media.value = URL.createObjectURL((e as any).currentTarget.files[0]);
-		emit("displayMedia", true);
+  let event = false;
+
+	if (formMedia.value.files.length) {
+		media.value = URL.createObjectURL(formMedia.value.files[0]);
+    event = true;
+    loadedMedia.value[props.name] = formMedia.value.files[0] as File;
 	} else {
 		media.value = "";
-		emit("displayMedia", false);
+    delete loadedMedia.value[props.name];
 	}
+
+  emit("displayMedia", event);
 }
 
 function deleteImage() {
