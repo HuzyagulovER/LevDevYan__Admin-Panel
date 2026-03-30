@@ -87,15 +87,6 @@ function objectToFormData<T extends Record<string, any>>(obj: T): FormData {
     return formData;
 }
 
-function timer(s: number, callback: VoidFunction = () => {
-}): Promise<void> {
-    return new Promise((res, rej) => {
-        setTimeout(() => {
-            res(callback())
-        }, s);
-    })
-}
-
 function getObjectFromFormData(formData: FormData) {
     let obj: { [key: string | number]: any } = {}
     for (let [name, value] of formData) {
@@ -591,7 +582,6 @@ export const Store = defineStore('Store', {
                 .catch(e => {
                     console.error(`${e.name}: ${e.message}`);
                 })
-                .finally(() => this.loading = false)
         },
         async getContent(id: string): Promise<Content> {
             this.loading = true

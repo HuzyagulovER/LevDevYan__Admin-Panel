@@ -30,8 +30,8 @@
 		<Container @drop="onDrop" class="content__container" lock-axis="y" drag-handle-selector=".content__drag-handle"
 			v-else>
 			<TransitionGroup :name="transitionName">
-				<Draggable v-for="content in contentList" :key="content.id" class="content__draggable">
-					<ContentItem :content="content"
+				<Draggable v-for="key in contentKeys" :key="key" class="content__draggable">
+					<ContentItem :content="contentList[key] as ContentPreview"
 						@confirm-delete-content="confirmDeleteContent" :class="{ hidden: hiddenContent }" />
 					<div class="content__drag-handle" :class="{ hidden: hiddenContent }">☰</div>
 				</Draggable>
@@ -57,10 +57,11 @@ import {
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { useCookies } from "vue3-cookies";
-import {Content, ContentList, NumberObject} from "../../helpers";
+import {Content, ContentList, ContentPreview, NumberObject} from "../../helpers";
 import { cloneDeep } from "lodash";
 // @ts-ignore
 import { Container, Draggable } from "vue-dndrop";
+const timer: any = inject("timer");
 
 const store = <StoreGeneric>inject("Store");
 const { loading } = storeToRefs(store);
@@ -78,7 +79,7 @@ const contentTypes: Ref<string[]> = ref([]);
 const hiddenTypes: Ref<boolean> = ref(false)
 const hiddenContent: Ref<boolean> = ref(false)
 
-const contentKeys: ComputedRef<string[]> = computed(() => {
+const contentKeys: ComputedRef<(keyof ContentList)[]> = computed(() => {
   let keys: NumberObject = {};
   for (const textId in contentList.value) {
     keys[textId] = contentList.value[textId as keyof ContentList];
@@ -86,7 +87,7 @@ const contentKeys: ComputedRef<string[]> = computed(() => {
 
   keys = Object.fromEntries(Object.entries(keys).sort(([, a], [, b]) => b - a));
 
-  return Object.keys(keys);
+  return Object.keys(keys) as (keyof ContentList)[];
 });
 const app: ComputedRef<string> = computed(() =>
     route.query.app ? <string>route.query.app : "psy"
@@ -127,15 +128,16 @@ watch(
 );
 
 async function getContents(): Promise<void> {
-  store.getContents({
+  await store.getContents({
     app: app.value,
     language: language.value,
     type: type.value
-  }).then((r: ContentList) => {
+  }).then(async (r: ContentList) => {
     hiddenContent.value = false
     contentList.value = r
-    console.log(contentList.value)
-  })
+  }).finally(
+      () => loading.value = false
+  )
 }
 
 async function getTypes(): Promise<string[]> {
@@ -169,22 +171,25 @@ async function confirmDeleteContent(id: string): Promise<void> {
 }
 
 async function onDrop(dropResult: any): Promise<void> {
-	const { removedIndex, addedIndex }: { removedIndex: number, addedIndex: number } = dropResult;
-	const oldContentKeysOrder: string[] = cloneDeep(contentKeys.value)
-	contentList.value = applyDrag(contentList.value, dropResult)
+	const {removedIndex, addedIndex}: { removedIndex: number, addedIndex: number } = dropResult;
 
-  loading.value = true
-  await store.updateContentOrder(
-      oldContentKeysOrder[removedIndex],
-      oldContentKeysOrder[addedIndex],
-  ).then(async (): Promise<void> => {
-    await getContents()
+  if (removedIndex !== addedIndex) {
+    const oldContentKeysOrder: string[] = cloneDeep(contentKeys.value)
+    contentList.value = applyDrag(contentList.value, dropResult)
+
+    loading.value = true
+    await store.updateContentOrder(
+        oldContentKeysOrder[removedIndex],
+        oldContentKeysOrder[addedIndex],
+    ).then(async (): Promise<void> => {
+      await getContents()
+    })
+
     loading.value = false
-  })
-
+  }
 }
 
-const applyDrag = (contentList: ContentList, dragResult: any): ContentList => {
+function applyDrag(contentList: ContentList, dragResult: any): ContentList {
 	const { removedIndex, addedIndex }: { removedIndex: number, addedIndex: number } = dragResult;
 	if (removedIndex === null && addedIndex === null) return contentList;
 
@@ -204,8 +209,9 @@ const applyDrag = (contentList: ContentList, dragResult: any): ContentList => {
 			result[contentKeys.value[removedIndex] as keyof ContentList] = contentList[contentKeys.value[removedIndex] as keyof ContentList]
 		}
 	});
+
 	return result
-};
+}
 </script>
 
 <style scoped lang="scss">

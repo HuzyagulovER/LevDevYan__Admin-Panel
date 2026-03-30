@@ -109,6 +109,15 @@ export function flattenObject(obj: { [key: string]: any }, keyName?: string): { 
     return flattendObj;
 }
 
+export function timer(s: number, callback: VoidFunction = () => {
+}): Promise<void> {
+	return new Promise((res, rej) => {
+		setTimeout(() => {
+			res(callback())
+		}, s);
+	})
+}
+
 const app = createApp(App)
 app
 	.use(createPinia())
@@ -122,5 +131,6 @@ app
 	.provide('maxMediaSize', maxMediaSize)
 	.provide('maxMediaSizeText', maxMediaSizeText)
 	.provide('isAcceptedExtension', isAcceptedExtension)
+	.provide('timer', timer)
 	.use(router)
 	.mount('#app')

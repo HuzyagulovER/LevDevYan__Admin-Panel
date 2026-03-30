@@ -123,7 +123,7 @@ export declare type Content = {
 	order: number
 }
 export declare type ContentPreview = Content & {
-	type: number
+	texts: number
 }
 export declare type ContentTexts = { [key: string]: ContentText }
 export declare type ContentText = {
