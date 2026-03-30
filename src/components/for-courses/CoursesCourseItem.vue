@@ -2,22 +2,22 @@
 	<div class="course">
 		<div class="course__container">
 			<div class="course__course-image course-image">
-				<img class="course-image__image" :src="about.image" alt="" v-if="about.image" />
+				<img class="course-image__image" :src="image" alt="" v-if="image" />
 				<p class="course-image__empty-image" v-else>Без<br />изображения</p>
 			</div>
 
 			<div class="course__info info">
-				<p class="info__title"><span>Название</span>: {{ about.title }}</p>
+				<p class="info__title"><span>Название</span>: {{ title }}</p>
 				<p class="info__days-amount">
-					<span>Сколько дней</span>: {{ about.period }}
+					<span>Сколько дней</span>: {{ durationDays }}
 				</p>
-				<p class="info__price"><span>Стоимость</span>: {{ about.price }}</p>
+				<p class="info__price"><span>Стоимость</span>: {{ price }}</p>
 				<p class="info__category">
-					<span>Категория</span>: {{ about.category }}
+					<span>Категория</span>: {{ category }}
 				</p>
 				<p class="info__active">
-					<span>Активных</span>: {{ active }}
-				</p>
+					<span>Активных</span>: {{ activeCount }}
+        </p>
 			</div>
 			<div class="course__buttons buttons">
 				<div class="buttons__wrapper">
@@ -28,8 +28,8 @@
 				</div>
 				<div class="buttons__wrapper">
 					<p>Доступность в МП</p>
-					<Checkbox :defaultChecked="props.production ? true : false" class="promocode__active"
-						@change-state="changeCourseProduction" />
+					<Checkbox :defaultChecked="props.is_in_production" class="promocode__active"
+                    @change-state="changeCourseProduction" />
 				</div>
 			</div>
 		</div>
@@ -42,10 +42,14 @@ import Checkbox from "@add-comps/Checkbox.vue";
 import { CourseAbout } from "../../../helpers";
 
 const props = defineProps<{
-	courseId: string;
-	active: string | number;
-	about: CourseAbout;
-	production: number;
+  courseId: string
+  title: string
+  durationDays: number
+  price: number
+  activeCount: number
+  is_in_production: boolean
+  category: string | null
+  image: string | null
 }>();
 const emit = defineEmits(["confirmDeletingActive", "changeCourseProduction"]);
 

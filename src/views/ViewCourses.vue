@@ -7,10 +7,20 @@
 			<p>Курсов еще нет...</p>
 		</div>
 		<TransitionGroup tag="div" name="list" v-else>
-			<CoursesCourseItem v-for="course in courses" :key="course.course_id" :courseId="course.course_id"
-				:about="course.about" :production="course.production" :active="course.active"
-				@confirm-deleting-active="confirmDeletingActive" @change-course-production="changeCourseProduction" />
-		</TransitionGroup>
+      <CoursesCourseItem v-for="course in courses"
+                         :key="course.id"
+                         :courseId="course.id"
+                         @confirm-deleting-active="confirmDeletingActive"
+                         @change-course-production="changeCourseProduction"
+                         :category="course.category"
+                         :duration-days="course.duration_days"
+                         :image="course.image"
+                         :price="course.price"
+                         :title="course.title"
+                         :is_in_production="course.is_in_production"
+                         :activeCount="course.activeCount"
+      />
+    </TransitionGroup>
 	</section>
 </template>
 
@@ -25,18 +35,19 @@ import {
 	ref,
 	Ref,
 	toRef,
-	watch,
 } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 import { useCookies } from "vue3-cookies";
+import {CoursesPreview} from "../../helpers";
 
 const store = <StoreGeneric>inject("Store");
 const clearVariable = <Function>inject("clearVariable");
-const { courses, loading, languages } = storeToRefs(store);
+const { loading, languages } = storeToRefs(store);
 const route = useRoute();
 const { cookies } = useCookies();
 
+let courses: Ref<CoursesPreview> = ref({});
 let isEmpty: ComputedRef<boolean> = computed(
 	() => !Object.keys(courses.value).length
 );
@@ -51,7 +62,17 @@ const language = function (): string {
 		: cookies.get(`${pageName.value}Lang`);
 };
 
-store.getCourses(language());
+getCourses(language());
+
+async function getCourses(language: string): Promise<void> {
+  loading.value = true
+
+  await store.getCourses(language)
+      .then(async (r: CoursesPreview) => {
+        courses.value = r
+      })
+      .finally(() => loading.value = false)
+}
 
 async function confirmDeletingActive(index: number): Promise<void> {
 	deleteIndex.value = index;
@@ -65,15 +86,18 @@ async function confirmDeletingActive(index: number): Promise<void> {
 	});
 }
 
-function changeLang(lang: string) {
-	store.getCourses(lang);
+async function changeLang(language: string) {
+  loading.value = true
+
+  await getCourses(language);
 }
 
-function changeCourseProduction(course_id: string, productionState: boolean) {
-	loading.value = true;
-	store.updateCourseProduction(course_id, productionState).then(() => {
-		loading.value = false;
-	});
+async function changeCourseProduction(courseId: string, state: boolean) {
+  loading.value = true;
+  await store.updateCourseProduction(courseId, state)
+      .then(() => {
+        loading.value = false;
+      });
 }
 </script>
 

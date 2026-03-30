@@ -8,7 +8,18 @@ export declare type Course = {
 	days: CourseDays | {}
 	active?: number | string
 }
-export declare type Courses = { [key: string]: Course } | Array<null>
+export declare type CoursePreview = {
+    id: string
+    is_in_production: boolean
+    activeCount: number
+    category: string
+    duration_days: number
+    image: string
+    price: number
+    title: string
+}
+export declare type CoursesPreview = { [key: string]: CoursePreview }
+export declare type Courses = { [key: string]: Course } | {}
 
 export declare interface Promocode {
 	id?: string,
@@ -201,7 +212,6 @@ export declare type State = {
 		additionFields: PopupAdditionFields,
 	}
 	mainTitle: string,
-	courses: Courses,
 	currentTime: string,
 	promocodes: Promocodes,
 	loadedMedia: { [key: string]: File },

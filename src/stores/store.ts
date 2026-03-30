@@ -169,7 +169,6 @@ export const Store = defineStore('Store', {
                 additionFields: [],
             },
             mainTitle: '',
-            courses: {},
             currentTime: '',
             promocodes: {},
             loadedMedia: {},
@@ -682,29 +681,31 @@ export const Store = defineStore('Store', {
             this.loadedImages = {};
         },
 
+        async getCourses(language: string | undefined): Promise<void> {
+            return await axiosInstance.get(url('courses'), {params: {language: language}})
+                .then(r => {
+                    return r.data.data
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                })
+        },
+        async updateCourseProduction(courseId: string, state: boolean): Promise<void> {
+            return await axiosInstance.post(url('courses', courseId), objectToFormData({state: state})).then(
+                r => {
+                    return r.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
 
         // ---------------------------------------------------------------------------------------------------------- //
 
 
         getAppByName(appName: string): string {
             return Object.keys(this.apps)[Object.values(this.apps).indexOf(appName)] ?? 'other'
-        },
-        async getCourses(lang: string | undefined): Promise<void> {
-            this.loading = true
-            const langFD = new FormData()
-            if (lang) {
-                langFD.append('lang', lang)
-            }
-
-            return await axiosInstance.post(...formRequest('Courses/getCourses', langFD) as [string, FormData])
-                .then(r => {
-                    this.courses = r.data.data
-                    this.loading = false
-                    return
-                })
-                .catch(e => {
-                    console.error(`${e.name}: ${e.message}`);
-                })
         },
         async getCourse(courseId: string): Promise<void> {
             this.loading = true
@@ -760,20 +761,6 @@ export const Store = defineStore('Store', {
             return await axiosInstance.post(...formRequest('Courses/updateCourse', fd) as [string, FormData]).then(
                 r => {
                     this.loadedFiles = {}
-                    return r.data
-                },
-                e => {
-                    return e.response.data
-                }
-            )
-        },
-        async updateCourseProduction(course_id: string, productionState: boolean): Promise<void> {
-            const fd = new FormData();
-            fd.append('course_id', course_id);
-            fd.append('production', (+productionState).toString());
-
-            return await axiosInstance.post(...formRequest('Courses/updateCourse', fd) as [string, FormData]).then(
-                r => {
                     return r.data
                 },
                 e => {
