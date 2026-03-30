@@ -10,7 +10,7 @@
 					<div class="account__wrapper"></div>
 					<div class="account__wrapper">
 						<div class="account__image">
-							<img src="@images/user_default.png" alt="Account image" />
+							<img :src="avatarUrl" alt="Account image" />
 						</div>
 					</div>
 				</div>
@@ -39,9 +39,10 @@ import { StringObject } from "../helpers";
 const route = useRoute();
 const router = useRouter();
 const store = <StoreGeneric>inject("Store");
-const { loading, mainTitle, popup, apps, activeApp } = storeToRefs(store);
+const { loading, mainTitle, popup, apps, activeApp, avatarUrl } = storeToRefs(store);
 
 store.updateTime();
+store.getCurrentUserPhoto();
 let idSignIn: ComputedRef<boolean> = computed(() => route.path !== "/sign-in");
 let no_scroll: ComputedRef<boolean> = computed(
 	() => loading.value || popup.value.isActive

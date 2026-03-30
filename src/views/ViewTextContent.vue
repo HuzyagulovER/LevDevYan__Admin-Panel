@@ -57,7 +57,7 @@ import {
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { useCookies } from "vue3-cookies";
-import {Content, ContentList} from "../../helpers";
+import {Content, ContentList, NumberObject} from "../../helpers";
 import { cloneDeep } from "lodash";
 // @ts-ignore
 import { Container, Draggable } from "vue-dndrop";
@@ -78,7 +78,16 @@ const contentTypes: Ref<string[]> = ref([]);
 const hiddenTypes: Ref<boolean> = ref(false)
 const hiddenContent: Ref<boolean> = ref(false)
 
-const contentKeys: ComputedRef<string[]> = computed(() => Object.keys(<ContentList>contentList.value))
+const contentKeys: ComputedRef<string[]> = computed(() => {
+  let keys: NumberObject = {};
+  for (const textId in contentList.value) {
+    keys[textId] = contentList.value[textId as keyof ContentList];
+  }
+
+  keys = Object.fromEntries(Object.entries(keys).sort(([, a], [, b]) => b - a));
+
+  return Object.keys(keys);
+});
 const app: ComputedRef<string> = computed(() =>
     route.query.app ? <string>route.query.app : "psy"
 )
@@ -125,6 +134,7 @@ async function getContents(): Promise<void> {
   }).then((r: ContentList) => {
     hiddenContent.value = false
     contentList.value = r
+    console.log(contentList.value)
   })
 }
 
@@ -163,20 +173,14 @@ async function onDrop(dropResult: any): Promise<void> {
 	const oldContentKeysOrder: string[] = cloneDeep(contentKeys.value)
 	contentList.value = applyDrag(contentList.value, dropResult)
 
-	loading.value = true
-	await store.updateContentOrder(
-		oldContentKeysOrder.slice(
-			Math.min(removedIndex, addedIndex),
-			Math.max(removedIndex, addedIndex) + 1
-		),
-		Object.keys(contentList.value).slice(
-			Math.min(removedIndex, addedIndex),
-			Math.max(removedIndex, addedIndex) + 1
-		)
-	).then(async (): Promise<void> => {
-		await getContents()
-		loading.value = false
-	})
+  loading.value = true
+  await store.updateContentOrder(
+      oldContentKeysOrder[removedIndex],
+      oldContentKeysOrder[addedIndex],
+  ).then(async (): Promise<void> => {
+    await getContents()
+    loading.value = false
+  })
 
 }
 

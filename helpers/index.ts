@@ -140,7 +140,7 @@ export declare type ContentText = {
 	media_size?: string
 	playtime?: string
 }
-export declare type ContentList = { [key: number]: ContentPreview } | {}
+export declare type ContentList = { [key: string]: ContentPreview } | {}
 
 export declare type Price = {
 	id: string
@@ -183,6 +183,7 @@ export declare type ScheduleSubscriptionTypes = { [key: string]: ScheduleSubscri
 export declare type State = {
 	monthNames: ReadonlyArray<string>
 	activeApp: string,
+	avatarUrl: string,
 	apps: StringObject,
 	OS: StringObject,
 	loading: boolean,

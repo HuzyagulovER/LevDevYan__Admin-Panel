@@ -116,7 +116,10 @@ function formRequest(uriName: string, dataObj?: FormData): Array<string | FormDa
     ]
 }
 
-function url(uriName: string, key?: string | number): string {
+function url(uriName: string, key?: string | number | Array<string | number>): string {
+    if (isArray(key)) {
+        key = key.join('/');
+    }
     return api_base + uriName + (key ? '/' + key : '');
 }
 
@@ -150,6 +153,7 @@ export const Store = defineStore('Store', {
         {
             monthNames: monthNames,
             activeApp: 'psy',
+            avatarUrl: '',
             apps: {
                 psy: 'PSY',
                 avocado: 'Avocado',
@@ -261,6 +265,17 @@ export const Store = defineStore('Store', {
     ),
 
     actions: {
+        async getCurrentUserPhoto(): Promise<void> {
+            return await axiosInstance.get(url('user/photo')).then(
+                r => {
+                    this.avatarUrl = r.data.data.photo;
+                },
+                e => {
+                    throw e.response.data
+                }
+            )
+        },
+
         async getPrices(): Promise<void> {
             return await axiosInstance.get(url('premiums')).then(
                 r => {
@@ -642,6 +657,19 @@ export const Store = defineStore('Store', {
                 }
             )
         },
+        async updateContentOrder(movedContentId: string, movedWithContentId: string): Promise<void> {
+            return await axiosInstance.post(
+                url('content', [movedContentId, 'changeOrder']),
+                objectToFormData({to: movedWithContentId})
+            ).then(
+                r => {
+                    return r.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
         createContentFormData (content: Content): FormData {
             const fd: FormData = objectToFormData(flattenObject(content));
 
@@ -834,21 +862,6 @@ export const Store = defineStore('Store', {
         },
 
 
-        async updateContentOrder(oldContentKeysOrder: string[], newContentKeysOrder: string[]): Promise<void> {
-            const fd = new FormData();
-
-            fd.append("old_content_keys_order", JSON.stringify(oldContentKeysOrder))
-            fd.append("new_content_keys_order", JSON.stringify(newContentKeysOrder))
-
-            return await axiosInstance.post(...formRequest('Content/updateContentOrder', fd) as [string, FormData]).then(
-                r => {
-                    return r.data
-                },
-                e => {
-                    return e.response.data
-                }
-            )
-        },
 
 
         async getLogsInfo(): Promise<void> {

@@ -4,7 +4,7 @@ import App from './App.vue'
 import {createPinia} from "pinia";
 import router from './routes';
 import {Store} from '@stores/store';
-import {assign, cloneDeep, isArray, isNull, isObject, isSet, isUndefined} from 'lodash';
+import {assign, cloneDeep, isArray, isNull, isObject, isUndefined} from 'lodash';
 
 export function clearVariable(variable: any): any {
 	switch (typeof variable) {
@@ -94,7 +94,6 @@ export function reverseObject(object: { [key: string | number]: any }): { [key: 
 };
 
 export function flattenObject(obj: { [key: string]: any }, keyName?: string): { [key: string]: any } {
-	console.log(obj)
     let flattendObj: { [key: string]: any } = {};
 
     Object.keys(obj).forEach((key: string) => {
