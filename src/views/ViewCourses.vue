@@ -18,7 +18,7 @@
                          :price="course.price"
                          :title="course.title"
                          :is_in_production="course.is_in_production"
-                         :activeCount="course.activeCount"
+                         :active_count="course.active_count"
       />
     </TransitionGroup>
 	</section>
@@ -52,7 +52,6 @@ let isEmpty: ComputedRef<boolean> = computed(
 	() => !Object.keys(courses.value).length
 );
 let popup: Ref<boolean> = ref(false);
-let deleteIndex: Ref<number> = ref(0);
 let pageName: Ref = toRef(route, "name");
 let lang = cookies.get(`${pageName.value}Lang`);
 
@@ -74,16 +73,16 @@ async function getCourses(language: string): Promise<void> {
       .finally(() => loading.value = false)
 }
 
-async function confirmDeletingActive(index: number): Promise<void> {
-	deleteIndex.value = index;
-	await store.callPopup("Удалить этот курс?").then((r: boolean) => {
-		if (r) {
-			store.deleteCourse([deleteIndex.value]).then(() => {
-				store.getCourses(language());
-			});
-			deleteIndex.value = 0;
-		}
-	});
+async function confirmDeletingActive(courseId: string): Promise<void> {
+  await store.callPopup("Удалить этот курс?")
+      .then((r: boolean) => {
+        if (r) {
+          store.deleteCourse(courseId)
+              .then(async () => {
+                await getCourses(language());
+              });
+        }
+      });
 }
 
 async function changeLang(language: string) {

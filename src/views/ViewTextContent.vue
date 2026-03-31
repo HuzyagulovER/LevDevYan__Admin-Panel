@@ -61,7 +61,6 @@ import {Content, ContentList, ContentPreview, NumberObject} from "../../helpers"
 import { cloneDeep } from "lodash";
 // @ts-ignore
 import { Container, Draggable } from "vue-dndrop";
-const timer: any = inject("timer");
 
 const store = <StoreGeneric>inject("Store");
 const { loading } = storeToRefs(store);

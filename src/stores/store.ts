@@ -6,7 +6,6 @@ import {
     Promocode,
     Promocodes,
     Notifications,
-    CourseToPost,
     Content,
     Price,
     State,
@@ -85,14 +84,6 @@ function objectToFormData<T extends Record<string, any>>(obj: T): FormData {
     });
 
     return formData;
-}
-
-function getObjectFromFormData(formData: FormData) {
-    let obj: { [key: string | number]: any } = {}
-    for (let [name, value] of formData) {
-        obj[name] = value
-    }
-    return obj
 }
 
 function formRequest(uriName: string, dataObj?: FormData): Array<string | FormData> {
@@ -175,23 +166,6 @@ export const Store = defineStore('Store', {
             loadedImages: {},
             loadedFiles: {},
 
-            defaultCourse: {
-                id: 0,
-                about: {
-                    id: 0,
-                    title: "",
-                    lang: "",
-                    period: "",
-                    description: "",
-                    for_whom: "",
-                    results: "",
-                    image: "",
-                    price: 0,
-                    category: ""
-                },
-                production: 0,
-                days: {}
-            },
             defaultDayItem: {
                 id: 0,
                 title: "",
@@ -468,7 +442,7 @@ export const Store = defineStore('Store', {
         },
         async callPopupWithData(text: string, additionFields: StringObject): Promise<StringObject> {
             return this.callPopup(text, additionFields).then((r: boolean): Promise<StringObject> => {
-                return new Promise((res, rej) => {
+                return new Promise((res) => {
                     if (r) res(additionFields)
                 })
             })
@@ -690,31 +664,10 @@ export const Store = defineStore('Store', {
                     console.error(`${e.name}: ${e.message}`);
                 })
         },
-        async updateCourseProduction(courseId: string, state: boolean): Promise<void> {
-            return await axiosInstance.post(url('courses', courseId), objectToFormData({state: state})).then(
-                r => {
-                    return r.data
-                },
-                e => {
-                    return e.response.data
-                }
-            )
-        },
-
-        // ---------------------------------------------------------------------------------------------------------- //
-
-
-        getAppByName(appName: string): string {
-            return Object.keys(this.apps)[Object.values(this.apps).indexOf(appName)] ?? 'other'
-        },
         async getCourse(courseId: string): Promise<void> {
             this.loading = true
-            const courseIdFD = new FormData()
-            courseIdFD.append('courses_ids', JSON.stringify([courseId]))
-
-            return await axiosInstance.post(...formRequest('Courses/getCourses', courseIdFD) as [string, FormData])
+            return await axiosInstance.get(url('courses', courseId))
                 .then(r => {
-                    this.loading = false
                     return r.data.data
                 })
                 .catch(e => {
@@ -722,18 +675,11 @@ export const Store = defineStore('Store', {
                 })
         },
         async addCourse(course: Course): Promise<void> {
-            const newCourse: CourseToPost = cloneDeep(course)
-            const fd = new FormData();
-            fd.append('about', JSON.stringify(newCourse['about']));
-            fd.append('days', JSON.stringify(newCourse['days']));
-
-            if (Object.keys(this.loadedFiles).length) {
-                for (const key in this.loadedFiles) {
-                    fd.append(key, this.loadedFiles[key]);
+            return await axiosInstance.post(url('courses'), this.createCourseFormData(course), {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
                 }
-            }
-
-            return await axiosInstance.post(...formRequest('Courses/createCourse', fd) as [string, FormData]).then(
+            }).then(
                 r => {
                     this.loadedFiles = {}
                     console.log(r);
@@ -746,19 +692,11 @@ export const Store = defineStore('Store', {
             )
         },
         async updateCourse(course: Course): Promise<void> {
-            const updateCourse: CourseToPost = cloneDeep(course)
-            const fd = new FormData();
-            fd.append('course_id', updateCourse['course_id']);
-            fd.append('about', JSON.stringify(updateCourse['about']));
-            fd.append('days', JSON.stringify(updateCourse['days']));
-
-            if (Object.keys(this.loadedFiles).length) {
-                for (const key in this.loadedFiles) {
-                    fd.append(key, this.loadedFiles[key]);
+            return await axiosInstance.post(url('courses', course.id), this.createCourseFormData(course), {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
                 }
-            }
-
-            return await axiosInstance.post(...formRequest('Courses/updateCourse', fd) as [string, FormData]).then(
+            }).then(
                 r => {
                     this.loadedFiles = {}
                     return r.data
@@ -768,11 +706,8 @@ export const Store = defineStore('Store', {
                 }
             )
         },
-        async deleteCourse(courses_ids: Array<string>): Promise<void> {
-            const fd = new FormData();
-            fd.append('courses_ids', JSON.stringify(courses_ids));
-
-            return await axiosInstance.post(...formRequest('Courses/deleteCourses', fd) as [string, FormData]).then(
+        async updateCourseProduction(courseId: string, state: boolean): Promise<void> {
+            return await axiosInstance.post(url('courses', courseId), objectToFormData({state: state})).then(
                 r => {
                     return r.data
                 },
@@ -780,6 +715,34 @@ export const Store = defineStore('Store', {
                     return e.response.data
                 }
             )
+        },
+        async deleteCourse(courseId: string): Promise<void> {
+            return await axiosInstance.delete(url('courses', courseId)).then(
+                r => {
+                    return r.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
+        createCourseFormData (course: Course): FormData {
+            const fd: FormData = objectToFormData(flattenObject(course));
+
+            if (Object.keys(this.loadedImages).length) {
+                for (const key in this.loadedImages) {
+                    fd.append(`images[${key}]`, this.loadedImages[key]);
+                }
+            }
+
+            return fd;
+        },
+
+        // ---------------------------------------------------------------------------------------------------------- //
+
+
+        getAppByName(appName: string): string {
+            return Object.keys(this.apps)[Object.values(this.apps).indexOf(appName)] ?? 'other'
         },
 
         async callPopup(text: string, additionFields?: StringObject): Promise<boolean> {
@@ -792,7 +755,7 @@ export const Store = defineStore('Store', {
                     delete this.popup.additionFields['error' as keyof PopupAdditionFields]
                 }, 2000);
 
-            return new Promise((res, rej) => {
+            return new Promise((res) => {
                 watch(
                     () => this.popup.isReturned,
                     () => {

@@ -7,7 +7,7 @@
 			</div>
 			<input type="text" class="day__input" name="title" v-model="day.title" placeholder="Название" />
 			<label for="description">Описание</label>
-			<textarea type="text" class="day__textarea" name="description" v-model="day.description"
+			<textarea class="day__textarea" name="description" v-model="day.description"
 				placeholder="Описание дня">
 			</textarea>
 			<div class="day__line" :class="{ opened: opened }">
@@ -45,7 +45,7 @@ import CoursesCreateEditTask from "@for-course-create/CoursesCreateEditTask.vue"
 import { CourseDay, CourseDayTask } from "../../../helpers";
 import { ComputedRef, ref, Ref } from "@vue/reactivity";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { computed, inject, watch } from "@vue/runtime-core";
+import { computed, inject } from "@vue/runtime-core";
 import { cloneDeep } from "lodash";
 
 const props = defineProps<{ day: CourseDay; number: number }>();
@@ -55,7 +55,6 @@ let getSHA256Hash = <Function>inject("getSHA256Hash");
 const store = <StoreGeneric>inject("Store");
 const { defaultTaskItem } = storeToRefs(store);
 
-const tasks: any = ref(null);
 let opened: Ref<boolean> = ref(false);
 
 let tasksNumber: ComputedRef<number> = computed(() => {

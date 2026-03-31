@@ -21,11 +21,11 @@
 			<TransitionGroup tag="div" name="list" v-else>
 				<CoursesCreateEditDay
 					class="days__day"
-					v-for="(j, i) in Object.keys(data).reverse()"
-					:key="j"
-					:day="data[j]"
+					v-for="(day, i) in Object.keys(data).reverse()"
+					:key="day"
+					:day="data[day]"
 					:number="Object.keys(data).length - i"
-					@delete-day="deleteDay(j)"
+					@delete-day="deleteDay(day)"
 				/>
 			</TransitionGroup>
 		</div>
@@ -33,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import IconImage from "@icons/IconImage.vue";
 import CoursesCreateEditDay from "@for-course-create/CoursesCreateEditDay.vue";
 import { ComputedRef, ref, Ref } from "@vue/reactivity";
 import { computed, inject } from "@vue/runtime-core";
@@ -48,7 +47,9 @@ const clearVariable = <Function>inject("clearVariable");
 let disabledForm: Ref<boolean> = ref(false);
 let error: Ref<Array<string>> = ref([]);
 let isEmpty: ComputedRef<boolean> = computed(
-	() => !Object.keys(props.data).length || props.data === null
+	() => {
+    return !Object.keys(props.data).length || props.data === null;
+  }
 );
 
 function deleteDay(index: string | number): void {

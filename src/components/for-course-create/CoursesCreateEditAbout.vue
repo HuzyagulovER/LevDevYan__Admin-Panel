@@ -1,7 +1,7 @@
 <template>
 	<div class="create-edit-about">
 		<form class="create-edit-about__form form" enctype="multipart/form-data" @submit.prevent="saveCourse($event)">
-			<InputImage class="form__file-input" :image="image" :name="'image'" :currentError="currentError"
+			<InputImage class="form__file-input" :image="image" :name="'main'" :currentError="currentError"
 				:disabled="disabledForm" @display-image="displayImage" />
 
 			<label for="promocode" class="form__label">Название</label>
@@ -10,7 +10,7 @@
 
 			<label for="period" class="form__label">Продолжительность в днях</label>
 			<input id="period" type="number" class="form__input" min="0" :class="{ _error: error.includes('period') }"
-				name="period" :disabled="disabledForm" v-model="data.period" @input="error = clearVariable(error)" />
+				name="period" :disabled="disabledForm" v-model="data.duration_days" @input="error = clearVariable(error)" />
 
 			<label for="price" class="form__label" v-if="false">Стоимость</label>
 			<input id="price" type="text" class="form__input" :class="{ _error: error.includes('price') }" name="price"
@@ -21,17 +21,17 @@
 				name="category" :disabled="disabledForm" v-model="data.category" @input="error = clearVariable(error)" />
 
 			<label for="description" class="form__label">Описание</label>
-			<textarea id="description" type="text" class="form__textarea" :class="{ _error: error.includes('description') }"
+			<textarea id="description" class="form__textarea" :class="{ _error: error.includes('description') }"
 				name="description" :disabled="disabledForm" v-model="data.description" @input="error = clearVariable(error)">
 			</textarea>
 
 			<label for="for_whom" class="form__label">Кому подойдет</label>
-			<textarea id="for_whom" type="text" class="form__textarea" :class="{ _error: error.includes('for_whom') }"
+			<textarea id="for_whom" class="form__textarea" :class="{ _error: error.includes('for_whom') }"
 				name="for_whom" :disabled="disabledForm" v-model="data.for_whom"
 				@input="error = clearVariable(error)"></textarea>
 
 			<label for="results" class="form__label">Результаты</label>
-			<textarea id="results" type="text" class="form__textarea" :class="{ _error: error.includes('results') }"
+			<textarea id="results" class="form__textarea" :class="{ _error: error.includes('results') }"
 				name="results" :disabled="disabledForm" v-model="data.results"
 				@input="error = clearVariable(error)"></textarea>
 
@@ -41,8 +41,6 @@
 </template>
 
 <script setup lang="ts">
-import IconImage from "@icons/IconImage.vue";
-import IconTrash from "@icons/IconTrash.vue";
 import InputImage from "@add-comps/InputImage.vue";
 import ButtonColored from "@add-comps/ButtonColored.vue";
 import { ref, Ref } from "@vue/reactivity";
@@ -113,7 +111,7 @@ function saveCourse(e: Event): void {
 			error.value.push(field);
 	});
 
-	if (props.data.period <= 0) error.value.push("period");
+	if (props.data.duration_days <= 0) error.value.push("period");
 
 	if (error.value.length) {
 		setTimeout(() => {
@@ -127,7 +125,7 @@ function saveCourse(e: Event): void {
 	}
 
 	if (props.courseId.toLowerCase() !== "new") {
-		emit("updateCourse");
+		emit("updateCourse", props.data);
 	} else {
 		emit("saveCourse");
 	}

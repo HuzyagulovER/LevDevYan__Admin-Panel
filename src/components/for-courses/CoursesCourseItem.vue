@@ -16,7 +16,7 @@
 					<span>Категория</span>: {{ category }}
 				</p>
 				<p class="info__active">
-					<span>Активных</span>: {{ activeCount }}
+					<span>Активных</span>: {{ active_count }}
         </p>
 			</div>
 			<div class="course__buttons buttons">
@@ -39,14 +39,13 @@
 <script setup lang="ts">
 import IconTrash from "@icons/IconTrash.vue";
 import Checkbox from "@add-comps/Checkbox.vue";
-import { CourseAbout } from "../../../helpers";
 
 const props = defineProps<{
   courseId: string
   title: string
   durationDays: number
   price: number
-  activeCount: number
+  active_count: number
   is_in_production: boolean
   category: string | null
   image: string | null
