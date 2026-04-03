@@ -193,6 +193,25 @@ export declare type ScheduleSubscriptionType = {
 }
 export declare type ScheduleSubscriptionTypes = { [key: string]: ScheduleSubscriptionType } | {}
 
+export declare type AdditionalSubscription = {
+    id: string
+    tag: string
+    name: string
+    price: number
+    old_price: number | null
+    is_old_price_visible: boolean
+    first_text: string | null
+    is_first_text_visible: boolean
+    second_text: string | null
+    is_second_text_visible: boolean
+    is_strikethrough: boolean
+    is_old_price_per_month: boolean
+    readonly price_divison: number | null
+    is_divide: boolean
+    duration_timestamp: string | null
+}
+export declare type AdditionalSubscriptions = { [key: string]: AdditionalSubscription }
+
 export declare type State = {
     monthNames: ReadonlyArray<string>
     activeApp: string,

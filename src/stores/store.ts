@@ -270,6 +270,16 @@ export const Store = defineStore('Store', {
                 }
             )
         },
+        async getAdditionalPrices(app: string): Promise<void> {
+            return await axiosInstance.get(url('premiums/additional/app', app)).then(
+                r => {
+                    return r.data.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
 
         async getPromocodes(): Promise<void> {
             return await axiosInstance.get(url('promocodes'))
