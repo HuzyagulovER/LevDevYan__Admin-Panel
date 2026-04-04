@@ -2,6 +2,9 @@
   <section class="subscriptions">
     <div class="subscriptions__top-line top-line">
       <ButtonsPages class="top-line__buttons-pages"/>
+      <ButtonCreate :to="'/additional-subscription/create/' + app" class="top-line__button-create">
+        Создать промокод
+      </ButtonCreate>
       <Filter :init-value="subs" @on-change-value="subs = $event" class="top-line__filter"/>
     </div>
     <div class="subscriptions__block active">
@@ -40,7 +43,7 @@
             <p class="empty" v-else>Текста нет</p>
           </div>
           <div class="item__icon">
-            <RouterLink :to="'/subscription-edit/' + app + '/' + price.id">
+            <RouterLink :to="{ name: 'SubscriptionEdit', params: { subscriptionId: price.id } }">
               <IconPencil/>
             </RouterLink>
           </div>
@@ -60,10 +63,12 @@
             <p class="item__value">
               {{ additionalSubscription['price' as keyof AdditionalSubscription] }} <span>&#x20bd;</span>
             </p>
-            <p class="item__text" :class="{empty: isNull(additionalSubscription.first_text)}">
-              {{ !isNull(additionalSubscription.first_text) ? additionalSubscription.first_text : 'Текста нет' }}
+            <p class="item__text" :class="{empty: isNull(additionalSubscription.text_1)}">
+              {{ !isNull(additionalSubscription.text_1) ? additionalSubscription.text_1 : 'Текста нет' }}
             </p>
-            <p class="item__id">id: {{ additionalSubscription.id }}</p>
+            <RouterLink :to="{name: 'AdditionalSubscriptionEdit', params: {subscriptionId: additionalSubscription.id}}" class="item__id">
+              {{ additionalSubscription.id }}
+            </RouterLink>
           </div>
         </div>
       </div>
@@ -121,6 +126,7 @@ import {
   AdditionalSubscriptions,
 } from "../../helpers";
 import {isNull} from "lodash";
+import ButtonCreate from "@add-comps/ButtonCreate.vue";
 
 const route = useRoute();
 const store = <StoreGeneric>inject("Store");
@@ -224,10 +230,11 @@ function selectDate() {
 
     &__button-create {
       margin-left: auto;
+      padding: 1rem 2rem;
     }
 
     &__filter {
-      margin-left: auto;
+      margin-left: 2rem;
     }
   }
 
@@ -407,20 +414,31 @@ function selectDate() {
       // gap: 1rem;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 2rem;
 
       //& > * + * {
       //  margin-left: 2rem;
       //}
 
-      &__name,
+      &__name {
+        flex: 5;
+      }
+
       &__value {
-        flex: 1;
+        flex: 4;
+      }
+
+      &__text {
+        flex: 7;
+      }
+
+      &__id {
+        flex: 9;
       }
 
       &__id,
       &__text {
-        flex: 2;
         word-break: break-word;
         font: {
           size: 1.3rem;
@@ -435,6 +453,11 @@ function selectDate() {
 
       &__value {
         text-align: center;
+      }
+
+      &__id {
+        color: $--c__blue;
+        text-decoration: underline;
       }
     }
 

@@ -108,7 +108,7 @@ import {
   watch,
 } from "vue";
 import {Price, ReturnedData, ReturnedError} from "../../helpers";
-import {isNull} from "lodash";
+import {isNull, isUndefined} from "lodash";
 
 const route = useRoute();
 const router = useRouter();
@@ -121,6 +121,7 @@ const price: Ref<Price> = ref({
   id: "",
   tag: "",
   name: "",
+  app: "",
   price: 0,
   second_price: null,
   second_price_visibility: true,
@@ -143,8 +144,10 @@ const currentError: Ref<string> = ref("");
 watch(
     () => route.params.subscriptionId,
     () => {
-      subscriptionId.value = <string>route.params.subscriptionId;
-      getPrice();
+      if (!isUndefined(route.params.subscriptionId)) {
+        subscriptionId.value = <string>route.params.subscriptionId;
+        getPrice();
+      }
     }
 );
 
@@ -156,12 +159,13 @@ getPrice();
 
 async function getPrice(): Promise<void> {
   loading.value = true;
+
   await store.getPrice(subscriptionId.value).then((r: Price) => {
     price.value = r;
 
     mainTitle.value =
         "Редактирование подписки " +
-        apps.value[app.value] +
+        apps.value[price.value.app] +
         " (" +
         r.name +
         ")";
@@ -176,8 +180,9 @@ function updatePrice() {
       .then((r: ReturnedData | ReturnedError) => {
         loading.value = false;
         if (r.success) {
+          let app = price.value.app;
           price.value = clearVariable(price.value);
-          router.push({path: "/subscriptions", query: {app: app.value}});
+          router.push({path: "/subscriptions", query: {app: app}});
         } else {
           currentError.value = r.error.status;
           setTimeout(() => {

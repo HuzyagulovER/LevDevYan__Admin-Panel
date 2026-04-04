@@ -142,7 +142,7 @@ watch(
 	max-width: 400px;
 	width: 18%;
 	min-width: 18%;
-	padding: 4rem 2.375rem;
+	padding: 3rem 2.375rem;
 	overflow: hidden;
 
 	&__line {

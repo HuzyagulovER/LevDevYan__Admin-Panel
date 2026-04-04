@@ -129,7 +129,6 @@ const monthNames: ReadonlyArray<string> = [
     "декабря",
 ];
 
-
 export const Store = defineStore('Store', {
     state: (): State => (
         {
@@ -270,6 +269,17 @@ export const Store = defineStore('Store', {
                 }
             )
         },
+        async updatePrice(id: string, price: Price): Promise<void> {
+            return await axiosInstance.post(url('premiums', id), objectToFormData(price)).then(
+                r => {
+                    return r.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
+
         async getAdditionalPrices(app: string): Promise<void> {
             return await axiosInstance.get(url('premiums/additional/app', app)).then(
                 r => {
@@ -279,6 +289,47 @@ export const Store = defineStore('Store', {
                     return e.response.data
                 }
             )
+        },
+        async getAdditionalPrice(priceId: string): Promise<void> {
+            return await axiosInstance.get(url('premiums/additional', priceId)).then(
+                r => {
+                    return r.data.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
+        async updateAdditionalPrice(id: string, price: Price): Promise<void> {
+            return await axiosInstance.post(url('premiums/additional', id), objectToFormData(price)).then(
+                r => {
+                    return r.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
+        async createAdditionalPrice(price: Price): Promise<void> {
+            return await axiosInstance.post(url('premiums/additional'), objectToFormData(price)).then(
+                r => {
+                    return r.data
+                },
+                e => {
+                    return e.response.data
+                }
+            )
+        },
+        async deleteAdditionalPrice(id: string): Promise<void> {
+            return await axiosInstance.delete(url('premiums/additional', id))
+                .then(
+                    r => {
+                        return r.data
+                    },
+                    e => {
+                        return e.response.data
+                    }
+                )
         },
 
         async getPromocodes(): Promise<void> {
@@ -320,17 +371,6 @@ export const Store = defineStore('Store', {
         },
         async updatePromocode(id: string, data: {}): Promise<void> {
             return await axiosInstance.post(url('promocodes', id), objectToFormData(data)).then(
-                r => {
-                    return r.data
-                },
-                e => {
-                    return e.response.data
-                }
-            )
-        },
-
-        async updatePrice(id: string, price: Price): Promise<void> {
-            return await axiosInstance.post(url('premiums', id), objectToFormData(price)).then(
                 r => {
                     return r.data
                 },

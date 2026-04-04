@@ -68,7 +68,10 @@ watch(() => filterValue.value,
 		width: 100%;
 		height: 100%;
 		padding: 1rem 1.2rem 1rem 3.8rem;
-		font-weight: 600;
+		font: {
+      weight: 600;
+      size: 1.5rem;
+    }
 		background: transparent;
 		border: 0;
 		cursor: pointer;

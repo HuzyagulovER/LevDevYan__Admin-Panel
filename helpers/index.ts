@@ -159,6 +159,7 @@ export declare type Price = {
     id: string
     tag: string
     name: string
+    app: string
     price: number
     second_price: number | null
     second_price_visibility: boolean
@@ -197,15 +198,16 @@ export declare type AdditionalSubscription = {
     id: string
     tag: string
     name: string
+    app: string
     price: number
-    old_price: number | null
-    is_old_price_visible: boolean
-    first_text: string | null
-    is_first_text_visible: boolean
-    second_text: string | null
-    is_second_text_visible: boolean
-    is_strikethrough: boolean
-    is_old_price_per_month: boolean
+    second_price: number | null
+    second_price_visibility: boolean
+    text_1: string
+    text_1_visibility: boolean
+    text_2: string
+    text_2_visibility: boolean
+    strikethrough: boolean
+    second_price_per_month: boolean
     readonly price_divison: number | null
     is_divide: boolean
     duration_timestamp: string | null

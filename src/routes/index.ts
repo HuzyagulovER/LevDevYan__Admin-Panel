@@ -26,10 +26,10 @@ import IconSubscription from "@add-comps/icons/IconSubscription.vue";
 import IconSmile from "@add-comps/icons/IconSmile.vue";
 import IconSystem from "@add-comps/icons/IconSystem.vue";
 
-import { Component } from 'vue';
+import {Component} from 'vue';
 import { Store } from '@stores/store';
-import { ReturnedError, ReturnedData } from '../../helpers';
 import { useCookies } from 'vue3-cookies';
+import ViewAdditionalSubscriptionCreateEdit from "@views/ViewAdditionalSubscriptionCreateEdit.vue";
 
 const { cookies } = useCookies();
 const IS_DEV = ["development", "dev"].includes(import.meta.env.MODE);
@@ -67,7 +67,8 @@ const routes: Array<RouteRecordRawWithMeta> = [
 			title: "Все курсы",
 			nav_icon: IconCourses,
 			nav_title: 'Курсы',
-			isNav: true
+			isNav: true,
+			saveScroll: true,
 		},
 	},
 	{
@@ -97,7 +98,8 @@ const routes: Array<RouteRecordRawWithMeta> = [
 			title: "Все промокоды",
 			nav_icon: IconPromocodes,
 			nav_title: 'Промокоды',
-			isNav: true
+			isNav: true,
+			saveScroll: true,
 		}
 	},
 	{
@@ -118,6 +120,7 @@ const routes: Array<RouteRecordRawWithMeta> = [
 			nav_title: 'Уведомления',
 			isNav: true,
 			variative: true,
+			saveScroll: true,
 		},
 	},
 	{
@@ -146,6 +149,7 @@ const routes: Array<RouteRecordRawWithMeta> = [
 			nav_title: "Контент",
 			isNav: true,
 			variative: true,
+			saveScroll: true,
 		},
 	},
 	{
@@ -166,11 +170,27 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		},
 	},
 	{
-		path: '/subscription-edit/:app/:subscriptionId',
-		name: "SubscriptionsEdit",
+		path: '/subscription-edit/:subscriptionId',
+		name: "SubscriptionEdit",
 		component: ViewSubscriptionEdit,
 		meta: {
 			title: "Редактирование подписки",
+		},
+	},
+	{
+		path: '/additional-subscription/edit/:subscriptionId',
+		name: "AdditionalSubscriptionEdit",
+		component: ViewAdditionalSubscriptionCreateEdit,
+		meta: {
+			title: "Редактирование дополнительной подписки",
+		},
+	},
+	{
+		path: '/additional-subscription/create/:app',
+		name: "AdditionalSubscriptionCreate",
+		component: ViewAdditionalSubscriptionCreateEdit,
+		meta: {
+			title: "Редактирование дополнительной подписки",
 		},
 	},
 	{
@@ -208,22 +228,31 @@ const routes: Array<RouteRecordRawWithMeta> = [
 
 const router = createRouter({
 	history: createWebHistory('/'),
-	scrollBehavior: function (to, from, savedPosition) {
-		if (to.hash) {
-			return { el: to.hash, behavior: 'smooth', }
-		} else if (savedPosition) {
-			return savedPosition
-		} else {
-			return { left: 0, top: 0 }
-		}
-	},
+	// scrollBehavior: function (to, from, savedPosition) {
+	// 	if (to.hash) {
+	// 		return { el: to.hash, behavior: 'smooth', }
+	// 	} else if (savedPosition) {
+	// 		return savedPosition
+	// 	} else {
+	// 		return { top: 0, behavior: 'auto' }
+	// 	}
+	// },
 	routes
 })
 
+const scrollPositions = new Map();
+
 router.beforeEach(async (to, from, next) => {
+	const container = document.querySelector('.main__container')
+	if (from.meta?.saveScroll && container) {
+		scrollPositions.set(from.fullPath, container.scrollTop)
+	}
+	if (container) {
+		container.scrollTop = 0
+	}
+
 	try {
 		const store = Store()
-
 		store.clearLoadedFiles();
 
 		if (IS_DEV) {

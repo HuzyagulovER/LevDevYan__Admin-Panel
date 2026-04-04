@@ -7,7 +7,7 @@
 					{{ mainTitle || route.meta.title }}
 				</h2>
 				<div class="header__account account">
-					<div class="account__wrapper"></div>
+<!--					<div class="account__wrapper"></div>-->
 					<div class="account__wrapper">
 						<div class="account__image">
 							<img :src="avatarUrl" alt="Account image" />
@@ -126,9 +126,12 @@ watch(
 		display: flex;
 		margin-bottom: 2rem;
 		align-items: center;
+    position: relative;
 
 		&__title {
 			flex: 1;
+      word-break: break-all;
+      margin-right: 7rem;
 
 			font: {
 				size: 2rem;
@@ -137,6 +140,11 @@ watch(
 		}
 
 		.account {
+      transform: translateY(-25%);
+      position: absolute;
+      top: 0;
+      right: 0;
+
 			&__image {
 				width: 5rem;
 				height: 5rem;
@@ -149,6 +157,9 @@ watch(
 					object-fit: cover;
 				}
 			}
+
+      &__wrapper {
+      }
 		}
 	}
 
