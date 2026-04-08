@@ -2,6 +2,8 @@ import {RouteComponent} from "vue-router"
 
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
+export declare type App = 'psy' | 'avocado'
+
 export declare type Course = {
     id?: string
     title: string
@@ -173,7 +175,8 @@ export declare type Price = {
     is_divide: boolean
     duration_timestamp: string | null
 }
-export declare type Prices = { [key: string]: Price } | {}
+export declare type Prices = Record<string, Price>
+export declare type AllPricesByApp = Record<App, Prices>
 
 export declare type ActiveSubscription = {
     id: string
@@ -294,12 +297,9 @@ export declare type User = {
     versions?: StringObject
     is_test?: boolean | number
 }
-export declare type UsersTypePremiums = {
-    psy: UsersTypePremium
-    avocado: UsersTypePremium
-}
+export declare type UsersTypePremiums = Record<App, UsersTypePremium>
 export declare type UsersTypePremium = {
-    autopayment: string | number
+    autopayment: boolean
     keyPaymant: string
     payDate: string | number
     payment_method_type: string
@@ -308,6 +308,7 @@ export declare type UsersTypePremium = {
     subscriptionDurationText: string
     typeApp: string
     typePremium: string
+    is_active: boolean
 }
 
 export declare type Logs = {

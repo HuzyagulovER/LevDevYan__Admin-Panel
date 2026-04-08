@@ -53,18 +53,18 @@
 							<p class="item__value">{{ getDateFromString((selectedUser as User).registration_date) }}</p>
 						</li>
 						<li class="user__item item"
-							v-if="open_app.psy !== '-' || (getPremium('psy') && getPremium('psy')?.status !== 'inactive')">
+							v-if="!isNull(psySubscription)">
 							<p class="item__title">Подписка PSY</p>
 							<p class="item__value">
-								{{ getPremium('psy')?.subscriptionDurationText }}
+								{{ psySubscription?.is_active ? psySubscription?.subscriptionDurationText : '&mdash;' }}
 							</p>
 							<IconPencil class="item__edit" @click="setSubscription({ app: 'psy' })" />
 						</li>
 						<li class="user__item item"
-							v-if="open_app.avocado !== '-' || (getPremium('avocado') && getPremium('avocado')?.status !== 'inactive')">
+							v-if="!isNull(avocadoSubscription)">
 							<p class="item__title">Подписка Avocado</p>
 							<p class="item__value">
-								{{ getPremium('avocado')?.subscriptionDurationText }}
+								{{ avocadoSubscription?.is_active ? avocadoSubscription?.subscriptionDurationText : '&mdash;' }}
 							</p>
 							<IconPencil class="item__edit" @click="setSubscription({ app: 'avocado' })" />
 						</li>
@@ -126,6 +126,7 @@ import { StoreGeneric, storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref, Ref, watch } from "vue";
 import { User, PopupAdditionFields, ReturnedError, ReturnedData, StringObject, NumberOrStringObject, Prices, UsersTypePremium, UsersTypePremiums } from "../../helpers";
 import { clearVariable } from "../main";
+import {isNull} from "lodash";
 
 const route = useRoute();
 const router = useRouter();
@@ -147,6 +148,8 @@ const open_app: ComputedRef<StringObject> = computed((): StringObject => {
 		avocado: getDateFromString((selectedUser.value as User).open_app['avocado' as keyof NumberOrStringObject] as string),
 	}
 })
+const psySubscription: ComputedRef<UsersTypePremium | null> = computed((): UsersTypePremium | null => (selectedUser.value as User).typePremium['psy'] ?? null)
+const avocadoSubscription: ComputedRef<UsersTypePremium | null> = computed((): UsersTypePremium | null => (selectedUser.value as User).typePremium['avocado'] ?? null)
 
 getUsersCounters()
 
@@ -310,7 +313,6 @@ async function setSubscription(addition_data?: {
 					},
 					async (e: any): Promise<void> => {
 						loading.value = false
-						console.log(e.response.data);
 						await store.clearPopup();
 						await store.callInfoPopup(
 							'Изменения не сохранены',

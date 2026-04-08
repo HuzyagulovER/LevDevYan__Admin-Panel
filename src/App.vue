@@ -35,6 +35,7 @@ import { ComputedRef, Ref, ref } from "@vue/reactivity";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { StringObject } from "../helpers";
+import {Store} from "@stores/store";
 
 const route = useRoute();
 const router = useRouter();
@@ -56,6 +57,15 @@ watch(
 			: document.body.classList.remove("no-scroll");
 	}
 );
+
+
+watch(
+    () => store.popup.isReturned,
+    () => {
+      console.log(store.popup.isReturned)
+      console.log(store.popup.isReturned && store.popup.answer)
+    }
+)
 
 const isMobile: any = () => {
 	return {

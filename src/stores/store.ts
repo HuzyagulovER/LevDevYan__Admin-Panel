@@ -477,9 +477,8 @@ export const Store = defineStore('Store', {
             const fd = new FormData()
             fd.append('identifier', this.popup.additionFields['identifier' as keyof PopupAdditionFields] as string);
             fd.append('id', this.popup.additionFields['id' as keyof PopupAdditionFields] as string);
-            if (this.popup.additionFields['autopayment' as keyof PopupAdditionFields]) {
-                fd.append('autopayment', this.popup.additionFields['autopayment' as keyof PopupAdditionFields] as string);
-            }
+            fd.append('app', this.popup.additionFields['app' as keyof PopupAdditionFields] as string);
+            fd.append('is_autopayment', this.popup.additionFields['autopayment' as keyof PopupAdditionFields] as string);
 
             return await axiosInstance.post(...formRequest('users/setSubscription', fd) as [string, FormData]).then(
                 r => {
@@ -806,9 +805,10 @@ export const Store = defineStore('Store', {
                 }, 2000);
 
             return new Promise((res) => {
-                watch(
+                const stopWatch = watch(
                     () => this.popup.isReturned,
                     () => {
+                        stopWatch()
                         res(this.popup.isReturned && this.popup.answer)
                     }
                 )

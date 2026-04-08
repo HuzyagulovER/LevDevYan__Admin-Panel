@@ -274,7 +274,7 @@ router.beforeEach(async (to, from, next) => {
 		// 	await store.checkSessionToken().then(
 		// 		(r: ReturnedError | ReturnedData) => {
 					let title = <HTMLElement>document.querySelector('head title')
-					title.innerText = <string>((to.meta.title || default_title) + ' (TESTING)')
+					title.innerText = <string>((to.meta.title || default_title))
 		// 			store.loading = false
 		//
 		// 			if (!r.success) {

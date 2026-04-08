@@ -7,7 +7,7 @@
 					<div class="popup-user-add-sub__input">
 						<label for="user_identifier" class="form__label">Почта или ID</label>
 						<input id="user_identifier" type="text" v-model="user_identifier" class="form__input" :class="{
-							_err: popup.additionFields.error === 'INVALID_ARGUMENT',
+							_err: fields.error === 'INVALID_ARGUMENT',
 						}" :disabled="disabled" />
 					</div>
 					<div class="popup-user-add-sub__input">
@@ -25,14 +25,14 @@
 							<option value="null">
 								Отключить
 							</option>
-							<option v-for="premium in popup.additionFields.prices[sub_app]" :value="premium.id" :key="premium.id">
+							<option v-for="premium in fields.prices[sub_app as App]" :value="premium.id" :key="premium.id">
 								{{ premium.name }}
 							</option>
 						</select>
 					</div>
-					<div class="popup-user-add-sub__input" v-if="popup.additionFields.autopayment && premium_id === ''">
+					<div class="popup-user-add-sub__input" v-if="!isByAdmin && premium_id === ''">
 						<label for="user_identifier" class="form__label">Автооплата</label>
-						<select id="sub_name" class="form__input" v-model="sub_autopayment">
+						<select id="sub_name" class="form__input" v-model="sub_autopayment" :disabled="isByAdmin || premium_id !== ''">
 							<option value="1">
 								Включена
 							</option>
@@ -56,10 +56,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from "@vue/reactivity";
+import {computed, ComputedRef, ref, Ref} from "@vue/reactivity";
 import { inject, watch } from "@vue/runtime-core";
-import { merge } from "lodash";
+import {merge, cloneDeep} from "lodash";
 import { StoreGeneric, storeToRefs } from "pinia";
+import {AllPricesByApp, App, UsersTypePremiums} from "../../../helpers";
+
+type PopupAdditionFields = {
+  app: string
+  autopayment: boolean
+  identifier: string
+  prices: AllPricesByApp
+  subs?: UsersTypePremiums
+  type: string
+  error?: string
+};
 
 const store = <StoreGeneric>inject("Store");
 const { popup, apps } = storeToRefs(store);
@@ -67,66 +78,77 @@ const { popup, apps } = storeToRefs(store);
 const disabled: Ref<boolean> = ref(false);
 const disable: Ref<boolean> = ref(false);
 const user_identifier: Ref<string> = ref("");
-const sub_app: Ref<string> = ref("");
+const sub_app: Ref<App | ''> = ref("");
 const premium_id: Ref<string> = ref("");
-const sub_autopayment: Ref<string> = ref("");
-const currentsSubName: Ref<string> = ref("")
+const sub_autopayment: Ref<number> = ref(0);
+
+const fields: ComputedRef<PopupAdditionFields> = computed(() => cloneDeep(popup.value?.additionFields));
+const currentsSubName: ComputedRef<string> = computed(() => {
+  if (fields.value?.subs && sub_app.value) {
+    return fields.value?.prices[sub_app.value as App][fields.value?.subs[sub_app.value as keyof UsersTypePremiums]?.typePremium]?.name ?? '';
+  }
+
+  return '';
+});
+const isByAdmin: ComputedRef<boolean> = computed(() => {
+  if (fields.value?.subs) {
+    return fields.value?.subs[sub_app.value as App]?.keyPaymant === 'by_admin';
+  }
+
+  return false;
+});
 
 watch(
-	() => popup.value,
+	() => fields.value,
 	() => {
-		if (popup.value.additionFields.app) {
-			sub_app.value = popup.value.additionFields.app
+		if (fields.value.app) {
+			sub_app.value = fields.value.app as App
 		}
-		if (popup.value.additionFields.identifier) {
-			user_identifier.value = popup.value.additionFields.identifier
+		if (fields.value.identifier) {
+			user_identifier.value = fields.value.identifier
 		}
 		if (sub_app.value && user_identifier.value) {
-			sub_autopayment.value = popup.value.additionFields.autopayment
+			sub_autopayment.value = +fields.value.autopayment
 			disabled.value = true
-			let typePremium = popup.value.additionFields.subs[sub_app.value].typePremium
-			currentsSubName.value = popup.value.additionFields.prices[sub_app.value][typePremium]?.name
 		}
 	},
 	{ deep: true }
 )
 
-watch(() => premium_id.value,
-	() => {
-		console.log(popup.value.additionFields);
-		console.log(premium_id.value);
-		console.log("");
-
-		sub_autopayment.value =
-			(premium_id.value === "")
-				? popup.value.additionFields.autopayment
-				: ''
-	})
+watch(
+    () => premium_id.value,
+    () => {
+      if (premium_id.value === "") {
+        sub_autopayment.value = 0
+      }
+    }
+)
 
 function confirm(ans: boolean): void {
 	if (!disable.value) {
 		disabled.value = true;
 		popup.value.answer = ans;
-		popup.value.isReturned = true;
+    popup.value.isReturned = true;
 
 		popup.value.additionFields = merge(popup.value.additionFields, {
 			identifier: user_identifier.value,
 			id: premium_id.value,
 			autopayment: sub_autopayment.value
 		});
+
 		setTimeout(() => {
 			disabled.value = false;
 
 			user_identifier.value = '';
-			sub_app.value = "";
-			premium_id.value = "";
-			sub_autopayment.value = ""
+			sub_app.value = '';
+			premium_id.value = '';
+			sub_autopayment.value = 0
 		}, 1000);
 	}
 
-	if (!ans) {
-		store.clearPopup();
-	}
+  if (!ans) {
+    store.clearPopup();
+  }
 }
 </script>
 
