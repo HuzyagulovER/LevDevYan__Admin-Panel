@@ -165,6 +165,7 @@ watch(
 		text-align: center;
 
 		&_colored {
+			font-family: "Philosopher", sans-serif;
 			color: $--c__light-violet;
 		}
 	}

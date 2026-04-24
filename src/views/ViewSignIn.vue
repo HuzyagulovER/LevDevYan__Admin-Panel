@@ -103,6 +103,7 @@ async function signIn(e: Event) {
 	}
 
 	&__main-title {
+		font-family: "Philosopher", sans-serif;
 		font-size: 2.8rem;
 		text-align: center;
 		margin-bottom: 3.2rem;
@@ -110,6 +111,7 @@ async function signIn(e: Event) {
 		color: $--c__white;
 
 		&_colored {
+			font-family: "Philosopher", sans-serif;
 			color: $--c__light-violet;
 		}
 	}
