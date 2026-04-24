@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, watch } from "@vue/runtime-core";
+import { inject } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import IconCalendar from "@add-comps/icons/IconCalendar.vue";
 import MainBubblesList from "./MainBubblesList.vue";
@@ -35,7 +35,7 @@ let { currentTime } = storeToRefs(store);
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .banner {
 	height: 13rem;

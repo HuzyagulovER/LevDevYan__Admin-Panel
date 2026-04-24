@@ -56,7 +56,7 @@ function confirm(ans: boolean) {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .popup-search-user {
 	position: absolute;

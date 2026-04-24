@@ -5,27 +5,15 @@
 				<div class="popup__container">
 					<img src="@images/Popup.png" alt="" width="164" height="116" class="popup__image" />
 					<p class="popup__text">{{ popup.text }}</p>
+          <slot></slot>
 					<div class="popup__wrapper">
-						<button class="popup__button" ref="button_true" tabindex="1" @click="confirm(true)">
+						<button class="popup__button" tabindex="1" @click="confirm(true)">
 							Да
 						</button>
 						<button class="popup__button" tabindex="1" @click="confirm(false)">
 							Нет
 						</button>
 					</div>
-					<!-- <div class="popup__close">
-						<svg
-							width="40"
-							height="40"
-							viewBox="0 0 40 40"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								d="M40 4.02857L35.9714 0L20 15.9714L4.02857 0L0 4.02857L15.9714 20L0 35.9714L4.02857 40L20 24.0286L35.9714 40L40 35.9714L24.0286 20L40 4.02857Z"
-							/>
-						</svg>
-					</div> -->
 				</div>
 			</div>
 		</Transition>
@@ -41,7 +29,6 @@ const store = <StoreGeneric>inject("Store");
 const { popup } = storeToRefs(store);
 
 let disabled: Ref<boolean> = ref(false);
-const button_true: Ref<null> = ref(null);
 
 function confirm(ans: boolean) {
 	if (!disabled.value) {
@@ -49,6 +36,7 @@ function confirm(ans: boolean) {
 		popup.value.answer = ans;
 		popup.value.isReturned = true;
 		popup.value.isActive = false;
+
 		setTimeout(() => {
 			store.clearPopup();
 			disabled.value = false;
@@ -58,7 +46,7 @@ function confirm(ans: boolean) {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .popup {
 	position: absolute;

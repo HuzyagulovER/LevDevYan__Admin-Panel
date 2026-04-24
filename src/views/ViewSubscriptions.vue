@@ -218,7 +218,7 @@ function selectDate() {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .subscriptions {
   padding-right: 20rem;
@@ -402,7 +402,7 @@ function selectDate() {
       }
 
       &::-webkit-calendar-picker-indicator {
-        background: url(/assets/Down-arrow.svg) no-repeat center/contain;
+        background: url(@images/Down-arrow.svg) no-repeat center/contain;
         width: 1.1rem;
         height: 100%;
       }
@@ -511,7 +511,7 @@ function selectDate() {
       }
 
       &::-webkit-calendar-picker-indicator {
-        background: url(/assets/Down-arrow.svg) no-repeat center/contain;
+        background: url(@images/Down-arrow.svg) no-repeat center/contain;
         width: 1.1rem;
         height: 100%;
       }

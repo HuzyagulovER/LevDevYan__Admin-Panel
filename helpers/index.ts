@@ -41,6 +41,43 @@ export declare interface Promocode {
 
 export declare type Promocodes = { [key: string]: Promocode } | {}
 
+export declare interface ReferralPromocode {
+    id: string,
+    code: string,
+    chained_with: string,
+    referred?: number,
+    referred_count?: number,
+    referred_last_month_count?: number,
+    description: string,
+}
+
+export declare interface ReferralPromocodeApplied {
+    data: Record<string, ReferralPromocodeAppliedRow>,
+    summary: ReferralPromocodeAppliedSummary,
+}
+
+export declare type ReferralPromocodeCalculation = {
+    id: string,
+    text: string,
+}
+
+export declare type ReferralPromocodeCalculations = Record<string, ReferralPromocodeCalculation>
+
+export declare interface ReferralPromocodeAppliedRow {
+    id: string,
+    user_name: string,
+    user_email: string,
+    premium_title: string,
+    premium_date: string,
+}
+
+export declare interface ReferralPromocodeAppliedSummary {
+    total_count: number,
+    total_sum: number,
+}
+
+export declare type ReferralPromocodes = { [key: string]: ReferralPromocode } | {}
+
 export declare interface Notification {
     id?: string,
     language: string,

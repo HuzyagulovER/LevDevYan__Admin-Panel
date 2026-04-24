@@ -1,6 +1,6 @@
 <template>
   <section class="notification-create">
-    <form class="notification-create__form form" @submit.prevent="notificationChangeHandler($event)">
+    <form class="notification-create__form form" @submit.prevent="notificationChangeHandler">
       <InputImage class="form__file-input" :image="image" :name="'notification_image'" :currentError="currentError"
                   :disabled="disabledForm" @display-image="displayImage($event)"/>
 
@@ -188,7 +188,7 @@
 
 <script setup lang="ts">
 import {ComputedRef, ref, Ref} from "@vue/reactivity";
-import {inject, watch, onMounted, computed, reactive} from "@vue/runtime-core";
+import {inject, watch, computed} from "@vue/runtime-core";
 import {StoreGeneric, storeToRefs} from "pinia";
 import {
   Notification,
@@ -199,7 +199,7 @@ import {
 import ButtonColored from "@add-comps/ButtonColored.vue";
 import InputImage from "@add-comps/InputImage.vue";
 import {useRoute, useRouter} from "vue-router";
-import {cloneDeep, isEmpty, isNull, merge} from "lodash";
+import {cloneDeep, isEmpty, isNull} from "lodash";
 
 const store = <StoreGeneric>inject("Store");
 const {
@@ -277,7 +277,6 @@ if (!isNew.value) {
   });
 } else {
   notification.value.app = activeApp.value;
-  console.log(notification.value);
 }
 
 function displayImage(data: boolean | [boolean, string]): void {
@@ -305,7 +304,7 @@ function parseValue(value: string | boolean | null): boolean | null {
   return JSON.parse(String(value));
 }
 
-function notificationChangeHandler(e: Event): void {
+function notificationChangeHandler(): void {
   disabledForm.value = true;
 
   if (notification.value.premium_availability === false) {
@@ -424,7 +423,7 @@ function createNotification(e: Event) {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .notification-create {
   .form {

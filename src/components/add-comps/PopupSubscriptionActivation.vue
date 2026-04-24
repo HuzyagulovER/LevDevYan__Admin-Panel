@@ -153,7 +153,7 @@ function confirm(ans: boolean): void {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .popup-user-add-sub {
 	position: absolute;

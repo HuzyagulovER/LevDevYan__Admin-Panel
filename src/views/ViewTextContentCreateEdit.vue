@@ -278,9 +278,7 @@ function displayMedia(isMedia: boolean, id: string): void {
 	}
 }
 
-function contentSaveHandler(e: Event): void {
-	const fd: FormData = new FormData(e.target as HTMLFormElement);
-
+function contentSaveHandler(): void {
 	disabledForm.value = true;
 	loading.value = true;
 
@@ -390,7 +388,7 @@ function reverseObject(object: { [key: string | number]: any }): { [key: string 
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .content-create-edit {
 	.form {
@@ -495,7 +493,7 @@ function reverseObject(object: { [key: string | number]: any }): { [key: string 
 					left: -0.8rem;
 					background-color: $--c__white;
 					z-index: -1;
-					box-shadow: 0px 0px 10px 0px $--c__grey;
+					box-shadow: 0 0 10px 0 $--c__grey;
 					border-radius: 0.5rem;
 				}
 			}

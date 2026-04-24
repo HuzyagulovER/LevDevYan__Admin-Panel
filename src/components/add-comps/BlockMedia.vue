@@ -13,7 +13,7 @@ import InputMedia from "@add-comps/InputMedia.vue";
 import PreviewMedia from "./PreviewMedia.vue";
 import { ref, Ref } from "@vue/reactivity";
 import { inject, watch } from "@vue/runtime-core";
-import { StoreGeneric, storeToRefs } from "pinia";
+import { StoreGeneric } from "pinia";
 import {
 	ContentText,
 } from "../../../helpers";
@@ -61,7 +61,7 @@ function deleteMedia() {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .media-block {
 	display: flex;

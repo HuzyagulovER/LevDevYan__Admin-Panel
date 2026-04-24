@@ -23,7 +23,7 @@ const { info_popup } = storeToRefs(store);
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .info-popup {
 	position: absolute;

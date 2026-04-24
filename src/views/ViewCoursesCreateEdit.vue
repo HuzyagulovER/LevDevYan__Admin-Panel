@@ -213,7 +213,7 @@ function changeLang(language: string) {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .courses-create-edit {
   flex: 1;

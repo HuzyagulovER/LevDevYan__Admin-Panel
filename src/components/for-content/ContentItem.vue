@@ -34,7 +34,7 @@
 import IconTrash from "@icons/IconTrash.vue";
 import { inject } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
-import {Content, ContentPreview} from "../../../helpers";
+import {ContentPreview} from "../../../helpers";
 
 const store = <StoreGeneric>inject("Store");
 const props = defineProps<{
@@ -49,7 +49,7 @@ function confirmDeleteContent() {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .content-item {
 	padding: 2.3rem;

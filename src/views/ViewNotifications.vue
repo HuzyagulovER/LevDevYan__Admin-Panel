@@ -9,11 +9,11 @@
 		</div>
 		<LanguageChoice @return-lang="changeLang" :isCookie="true" />
 		<div class="notifications__empty" v-if="isEmpty">
-			<img src="@images/Notifications__Empty-Notifications.png" width="234" height="288" />
+			<img alt="Empty notifications" src="@images/Notifications__Empty-Notifications.png" width="234" height="288" />
 			<p>Уведомлений еще нет...</p>
 		</div>
 		<TransitionGroup tag="div" :name="transitionName">
-			<NoificationsNotificationItem v-for="(notification, j) in notifications" :key="notification?.id" :index="j"
+			<NotificationsNotificationItem v-for="(notification, j) in notifications" :key="notification?.id" :index="j"
                                     :notification="notification as Notification" class="notifications__notification"
                                     @confirm-deleting-active="deleteNotification" />
 		</TransitionGroup>
@@ -23,12 +23,11 @@
 <script setup lang="ts">
 import ButtonCreate from "@add-comps/ButtonCreate.vue";
 import ButtonsPages from "@add-comps/ButtonsPages.vue";
-import NoificationsNotificationItem from "@for-nots/NoificationsNotificationItem.vue";
+import NotificationsNotificationItem from "@for-nots/NotificationsNotificationItem.vue";
 import LanguageChoice from "@add-comps/LanguageChoice.vue";
 import { inject, Ref, ref, toRef, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import {
-	Courses,
 	Notification,
 	Notifications,
 	ReturnedData,
@@ -110,7 +109,7 @@ function changeLang(lang: string): void {
 </script>
 
 <style lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .notifications {
 	flex: 1;

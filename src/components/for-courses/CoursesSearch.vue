@@ -1,7 +1,7 @@
 <template>
 	<div class="search">
 		<InputSearch class="search__input-search" />
-		<ButtonCreate :to="`/courses/create-edit/new/about`" class="search__button-create" @click="createNewCourse">
+		<ButtonCreate :to="`/courses/create-edit/new/about`" class="search__button-create">
 			Создать курс
 		</ButtonCreate>
 	</div>
@@ -12,18 +12,13 @@ import InputSearch from "@add-comps/InputSearch.vue";
 import ButtonCreate from "@/components/add-comps/ButtonCreate.vue";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { inject } from "@vue/runtime-core";
-import { cloneDeep } from "lodash";
 
 const store = <StoreGeneric>inject("Store");
-const { defaultCourse, courses } = storeToRefs(store);
-
-function createNewCourse() {
-	// courses.value.push(cloneDeep(defaultCourse.value));
-}
+const { courses } = storeToRefs(store);
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .search {
 	display: flex;

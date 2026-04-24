@@ -10,7 +10,12 @@ import {
     Price,
     State,
     PopupAdditionFields,
-    StringObject, Notification, ContentList,
+    StringObject,
+    Notification,
+    ContentList,
+    ReferralPromocode,
+    ReferralPromocodeApplied,
+    ReferralPromocodeCalculations,
 } from "../../helpers";
 import {cloneDeep, isArray, isBoolean, isEmpty, isNull, isObject} from 'lodash';
 import {clearVariable, flattenObject} from '../main';
@@ -32,8 +37,6 @@ axiosInstance.interceptors.request.use((config: AxiosRequestConfig) => {
     if (isEmpty(config.headers)) {
         config.headers = {};
     }
-
-    config.headers['API-v2-Updated-Version'] = true;
 
     if (!isEmpty(cookies.get("session_token"))) {
         config.headers['Authorization'] = 'Bearer ' + cookies.get("session_token");
@@ -380,6 +383,102 @@ export const Store = defineStore('Store', {
             )
         },
 
+        async getReferralPromocodes(): Promise<void> {
+            return await axiosInstance.get(url('referral-codes'))
+                .then(r => {
+                    return r.data.data
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                });
+        },
+        async getReferralPromocode(id: string): Promise<ReferralPromocode> {
+            return await axiosInstance.get(url('referral-codes', id))
+                .then(r => {
+                    return r.data.data
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                });
+        },
+        async getReferralPromocodeApplied(id: string, type: string, dates?: Record<string, string>): Promise<ReferralPromocodeApplied | {}> {
+            const params: Record<string, string> = {type: type};
+            if (!isEmpty(dates?.from) && !isEmpty(dates?.to)) {
+                params.dateFrom = dates?.from as string;
+                params.dateTo = dates?.to as string;
+            }
+
+            return await axiosInstance.get(url('referral-codes/applied', id), {params: params})
+                .then((r): ReferralPromocodeApplied => {
+                    return r.data
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                    return {};
+                });
+        },
+        async getCalculations(id: string): Promise<ReferralPromocodeCalculations | {}> {
+            return await axiosInstance.get(url('referral-codes', [id, 'calculations']))
+                .then((r): ReferralPromocodeCalculations => {
+                    return r.data.data
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                    return {};
+                });
+        },
+        async createCalculations(id: string, text: string): Promise<void> {
+            return await axiosInstance.post(url('referral-codes', [id, 'calculations']), objectToFormData({text: text}))
+                .then((r) => {
+                    return r.data
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                    return {};
+                });
+        },
+        async deleteCalculations(id: string): Promise<void> {
+            return await axiosInstance.delete(url('referral-codes/calculations', id))
+                .then((r) => {
+                    return r.data
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                    return {};
+                });
+        },
+        async createReferralPromocode(data: ReferralPromocode): Promise<void> {
+            return await axiosInstance.post(url('referral-codes'), objectToFormData(data))
+                .then(
+                    r => {
+                        return r.data
+                    },
+                    e => {
+                        return e.response.data
+                    }
+                )
+        },
+        async deleteReferralPromocode(id: string): Promise<void> {
+            return await axiosInstance.delete(url('referral-codes', id))
+                .then(r => {
+                    return r.data;
+                })
+                .catch(e => {
+                    console.error(`${e.name}: ${e.message}`);
+                });
+        },
+        async updateReferralPromocode(id: string, data: {}): Promise<void> {
+            return await axiosInstance.post(url('referral-codes', id), objectToFormData(data))
+                .then(
+                    r => {
+                        return r.data
+                    },
+                    e => {
+                        return e.response.data
+                    }
+                )
+        },
+
         async getActiveSubscriptions(app: string, device: string): Promise<void> {
             return await axiosInstance.get(url('premiums/counters', app), {params: {device: device}}).then(
                 r => {
@@ -597,7 +696,7 @@ export const Store = defineStore('Store', {
         async getContents(data: Object): Promise<ContentList> {
             this.loading = true
 
-            return await axiosInstance.get(url('content'), { params: data })
+            return await axiosInstance.get(url('content'), {params: data})
                 .then(r => {
                     return r.data.data
                 })
@@ -620,7 +719,7 @@ export const Store = defineStore('Store', {
         async getTypes(app: string): Promise<string[]> {
             this.loading = true
 
-            return await axiosInstance.get(url('content/types'), { params: { app: app }})
+            return await axiosInstance.get(url('content/types'), {params: {app: app}})
                 .then(r => {
                     return r.data.data
                 })
@@ -682,7 +781,7 @@ export const Store = defineStore('Store', {
                 }
             )
         },
-        createContentFormData (content: Content): FormData {
+        createContentFormData(content: Content): FormData {
             const fd: FormData = objectToFormData(flattenObject(content));
 
             if (Object.keys(this.loadedMedia).length) {
@@ -731,7 +830,6 @@ export const Store = defineStore('Store', {
             }).then(
                 r => {
                     this.loadedFiles = {}
-                    console.log(r);
 
                     return r.data
                 },
@@ -775,7 +873,7 @@ export const Store = defineStore('Store', {
                 }
             )
         },
-        createCourseFormData (course: Course): FormData {
+        createCourseFormData(course: Course): FormData {
             const fd: FormData = objectToFormData(flattenObject(course));
 
             if (Object.keys(this.loadedImages).length) {
@@ -821,13 +919,10 @@ export const Store = defineStore('Store', {
         },
 
         async callInfoPopup(text: string, additionFields?: StringObject): Promise<void> {
+            this.info_popup.text = text;
+            this.info_popup.isActive = true;
+            this.info_popup.additionFields = additionFields && Object.keys(additionFields).length > 0 ? additionFields : {};
 
-            this.info_popup.text = text
-            this.info_popup.isActive = true
-            this.info_popup.additionFields = additionFields && Object.keys(additionFields).length > 0 ? additionFields : {}
-            // setTimeout(() => {
-            // 	this.info_popup = cloneDeep(clearVariable(this.info_popup))
-            // }, 2000);
             return new Promise((res) => {
                 setTimeout(() => {
                     this.info_popup = cloneDeep(clearVariable(this.info_popup));
@@ -850,8 +945,6 @@ export const Store = defineStore('Store', {
                 }
             )
         },
-
-
 
 
         async getLogsInfo(): Promise<void> {

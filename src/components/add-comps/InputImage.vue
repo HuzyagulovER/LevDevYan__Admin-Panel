@@ -115,7 +115,7 @@ function deleteImage() {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .file-input {
 	background-color: rgba($color: $file-input-color, $alpha: 0.23);

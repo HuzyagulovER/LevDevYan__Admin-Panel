@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { ref, Ref } from "@vue/reactivity";
 import { inject, watch } from "@vue/runtime-core";
-import { merge, cloneDeep } from "lodash";
+import { merge } from "lodash";
 import { StoreGeneric, storeToRefs } from "pinia";
 
 const store = <StoreGeneric>inject("Store");
@@ -66,7 +66,7 @@ function confirm(ans: boolean) {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .popup-user-delete {
 	position: absolute;

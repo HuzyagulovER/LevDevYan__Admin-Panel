@@ -116,7 +116,7 @@ function deleteImage() {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .media-input {
 	display: flex;

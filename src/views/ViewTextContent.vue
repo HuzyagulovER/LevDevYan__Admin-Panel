@@ -214,7 +214,7 @@ function applyDrag(contentList: ContentList, dragResult: any): ContentList {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .content {
 	flex: 1;

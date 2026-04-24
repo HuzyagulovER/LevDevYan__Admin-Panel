@@ -1,5 +1,4 @@
 import {createApp} from 'vue'
-import './style.css'
 import App from './App.vue'
 import {createPinia} from "pinia";
 import router from './routes';
@@ -51,7 +50,7 @@ function formatBytes(bytes: number, decimals: number = 2) {
 export function isLargeFile(e: Event & {
 	currentTarget: HTMLInputElement
 }, maxSize: number = maxFileSize) {
-	return !!(e.currentTarget.files && e.currentTarget.files[0].size > maxSize)
+	return e.currentTarget.files && e.currentTarget.files[0].size > maxSize
 }
 
 export function isAcceptedExtension(e: Event & {
@@ -82,16 +81,14 @@ export const getSHA256Hash = async (input: any) => {
 };
 
 export function reverseObject(object: { [key: string | number]: any }): { [key: string | number]: any } {
-	console.log(object);
-
 	const keys: Array<string | number> = Object.keys(object).reverse(),
 		newObject: { [key: string | number]: any } = {}
 	keys.forEach((el: string | number): void => {
 		newObject[el] = cloneDeep(object[el])
 	})
-	console.log(newObject);
+
 	return newObject
-};
+}
 
 export function flattenObject(obj: { [key: string]: any }, keyName?: string): { [key: string]: any } {
     let flattendObj: { [key: string]: any } = {};
@@ -111,7 +108,7 @@ export function flattenObject(obj: { [key: string]: any }, keyName?: string): { 
 
 export function timer(s: number, callback: VoidFunction = () => {
 }): Promise<void> {
-	return new Promise((res, rej) => {
+	return new Promise((res) => {
 		setTimeout(() => {
 			res(callback())
 		}, s);

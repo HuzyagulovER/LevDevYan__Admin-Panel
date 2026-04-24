@@ -11,7 +11,7 @@ const { color } = defineProps<{
 </script>
 
 <style lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .subscription-item {
 	border-radius: 1.6rem;

@@ -3,8 +3,10 @@ import ViewSignIn from "@views/ViewSignIn.vue";
 import ViewMain from "@views/ViewMain.vue";
 import ViewCourses from "@views/ViewCourses.vue";
 import ViewCoursesCreateEdit from "@views/ViewCoursesCreateEdit.vue";
+import ViewBasePromocodes from "@views/ViewBasePromocodes.vue";
 import ViewPromocodes from "@views/ViewPromocodes.vue";
 import ViewPromocodesCreate from "@views/ViewPromocodesCreate.vue";
+import ViewReferralPromocodes from "@views/ViewReferralPromocodes.vue";
 import ViewNotifications from "@views/ViewNotifications.vue";
 import ViewTextContent from "@views/ViewTextContent.vue";
 import ViewSubscriptions from "@views/ViewSubscriptions.vue";
@@ -30,6 +32,8 @@ import {Component} from 'vue';
 import { Store } from '@stores/store';
 import { useCookies } from 'vue3-cookies';
 import ViewAdditionalSubscriptionCreateEdit from "@views/ViewAdditionalSubscriptionCreateEdit.vue";
+import ViewReferralPromocodesCreateEdit from "@views/ViewReferralPromocodesCreateEdit.vue";
+import ViewReferralPromocodesShow from "@views/ViewReferralPromocodesShow.vue";
 
 const { cookies } = useCookies();
 const IS_DEV = ["development", "dev"].includes(import.meta.env.MODE);
@@ -93,14 +97,50 @@ const routes: Array<RouteRecordRawWithMeta> = [
 	{
 		path: "/promocodes",
 		name: "Promocodes",
-		component: ViewPromocodes,
+		component: ViewBasePromocodes,
 		meta: {
-			title: "Все промокоды",
 			nav_icon: IconPromocodes,
-			nav_title: 'Промокоды',
 			isNav: true,
 			saveScroll: true,
-		}
+			nav_title: 'Промокоды',
+			title: "Все промокоды",
+		},
+		children: [
+			{
+				path: '',
+				name: "PromocodesOnce",
+				component: ViewPromocodes,
+				meta: {
+					title: "Одноразовые промокоды",
+					nav_title: 'Одноразовые',
+				}
+			},
+			{
+				path: 'referrals',
+				name: "PromocodesReferral",
+				component: ViewReferralPromocodes,
+				meta: {
+					title: "Многоразовые промокоды",
+					nav_title: 'Многоразовые',
+				}
+			},
+		],
+	},
+	{
+		path: '/promocodes/referrals/create-edit/:id',
+		name: "ReferralPromocodesCreateEdit",
+		component: ViewReferralPromocodesCreateEdit,
+		meta: {
+			title: "Реферальный промокод"
+		},
+	},
+	{
+		path: '/promocodes/referrals/:id',
+		name: "ReferralPromocodesShow",
+		component: ViewReferralPromocodesShow,
+		meta: {
+			title: "Реферальный промокод"
+		},
 	},
 	{
 		path: '/promocodes/create',
@@ -269,32 +309,14 @@ router.beforeEach(async (to, from, next) => {
 			}
 		}
 
-		// if (cookies.get("session_token")) {
-		// 	store.loading = true
-		// 	await store.checkSessionToken().then(
-		// 		(r: ReturnedError | ReturnedData) => {
-					let title = <HTMLElement>document.querySelector('head title')
-					title.innerText = <string>((to.meta.title || default_title))
-		// 			store.loading = false
-		//
-		// 			if (!r.success) {
-		// 				throw new Error(r.error.status);
-		// 			}
-		// 			if (!r.data.is_valid) {
-		// 				cookies.remove("session_token")
-		// 				next({ path: '/sign-in' })
-		// 				return
-		// 			}
-					if (to.path === '/sign-in') {
-						next({ path: '/' })
-					} else {
-						next()
-					}
-		// 		}
-		// 	)
-		// }
+		let title = <HTMLElement>document.querySelector('head title')
+		title.innerText = <string>((to.meta.title || default_title))
+		if (to.path === '/sign-in') {
+			next({path: '/'})
+		} else {
+			next()
+		}
 	} catch (error) {
-		console.log(error);
 		// next({ path: '/sign-in' })
 	}
 })

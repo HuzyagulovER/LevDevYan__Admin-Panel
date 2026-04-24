@@ -28,7 +28,7 @@ function changeState() {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .checkbox {
 	margin-left: auto;

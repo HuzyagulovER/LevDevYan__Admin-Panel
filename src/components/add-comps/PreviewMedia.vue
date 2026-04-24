@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import IconPlay from "@icons/IconPlay.vue";
 import IconPause from "@icons/IconPause.vue";
-import { ref, Ref, ComputedRef, computed } from "@vue/reactivity";
+import { ref, Ref } from "@vue/reactivity";
 import { inject, watch } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 
@@ -38,7 +38,7 @@ const props = defineProps<{
 
 const emit = defineEmits(["displayMedia"]),
 	store = <StoreGeneric>inject("Store"),
-	{ acceptedMediaExtensions, fileErrorStatuses } = storeToRefs(store),
+	{ acceptedMediaExtensions } = storeToRefs(store),
 	isLargeFile: any = inject("isLargeFile"),
 	maxMediaSize: any = inject("maxMediaSize"),
 	isAcceptedExtension: any = inject("isAcceptedExtension"),
@@ -106,7 +106,7 @@ function toggleAudio(param: boolean): void {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .media-preview {
 	display: flex;

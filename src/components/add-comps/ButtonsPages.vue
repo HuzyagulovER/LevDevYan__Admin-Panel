@@ -20,7 +20,7 @@ const route = useRoute();
 </script>
 
 <style lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .buttons-pages {
 	display: flex;

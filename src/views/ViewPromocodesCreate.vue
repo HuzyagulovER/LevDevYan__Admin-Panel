@@ -68,7 +68,7 @@ function addPromocode(): void {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .promocodes-create {
 	.form {
@@ -81,15 +81,6 @@ function addPromocode(): void {
 		&__label,
 		&__input {
 			width: 100%;
-		}
-
-		&__label {
-			margin-bottom: 0.5rem;
-
-			font: {
-				family: "Mazzard SemiBold";
-				size: 1.6rem;
-			}
 		}
 
 		&__input {

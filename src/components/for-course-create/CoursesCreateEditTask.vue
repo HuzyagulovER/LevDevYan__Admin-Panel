@@ -17,7 +17,7 @@
 				</label>
 				<label class="form__label" for="task-description">
 					<p>Описание:</p>
-					<textarea type="text" id="task-description" name="description" class="form__textarea"
+					<textarea id="task-description" name="description" class="form__textarea"
 						v-model="task.description"></textarea>
 				</label>
 			</form>
@@ -51,7 +51,7 @@ async function confirmDeletingActive() {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .task {
 	background-color: $--c__light-blue;

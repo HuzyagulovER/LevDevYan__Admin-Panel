@@ -106,7 +106,7 @@ function getMainCounters(): void {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .home {
 	flex: 1;

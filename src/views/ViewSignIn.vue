@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { ComputedRef, ref, Ref } from "@vue/reactivity";
-import { computed, inject, watch } from "@vue/runtime-core";
+import { computed, inject } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import { useCookies } from "vue3-cookies";
@@ -84,7 +84,7 @@ async function signIn(e: Event) {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .sign-in {
 	width: 100%;
@@ -103,7 +103,6 @@ async function signIn(e: Event) {
 	}
 
 	&__main-title {
-		font-family: "Philosopher";
 		font-size: 2.8rem;
 		text-align: center;
 		margin-bottom: 3.2rem;
@@ -111,7 +110,6 @@ async function signIn(e: Event) {
 		color: $--c__white;
 
 		&_colored {
-			font-family: "Philosopher";
 			color: $--c__light-violet;
 		}
 	}

@@ -12,7 +12,7 @@ const props = defineProps<{
 </script>
 
 <style lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .form-button {
 	display: flex;

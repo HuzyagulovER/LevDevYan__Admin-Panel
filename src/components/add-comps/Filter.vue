@@ -44,7 +44,7 @@ watch(() => filterValue.value,
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .filter {
 	display: flex;

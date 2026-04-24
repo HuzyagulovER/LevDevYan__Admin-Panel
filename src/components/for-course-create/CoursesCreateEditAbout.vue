@@ -133,7 +133,7 @@ function saveCourse(e: Event): void {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .create-edit-about {
 	@media screen and (max-width: $mobile--breakpoint) {

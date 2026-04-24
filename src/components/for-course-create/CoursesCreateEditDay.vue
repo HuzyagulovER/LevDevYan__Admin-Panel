@@ -120,7 +120,7 @@ async function confirmDeletingActive() {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .day {
 	padding: 2rem 3rem;

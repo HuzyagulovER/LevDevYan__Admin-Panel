@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, Ref, toRef, watch } from "@vue/runtime-core";
+import { inject } from "@vue/runtime-core";
 import { StateTree } from "pinia";
 import { Promocode } from "../../../helpers";
 import Checkbox from "@add-comps/Checkbox.vue";
@@ -54,8 +54,6 @@ import IconTrash from "@add-comps/icons/IconTrash.vue";
 const store = <StateTree>inject("Store");
 const props = defineProps<{ promocode: Promocode }>();
 const emit = defineEmits(["confirmDeleting", "changePromocodeState"]);
-
-const promo: Ref<Promocode> = ref({ ...props.promocode });
 
 function confirmDeleting() {
 	emit("confirmDeleting", props.promocode.id);
@@ -67,7 +65,7 @@ function changePromocodeState(state: boolean): void {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .promocode {
 	padding: 0.8rem 2rem;

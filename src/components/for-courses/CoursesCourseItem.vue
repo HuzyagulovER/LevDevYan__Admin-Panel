@@ -62,7 +62,7 @@ function changeCourseProduction(state: boolean) {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 $vertical-padding: 2.3rem;
 
 .course {

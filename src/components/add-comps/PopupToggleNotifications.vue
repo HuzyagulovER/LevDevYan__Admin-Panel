@@ -77,7 +77,7 @@ function confirm(ans: boolean): void {
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .popup-toggle-notifications {
 	position: absolute;

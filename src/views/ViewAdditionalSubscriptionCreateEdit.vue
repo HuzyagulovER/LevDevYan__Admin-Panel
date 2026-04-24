@@ -283,7 +283,7 @@ async function confirmDeleting() {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .price-edit {
   display: flex;

@@ -186,7 +186,7 @@ async function confirmDeletingUser(addition_data?: StringObject): Promise<void> 
 		.then((r: PopupAdditionFields): void => {
 			if (Object.hasOwn(r, "user_identifier")) {
 				store.deleteUser(r["user_identifier" as keyof PopupAdditionFields]).then(
-					async (r: boolean): Promise<void> => {
+					async (): Promise<void> => {
 						await store.clearPopup();
 						store.callInfoPopup(
 							'Пользователь удален',
@@ -297,7 +297,7 @@ async function setSubscription(addition_data?: {
 
 			if (Object.hasOwn(r, "identifier")) {
 				store.setSubscription().then(
-					async (r: boolean): Promise<void> => {
+					async (): Promise<void> => {
 						loading.value = false
 						await store.clearPopup();
 						await store.callInfoPopup(
@@ -311,7 +311,7 @@ async function setSubscription(addition_data?: {
 							}
 						})
 					},
-					async (e: any): Promise<void> => {
+					async (): Promise<void> => {
 						loading.value = false
 						await store.clearPopup();
 						await store.callInfoPopup(
@@ -347,7 +347,7 @@ async function toggleNotifications(addition_data?: StringObject): Promise<void> 
 						await store.callInfoPopup(
 							'Уведомления сохранены',
 							{
-								isSuccess: !!r
+								isSuccess: r
 							}
 						).then((): void => {
 							if (user_identifier.value) {
@@ -355,9 +355,9 @@ async function toggleNotifications(addition_data?: StringObject): Promise<void> 
 							}
 						})
 					},
-					async (e: ReturnedError): Promise<void> => {
+					async (): Promise<void> => {
 						loading.value = false
-						console.log(e.error.status);
+
 						await store.clearPopup();
 						await store.callInfoPopup(
 							'Уведомления не сохранены',
@@ -395,7 +395,7 @@ function viewJson(is_view: boolean): void {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .users {
 	display: flex;

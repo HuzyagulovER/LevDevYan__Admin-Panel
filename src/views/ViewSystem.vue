@@ -31,11 +31,10 @@ import ButtonColored from "@add-comps/ButtonColored.vue";
 
 import { useRoute } from "vue-router";
 import { StoreGeneric, storeToRefs } from "pinia";
-import { inject, ref, Ref, watch } from "vue";
+import { inject, ref, Ref } from "vue";
 import {
 	Logs,
 	LogsInfo,
-	LogsInfoItem,
 	ReturnedData,
 	ReturnedError
 } from "../../helpers";
@@ -73,7 +72,7 @@ async function clearLogs(domainId: string) {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .system {
 

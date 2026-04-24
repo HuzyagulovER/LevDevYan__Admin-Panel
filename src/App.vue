@@ -4,7 +4,7 @@
 		<div class="main__container" :class="{ 'no-scroll': no_scroll }">
 			<header class="main__header header" v-if="idSignIn">
 				<h2 class="header__title">
-					{{ mainTitle || route.meta.title }}
+					{{ mainTitle || route.meta['title' as keyof RouteMeta] }}
 				</h2>
 				<div class="header__account account">
 <!--					<div class="account__wrapper"></div>-->
@@ -31,8 +31,8 @@ import InfoPopup from "@add-comps/InfoPopup.vue";
 import TheNavbar from "@comps/TheNavbar.vue";
 import MainLoader from "@add-comps/MainLoader.vue";
 import { computed, inject, watch } from "@vue/runtime-core";
-import { ComputedRef, Ref, ref } from "@vue/reactivity";
-import { RouterView, useRoute, useRouter } from "vue-router";
+import { ComputedRef } from "@vue/reactivity";
+import {RouteMeta, RouterView, useRoute, useRouter} from "vue-router";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { StringObject } from "../helpers";
 import {Store} from "@stores/store";
@@ -59,13 +59,13 @@ watch(
 );
 
 
-watch(
-    () => store.popup.isReturned,
-    () => {
-      console.log(store.popup.isReturned)
-      console.log(store.popup.isReturned && store.popup.answer)
-    }
-)
+// watch(
+//     () => store.popup.isReturned,
+//     () => {
+//       console.log(store.popup.isReturned)
+//       console.log(store.popup.isReturned && store.popup.answer)
+//     }
+// )
 
 const isMobile: any = () => {
 	return {
@@ -91,17 +91,13 @@ const isMobile: any = () => {
 			return this.iOS() || this.Mac();
 		},
 		any: function () {
-			if (
-				this.Android() ||
-				this.BlackBerry() ||
-				this.iOS() ||
-				this.Mac() ||
-				this.Opera() ||
-				this.Windows()
-			) {
-				return true;
-			}
-			return false;
+			return !!(this.Android() ||
+          this.BlackBerry() ||
+          this.iOS() ||
+          this.Mac() ||
+          this.Opera() ||
+          this.Windows());
+
 		},
 	};
 };
@@ -118,7 +114,7 @@ watch(
 </script>
 
 <style lang="scss">
-@import "@/style.scss";
+@import "@styles/style.scss";
 
 .main {
 	flex-grow: 1;

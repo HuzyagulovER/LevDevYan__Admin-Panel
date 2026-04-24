@@ -3,7 +3,7 @@
 		<div class="lang-choice__container">
 			<div class="lang-choice__active-lang">
 				<p class="lang-choice__text">{{ languages[activeLang] }}</p>
-				<img class="lang-choice__arrow" src="@images/Down-arrow.svg" @click="activeDropdown = !activeDropdown" />
+				<img alt="Drop arrow" class="lang-choice__arrow" src="@images/Down-arrow.svg" @click="activeDropdown = !activeDropdown" />
 			</div>
 			<div class="lang-choice__drop-down drop-down">
 				<div class="drop-down__item" v-for="(language, j) in languages" :key="j" @click="returnLang(j)">
@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { StoreGeneric, storeToRefs } from "pinia";
-import { inject, Ref, ref, toRef, toRefs, watch } from "vue";
+import { inject, Ref, ref, toRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useCookies } from "vue3-cookies";
 
@@ -67,7 +67,7 @@ function returnLang(langId: string | number) {
 </script>
 
 <style lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .lang-choice {
 	display: flex;

@@ -20,7 +20,7 @@
 				<li class="pages__page" v-for="(link, j) of links" :key="j" :data-page="activeNavPage === link.name">
 					<RouterLink class="pages__link" :to="link.to + (link.variative ? '?app=' + activeApp : '')">
 						<div class="pages__icon">
-							<component :is="link.nav_icon" />
+							<Component :is="link.nav_icon" />
 						</div>
 						<p>{{ link.nav_title }}</p>
 					</RouterLink>
@@ -33,7 +33,6 @@
 						<p>Выход</p>
 					</div>
 				</li>
-				<div class="pages__selected-page"></div>
 			</ul>
 			<img src="@images/Nav__Image.png" alt="" class="nav__image" />
 		</div>
@@ -42,7 +41,7 @@
 
 <script setup lang="ts">
 import IconLogout from "@icons/IconLogout.vue";
-import { useRouter, useRoute, RouteComponent } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import {
 	computed,
 	toRefs,
@@ -54,8 +53,7 @@ import {
 } from "@vue/runtime-core";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useCookies } from "vue3-cookies";
-import { StringObject, Link } from "../../helpers";
-import { String } from "lodash";
+import { Link } from "../../helpers";
 
 const router = useRouter();
 const route = useRoute();
@@ -133,7 +131,7 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .nav {
 	background-color: $--c__blue_dark;
@@ -167,7 +165,6 @@ watch(
 		text-align: center;
 
 		&_colored {
-			font-family: "Philosopher";
 			color: $--c__light-violet;
 		}
 	}

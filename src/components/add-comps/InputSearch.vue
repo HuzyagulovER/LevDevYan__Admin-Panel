@@ -12,7 +12,7 @@ import IconSearch from "@icons/IconSearch.vue";
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .input-search {
 	width: 100%;

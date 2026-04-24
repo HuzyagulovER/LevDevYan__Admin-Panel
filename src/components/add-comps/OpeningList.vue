@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, watch } from "@vue/runtime-core";
-import { ComputedRef, ref, Ref } from "@vue/reactivity";
+import { watch } from "@vue/runtime-core";
+import { ref, Ref } from "@vue/reactivity";
 
 const props = defineProps<{ isOpen: boolean }>();
 const openingList: Ref<any> = ref(null);
@@ -33,7 +33,7 @@ watch(
 </script>
 
 <style scoped lang="scss">
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .opening-list {
 	height: 0;

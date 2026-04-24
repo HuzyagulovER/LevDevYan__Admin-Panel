@@ -18,7 +18,7 @@ defineProps<{ to?: string }>();
 </script>
 
 <style lang="scss" scoped>
-@import "@/style.scss";
+@import "@styles/_variables.scss";
 
 .button-create {
 	background-color: $--c__orange;
