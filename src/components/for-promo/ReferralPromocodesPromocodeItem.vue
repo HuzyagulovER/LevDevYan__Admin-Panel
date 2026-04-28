@@ -16,11 +16,12 @@
         </div>
       </div>
       <div class="referral-promocode__wrapper referral-promocode__wrapper_buttons">
-        <RouterLink :to="{name: 'ReferralPromocodesShow', params: {id: promocode.id} }" class="referral-promocode__show">
-          <IconEye />
+        <RouterLink :to="{name: 'ReferralPromocodesShow', params: {id: promocode.id} }"
+                    class="referral-promocode__show">
+          <IconEye/>
         </RouterLink>
         <div class="referral-promocode__edit">
-          <ButtonEditPencil :to="{name: 'ReferralPromocodesCreateEdit', params: {id: promocode.id} }"/>
+          <ButtonEditPencil :to="{name: 'ReferralPromocodesEdit', params: {id: promocode.id} }"/>
         </div>
         <div class="referral-promocode__delete">
           <IconTrash @click="confirmDeleting" class="icon-trash"/>
@@ -97,17 +98,15 @@ function confirmDeleting() {
     }
 
     &_highlight {
-      p {
-        text-align: center;
-        background-color: $--c__light-blue;
-        border-radius: 0.6rem;
-        font-weight: bold;
-        padding: 0.4rem 2rem;
-        word-wrap: break-word;
+      text-align: center;
+      background-color: $--c__light-blue;
+      border-radius: 0.6rem;
+      font-weight: bold;
+      padding: 0.4rem 2rem;
+      word-wrap: break-word;
 
-        font: {
-          size: 1.35rem;
-        }
+      font: {
+        size: 1.35rem;
       }
     }
 

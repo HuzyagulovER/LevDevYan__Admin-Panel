@@ -49,6 +49,7 @@ export declare interface ReferralPromocode {
     referred_count?: number,
     referred_last_month_count?: number,
     description: string,
+    type: string,
 }
 
 export declare interface ReferralPromocodeApplied {
@@ -74,6 +75,7 @@ export declare interface ReferralPromocodeAppliedRow {
 export declare interface ReferralPromocodeAppliedSummary {
     total_count: number,
     total_sum: number,
+    date_string: string,
 }
 
 export declare type ReferralPromocodes = { [key: string]: ReferralPromocode } | {}

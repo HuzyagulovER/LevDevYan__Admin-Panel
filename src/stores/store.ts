@@ -119,7 +119,7 @@ function copyFormData(formData: FormData): FormData {
 
 const monthNames: ReadonlyArray<string> = [
     "января",
-    "ферваля",
+    "февраля",
     "марта",
     "апреля",
     "мая",
@@ -401,8 +401,8 @@ export const Store = defineStore('Store', {
                     console.error(`${e.name}: ${e.message}`);
                 });
         },
-        async getReferralPromocodeApplied(id: string, type: string, dates?: Record<string, string>): Promise<ReferralPromocodeApplied | {}> {
-            const params: Record<string, string> = {type: type};
+        async getReferralPromocodeApplied(id: string, type: string, typeByAutopayment: string, dates?: Record<string, string>): Promise<ReferralPromocodeApplied | {}> {
+            const params: Record<string, string> = {type: type, byAutopayment: typeByAutopayment};
             if (!isEmpty(dates?.from) && !isEmpty(dates?.to)) {
                 params.dateFrom = dates?.from as string;
                 params.dateTo = dates?.to as string;

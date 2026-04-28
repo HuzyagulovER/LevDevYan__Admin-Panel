@@ -331,17 +331,33 @@ body.apple p {
     justify-content: center;
     border-radius: 0.7rem;
     font-size: 1.5rem;
+    line-height: 1.5rem;
     cursor: pointer;
     white-space: nowrap;
     word-break: keep-all;
+    background-color: transparent;
+
+    &_bordered,
+    &_unbordered {
+      border-style: solid;
+      border-width: 0.2rem;
+      padding: 0.7rem 1.5rem;
+    }
 
     &_bordered {
-      border: 0.2rem solid $--c__violet;
-      padding: 0.7rem 3.25rem;
+      border-color: $--c__violet;
 
       &.active {
         background-color: $--c__violet;
         color: $--c__white;
+      }
+    }
+
+    &_unbordered {
+      border-color: transparent;
+
+      &.active {
+        border-color: $--c__violet;
       }
     }
   }

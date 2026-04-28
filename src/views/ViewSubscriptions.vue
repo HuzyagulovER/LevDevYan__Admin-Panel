@@ -56,21 +56,26 @@
         <p class="subscriptions__subtitle subtitle">Дополнительные подписки</p>
       </div>
       <div class="subscriptions__wrapper" v-if="Object.keys(additionalSubscriptions).length !== 0">
-        <div class="subscriptions__container" v-for="(additionalSubscription, j) in additionalSubscriptions"
-             :key="j">
+        <RouterLink class="subscriptions__container"
+                    v-for="(additionalSubscription, j) in additionalSubscriptions"
+                    :to="{name: 'AdditionalSubscriptionEdit', params: {subscriptionId: additionalSubscription.id}}"
+                    :key="j">
           <div class="additional__item item">
             <p class="item__name">{{ additionalSubscription['name' as keyof AdditionalSubscription] }}</p>
             <p class="item__value">
               {{ additionalSubscription['price' as keyof AdditionalSubscription] }} <span>&#x20bd;</span>
             </p>
-            <p class="item__text" :class="{empty: isNull(additionalSubscription.text_1)}">
-              {{ !isNull(additionalSubscription.text_1) ? additionalSubscription.text_1 : 'Текста нет' }}
+            <p class="item__app" :class="{empty: isNull(additionalSubscription.app)}">
+              {{ !isNull(additionalSubscription.app) ? apps[additionalSubscription.app] : 'Приложения нет' }}
             </p>
-            <RouterLink :to="{name: 'AdditionalSubscriptionEdit', params: {subscriptionId: additionalSubscription.id}}" class="item__id">
+            <p class="item__tag" :class="{empty: isNull(additionalSubscription.tag)}">
+              {{ !isNull(additionalSubscription.tag) ? additionalSubscription.tag : 'Тэга нет' }}
+            </p>
+            <p class="item__id" @click.prevent="copy(additionalSubscription.id, $event)">
               {{ additionalSubscription.id }}
-            </RouterLink>
+            </p>
           </div>
-        </div>
+        </RouterLink>
       </div>
       <div class="subscriptions__wrapper empty" v-else>
         <p>Дополнительных подписок пока нет &#128564;</p>
@@ -130,7 +135,7 @@ import ButtonCreate from "@add-comps/ButtonCreate.vue";
 
 const route = useRoute();
 const store = <StoreGeneric>inject("Store");
-const {loading} = storeToRefs(store);
+const {loading, apps} = storeToRefs(store);
 
 const prices: Ref<Prices> = ref({});
 const activeSubscriptions: Ref<ActiveSubscriptions> = ref({});
@@ -215,6 +220,10 @@ function selectDate() {
   getScheduleSubscriptions(date.value).then(() => (loading.value = false));
 }
 
+function copy(id: string, event: Event) {
+  event.stopPropagation();
+  navigator.clipboard.writeText(id).catch(() => console.log);
+}
 </script>
 
 <style lang="scss" scoped>
@@ -365,13 +374,10 @@ function selectDate() {
       padding: 2rem 3rem;
       border: 0.1rem solid $--c__light-violet;
       border-radius: 1.6rem;
-      gap: 0;
+      gap: 1.5rem;
     }
 
     .subscriptions__container {
-      & + .subscriptions__container {
-        margin-top: 2rem;
-      }
     }
 
     &__top-line {
@@ -408,56 +414,42 @@ function selectDate() {
       }
     }
 
+    &__item {
+      & > * {
+        font-size: 1.5rem !important;
+        word-break: break-word;
+      }
+    }
+
     .item {
-      // display: grid;
-      // grid-template: 1fr / 2fr 2fr 3fr 2fr 2fr;
-      // gap: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: grid;
+      grid-template: 1fr / 8fr 5fr 8fr 10fr 18fr;
       gap: 2rem;
-
-      //& > * + * {
-      //  margin-left: 2rem;
-      //}
-
-      &__name {
-        flex: 5;
-      }
-
-      &__value {
-        flex: 4;
-      }
-
-      &__text {
-        flex: 7;
-      }
-
-      &__id {
-        flex: 9;
-      }
 
       &__id,
       &__text {
         word-break: break-word;
         font: {
-          size: 1.3rem;
+          size: 1.3rem !important;
         }
       }
 
-      &__text {
+      &__text,
+      &__tag,
+      &__app {
         &.empty {
           color: $--c__grey;
         }
       }
 
-      &__value {
+      &__value,
+      &__tag,
+      &__app {
         text-align: center;
       }
 
       &__id {
-        color: $--c__blue;
-        text-decoration: underline;
+        text-decoration: 1px dashed underline;
       }
     }
 

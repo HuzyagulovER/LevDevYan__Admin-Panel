@@ -127,19 +127,27 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		],
 	},
 	{
-		path: '/promocodes/referrals/create-edit/:id',
-		name: "ReferralPromocodesCreateEdit",
-		component: ViewReferralPromocodesCreateEdit,
+		path: '/promocodes/referrals/show/:id',
+		name: "ReferralPromocodesShow",
+		component: ViewReferralPromocodesShow,
 		meta: {
 			title: "Реферальный промокод"
 		},
 	},
 	{
-		path: '/promocodes/referrals/:id',
-		name: "ReferralPromocodesShow",
-		component: ViewReferralPromocodesShow,
+		path: '/promocodes/referrals/create',
+		name: "ReferralPromocodesCreate",
+		component: ViewReferralPromocodesCreateEdit,
 		meta: {
-			title: "Реферальный промокод"
+			title: "Создать реферальный промокод"
+		},
+	},
+	{
+		path: '/promocodes/referrals/edit/:id',
+		name: "ReferralPromocodesEdit",
+		component: ViewReferralPromocodesCreateEdit,
+		meta: {
+			title: "Редактирование реферального промокода"
 		},
 	},
 	{

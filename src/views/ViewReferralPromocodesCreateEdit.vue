@@ -43,13 +43,21 @@
           />
         </div>
       </div>
-      <!--      <label for="type" class="form__label">Тип</label>-->
-      <!--      <input id="type" type="text" class="form__input" :class="{ _error: error.includes('value') }" name="type"-->
-      <!--             :disabled="disabledForm" v-model="newPromocode.value" @input="error = clearVariable(error)" />-->
-      <!--      <label for="value" class="form__label">Значение</label>-->
-      <!--      <input id="value" type="text" class="form__input" :class="{ _error: error.includes('type') }" name="value"-->
-      <!--             :disabled="disabledForm" v-model="newPromocode.type" @input="error = clearVariable(error)" />-->
-
+      <div class="form__row">
+        <div class="form__col">
+          <label for="promocode" class="form__label">Тип</label>
+          <input id="type"
+                 type="text"
+                 maxlength="20"
+                 class="form__input"
+                 :class="{ _error: errors.includes('type') }"
+                 name="promocode"
+                 :disabled="disabledForm"
+                 v-model="promocode.type"
+                 @input="clearErrors"
+          />
+        </div>
+      </div>
       <ButtonColored type="submit" :disabled="disabledForm"></ButtonColored>
     </form>
   </section>
@@ -77,6 +85,7 @@ const defaultReferralPromocode: ReferralPromocode = {
   code: '',
   chained_with: '',
   description: '',
+  type: '',
 };
 
 const promocode: Ref<ReferralPromocode> = ref(defaultReferralPromocode);

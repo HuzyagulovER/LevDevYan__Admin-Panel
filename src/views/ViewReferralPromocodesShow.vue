@@ -3,38 +3,24 @@
     <form class="referral-promocode___form form">
       <div class="form__row">
         <div class="form__col">
-          <label for="promocode" class="form__label">Название</label>
-          <input id="promocode"
-                 type="text"
-                 maxlength="20"
-                 class="form__input"
-                 name="promocode"
-                 disabled
-                 v-model="promocode.code"
-          />
+          <p class="form__label">Название</p>
+          <p>{{ promocode.code }}</p>
         </div>
         <div class="form__col">
-          <label for="chained_with" class="form__label">Привязан</label>
-          <input id="chained_with"
-                 type="text"
-                 maxlength="64"
-                 class="form__input"
-                 name="chained_with"
-                 disabled
-                 v-model="promocode.chained_with"
-          />
+          <p class="form__label">Привязан</p>
+          <p>{{ promocode.chained_with }}</p>
         </div>
       </div>
       <div class="form__row">
         <div class="form__col">
-          <label for="description" class="form__label">Дополнительная информация</label>
-          <textarea id="description"
-                    maxlength="512"
-                    class="form__textarea"
-                    name="description"
-                    disabled
-                    v-model="promocode.description"
-          />
+          <p class="form__label">Дополнительная информация</p>
+          <p>{{ promocode.description }}</p>
+        </div>
+      </div>
+      <div class="form__row">
+        <div class="form__col">
+          <p class="form__label">Тип</p>
+          <p>{{ promocode.type }}</p>
         </div>
       </div>
       <div class="form__row">
@@ -44,7 +30,7 @@
       </div>
       <div class="form__row form__row_buttons row-flex-start margin-top-low">
         <div class="form__col" v-for="(typeObj, typeString) in types" :key="typeString">
-          <p class="form__button form__button_bordered"
+          <p class="form__button form__button_unbordered"
              :class="{active: type === typeString}"
              @click="typeObj.onclick(typeString)">
             {{ typeObj.text }}
@@ -53,6 +39,17 @@
               }}</span>
           </p>
         </div>
+        <div class="form__col">
+          <p class="form__button form__button_bordered"
+             @click="chooseTypeByAutopayment">
+            {{ typesByAutopayment[typeByAutopayment] }}
+          </p>
+        </div>
+      </div>
+      <div class="form__row form__row_date row-flex-start margin-top-low">
+        <p class="" v-if="promocodeApplied.summary.date_string">
+          {{ promocodeApplied.summary.date_string }}
+        </p>
       </div>
       <div class="form__row form__row_summary row-flex-start margin-top-low">
         <div class="form__col">
@@ -78,12 +75,6 @@
       </div>
       <div class="form__row margin-top-low">
         <table>
-          <tr>
-            <th>Имя</th>
-            <th>E-mail</th>
-            <th>Подписка</th>
-            <th>Дата</th>
-          </tr>
           <tr v-for="row in promocodeApplied.data" :key="row.id">
             <td>{{ row.user_name }}</td>
             <td>{{ row.user_email }}</td>
@@ -98,21 +89,18 @@
         </div>
       </div>
       <div class="form__row margin-top-low width-limitation">
-        <!--        <div class="form__col">-->
         <input name="calculationText" class="form__input flex-1" type="text" maxlength="300"
                v-model="calculationText"/>
         <p class="form__button form__button_green" @click="createCalculations">Добавить</p>
-        <!--        </div>-->
       </div>
       <div class="form__row margin-top-low width-limitation align-items-start"
            v-for="promocodeCalculation in promocodeCalculations" :key="promocodeCalculation.id">
-        <!--        <div class="form__col flex-row">-->
         <p class="flex-1">{{ promocodeCalculation.text }}</p>
         <p class="form__button form__button_red" @click="deleteCalculations(promocodeCalculation.id)">Удалить</p>
-        <!--        </div>-->
       </div>
     </form>
     <PopupReferralPromocodeDate/>
+    <PopupReferralPromocodeTypeByAutopayment/>
   </section>
 </template>
 
@@ -125,6 +113,7 @@ import {
 import {cloneDeep, isEmpty} from "lodash";
 import {useRoute} from "vue-router";
 import PopupReferralPromocodeDate from "@add-comps/PopupReferralPromocodeDate.vue";
+import PopupReferralPromocodeTypeByAutopayment from "@add-comps/PopupReferralPromocodeTypeByAutopayment.vue";
 
 type PropsTypes = {
   text: string,
@@ -144,6 +133,7 @@ const defaultReferralPromocode: ReferralPromocode = {
   code: '',
   chained_with: '',
   description: '',
+  type: '',
 };
 const types: Record<string, PropsTypes> = {
   currentMonth: {
@@ -159,12 +149,18 @@ const types: Record<string, PropsTypes> = {
     onclick: chooseDates,
   },
 };
+const typesByAutopayment: Record<string, string> = {
+  all: 'Все',
+  new: 'Только новые',
+  autopayment: 'Только автооплаты',
+};
 
 const promocode: Ref<ReferralPromocode> = ref(defaultReferralPromocode);
-const promocodeApplied: Ref<ReferralPromocodeApplied> = ref({summary: {total_count: 0, total_sum: 0}, data: {}});
+const promocodeApplied: Ref<ReferralPromocodeApplied> = ref({summary: {total_count: 0, total_sum: 0, date_string: ''}, data: {}});
 const promocodeCalculations: Ref<ReferralPromocodeCalculations> = ref({});
 const type: Ref<string> = ref('currentMonth');
 const dates: DatesProps = reactive({from: '', to: ''});
+const typeByAutopayment: Ref<string> = ref('all');
 const percent: Ref<number> = ref(0);
 const calculationText: Ref<string> = ref('');
 const id: string = route.params.id as string;
@@ -178,7 +174,7 @@ getReferralPromocode()
     );
 
 watch(
-    type,
+    [type, typeByAutopayment],
     () => {
       if (!isEmpty(type.value)) {
         if (type.value !== 'date') {
@@ -207,11 +203,12 @@ function getReferralPromocode(): Promise<ReferralPromocode> {
 
 function getReferralPromocodeApplied(): Promise<ReferralPromocodeApplied> {
   loading.value = true;
-
+  console.log('getReferralPromocodeApplied')
   return store.getReferralPromocodeApplied(
       id,
       type.value,
-      dates.from !== '' && dates.to !== '' ? dates : null
+      typeByAutopayment.value,
+      dates.from !== '' && dates.to !== '' ? dates : null,
   )
       .then((r: ReferralPromocodeApplied): void => {
         promocodeApplied.value = cloneDeep(r)
@@ -246,6 +243,24 @@ async function chooseDates() {
   }
 }
 
+async function chooseTypeByAutopayment() {
+  console.log({
+    type: 'referral-promocode-type-by-autopayment',
+    values: typesByAutopayment
+  })
+  await store
+      .callPopupWithData('', {
+        type: 'referral-promocode-type-by-autopayment',
+        values: typesByAutopayment
+      })
+      .then(async (r: any) => {
+        console.log(r);
+        typeByAutopayment.value = r.selected;
+        console.log(typeByAutopayment.value)
+      })
+      .then(() => store.clearPopup());
+}
+
 async function getCalculations() {
   loading.value = true;
 
@@ -263,6 +278,7 @@ async function createCalculations() {
     await store.createCalculations(id, calculationText.value)
         .then(async (): Promise<void> => {
           await getCalculations();
+          calculationText.value = '';
         })
         .then((): void => {
           loading.value = false;
@@ -271,7 +287,7 @@ async function createCalculations() {
 }
 
 async function deleteCalculations(calculationId: string) {
-  await store.callPopup("Удалить этот промокод?").then(async (r: boolean) => {
+  await store.callPopup("Удалить эту запись?").then(async (r: boolean) => {
     if (r) {
       loading.value = true;
       await store.deleteCalculations(calculationId)
@@ -323,6 +339,12 @@ async function deleteCalculations(calculationId: string) {
       &_summary {
         align-items: center !important;
         gap: 6rem;
+        margin-top: 1rem;
+      }
+
+      &_date {
+        margin-top: 1rem;
+        color: $--c__violet;
       }
     }
 
