@@ -203,7 +203,7 @@ function getReferralPromocode(): Promise<ReferralPromocode> {
 
 function getReferralPromocodeApplied(): Promise<ReferralPromocodeApplied> {
   loading.value = true;
-  console.log('getReferralPromocodeApplied')
+
   return store.getReferralPromocodeApplied(
       id,
       type.value,
@@ -244,19 +244,13 @@ async function chooseDates() {
 }
 
 async function chooseTypeByAutopayment() {
-  console.log({
-    type: 'referral-promocode-type-by-autopayment',
-    values: typesByAutopayment
-  })
   await store
       .callPopupWithData('', {
         type: 'referral-promocode-type-by-autopayment',
         values: typesByAutopayment
       })
       .then(async (r: any) => {
-        console.log(r);
         typeByAutopayment.value = r.selected;
-        console.log(typeByAutopayment.value)
       })
       .then(() => store.clearPopup());
 }

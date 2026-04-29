@@ -58,10 +58,8 @@
 						<Draggable class="texts__text text" v-for="(id, i) in textsKeys" :key="id">
 							<div class="text__top-line">
 								<label class="form__label">Элемент {{ textsKeys.length - i }}</label>
-								<BlockMedia :text="activeContent.texts[id]" :hash="id" :currentError="currentError"
+								<BlockMedia :object="activeContent.texts[id]" :hash="id" :currentError="currentError"
 									:disabled="disabledForm" @display-media="displayMedia($event, id)" />
-								<!-- <InputMedia class="form__media-input" :media="text?.media" :name="'content_media_' + j"
-								:currentError="currentError" :disabled="disabledForm" @display-media="displayMedia($event, j)" /> -->
 							</div>
 							<div class="text__delete">
 								<IconTrash class="text__icon icon-trash" @click="confirmDeleteText(id)" />
@@ -305,6 +303,7 @@ function contentSaveHandler(): void {
 	for (const key in pushContent.texts) {
 		delete pushContent.texts[key].media_size
 		delete pushContent.texts[key].playtime
+		delete pushContent.texts[key].media_format
 	}
 
 	if (isNew.value) {
@@ -317,10 +316,10 @@ function contentSaveHandler(): void {
     }
     for (const key in pushContent.texts) {
       if (pushContent.texts[key].image) {
-        delete pushContent.texts[key].image
+        delete pushContent.texts[key].image;
       }
       if (pushContent.texts[key].media) {
-        delete pushContent.texts[key].media
+        delete pushContent.texts[key].media;
       }
     }
 		store.updateContent(pushContent).then((r: ReturnedData | ReturnedError) => {

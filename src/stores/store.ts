@@ -169,7 +169,7 @@ export const Store = defineStore('Store', {
             loadedFiles: {},
 
             defaultDayItem: {
-                id: 0,
+                id: '',
                 title: "",
                 description: "",
                 tasks: {}
@@ -729,7 +729,7 @@ export const Store = defineStore('Store', {
                 .finally(() => this.loading = false)
         },
         async addContent(content: Content): Promise<void> {
-            return await axiosInstance.post(url('content'), this.createContentFormData(content), {
+            return await axiosInstance.post(url('content'), this.fillMediaAndImagesFormData(content), {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -754,7 +754,7 @@ export const Store = defineStore('Store', {
             )
         },
         async updateContent(content: Content): Promise<void> {
-            return await axiosInstance.post(url('content', content.id), this.createContentFormData(content), {
+            return await axiosInstance.post(url('content', content.id), this.fillMediaAndImagesFormData(content), {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -781,8 +781,8 @@ export const Store = defineStore('Store', {
                 }
             )
         },
-        createContentFormData(content: Content): FormData {
-            const fd: FormData = objectToFormData(flattenObject(content));
+        fillMediaAndImagesFormData(object: Record<string, any>): FormData {
+            const fd: FormData = objectToFormData(flattenObject(object));
 
             if (Object.keys(this.loadedMedia).length) {
                 for (const key in this.loadedMedia) {
@@ -823,7 +823,7 @@ export const Store = defineStore('Store', {
                 })
         },
         async addCourse(course: Course): Promise<void> {
-            return await axiosInstance.post(url('courses'), this.createCourseFormData(course), {
+            return await axiosInstance.post(url('courses'), this.fillMediaAndImagesFormData(course), {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -839,7 +839,7 @@ export const Store = defineStore('Store', {
             )
         },
         async updateCourse(course: Course): Promise<void> {
-            return await axiosInstance.post(url('courses', course.id), this.createCourseFormData(course), {
+            return await axiosInstance.post(url('courses', course.id), this.fillMediaAndImagesFormData(course), {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -872,17 +872,6 @@ export const Store = defineStore('Store', {
                     return e.response.data
                 }
             )
-        },
-        createCourseFormData(course: Course): FormData {
-            const fd: FormData = objectToFormData(flattenObject(course));
-
-            if (Object.keys(this.loadedImages).length) {
-                for (const key in this.loadedImages) {
-                    fd.append(`images[${key}]`, this.loadedImages[key]);
-                }
-            }
-
-            return fd;
         },
 
         // ---------------------------------------------------------------------------------------------------------- //

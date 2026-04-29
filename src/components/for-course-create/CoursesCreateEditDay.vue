@@ -20,7 +20,7 @@
 				</div>
 			</div>
 
-			<OpeningList class="progran__tasks tasks" :isOpen="opened">
+			<OpeningList class="tasks" :isOpen="opened">
 				<div class="tasks__container">
 					<div class="tasks__empty empty" v-if="emptyTasks">
 						<img src="@images/Courses__Edit_Empty-Tasks.png" alt="" width="118" height="123" class="empty__image" />
@@ -91,7 +91,7 @@ async function addTask(e: Event): Promise<void> {
 
 	if (taskPropsNumber > getEmptiesFromLastTask()) {
 		let hash: string = await getSHA256Hash(Date.now());
-		props.day.tasks[hash] = cloneDeep(defaultTaskItem.value);
+		props.day.tasks[hash] = Object.assign(cloneDeep(defaultTaskItem.value), {id: hash});
 		if (!opened.value) toggleTasks();
 		setTimeout(() => {
 			const tasks = (e.target as any).closest(".day").querySelectorAll(".task");

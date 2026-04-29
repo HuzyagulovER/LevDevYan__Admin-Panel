@@ -84,6 +84,11 @@ html, body, #app {
   display: flex;
 }
 
+body p {
+  height: unset !important;
+  line-height: unset !important;
+}
+
 a {
   text-decoration: none;
   color: inherit;

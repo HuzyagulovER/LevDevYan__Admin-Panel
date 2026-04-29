@@ -2,20 +2,26 @@
   <section class="courses-create-edit">
     <div class="courses-create-edit__top-line top-line">
       <RouterLink class="top-line__link-about" :to="`/courses/create-edit/${route.params.courseId}/about`"
-                  :class="{ js_active: route.path.includes('about') }">
+                  :class="{ js_active: page === 'about' }">
         О курсе
       </RouterLink>
       <RouterLink class="top-line__link-days" :class="{ js_active: page === 'days' }"
                   :to="`/courses/create-edit/${route.params.courseId}/days`">
         Программа курса
       </RouterLink>
-      <ButtonCreate class="top-line__button-create" v-if="page === 'days'" @click="createNewDay">
-        Добавить день
-      </ButtonCreate>
-      <LanguageChoice :isCookie="false" v-else :defaultLang="(activeData as CourseAbout).language"
+
+      <LanguageChoice v-show="page === 'about'"
+                      :isCookie="false"
+                      :defaultLang="(activeData as CourseAbout).language"
                       @return-lang="changeLang"
                       class="top-line__lang-choice"/>
+      <ButtonCreate v-show="page === 'days'"
+                    class="top-line__button-create"
+                    @click="createNewDay">
+        Добавить день
+      </ButtonCreate>
     </div>
+
     <div class="courses-create-edit__container">
       <RouterView v-slot="{ Component }">
         <KeepAlive>
@@ -91,6 +97,7 @@ if (route.params.courseId === "new") {
   onMounted(() => {
     changeLang(Object.keys(languages.value)[0]);
   });
+  splitActiveCourseToVars()
   loading.value = false;
 } else {
   store.getCourse(route.params.courseId)
@@ -154,6 +161,9 @@ function splitActiveCourseToVars() {
 function saveCourse(): void {
   disabledForm.value = true;
   loading.value = true;
+
+  console.log(about.value)
+
   const pushCourse: Course = merge(about.value as CourseAbout, {days: days.value});
 
   if (pushCourse.image) {
@@ -184,6 +194,18 @@ function updateCourse(): void {
 
   if (pushCourse.image) {
     delete pushCourse.image;
+  }
+
+  for (const dayKey in pushCourse.days) {
+    for (const taskKey in pushCourse.days[dayKey].tasks) {
+      if (pushCourse.days[dayKey].tasks[taskKey].media) {
+        delete pushCourse.days[dayKey].tasks[taskKey].media;
+      }
+
+      delete pushCourse.days[dayKey].tasks.media_size
+      delete pushCourse.days[dayKey].tasks.playtime
+      delete pushCourse.days[dayKey].tasks.media_format
+    }
   }
 
   store

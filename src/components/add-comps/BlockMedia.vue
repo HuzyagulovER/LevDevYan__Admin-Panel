@@ -1,6 +1,6 @@
 <template>
 	<div class="media-block">
-		<PreviewMedia :media="media" :media_size="media_size" :playtime="playtime" v-show="media" />
+		<PreviewMedia :media="media" :media_size="media_size" :playtime="playtime" :media_format="media_format" v-show="media" />
 		<InputMedia :media="media" :name="hash" :currentError="currentError" :disabled="disabled"
 			@display-media="displayMedia($event)" v-show="!media" />
 		<IconTrash @click="deleteMedia" class="media-block__delete icon-trash" v-show="media" />
@@ -15,33 +15,30 @@ import { ref, Ref } from "@vue/reactivity";
 import { inject, watch } from "@vue/runtime-core";
 import { StoreGeneric } from "pinia";
 import {
-	ContentText,
+  Media,
 } from "../../../helpers";
 
 const props = defineProps<{
 	hash: string
-	text: ContentText,
+	object: Media,
 	currentError: string
 	disabled: boolean
 }>();
 const emit = defineEmits(["displayMedia"]);
 const store = <StoreGeneric>inject("Store");
 
-let media: Ref<string> = ref(props.text.media ?? ""),
-	media_size: Ref<string> = ref(props.text.media_size ?? ''),
-	playtime: Ref<string> = ref(props.text.playtime ?? ''),
+let media: Ref<string> = ref(props.object.media ?? ''),
+	media_size: Ref<string> = ref(props.object.media_size ?? ''),
+	playtime: Ref<string> = ref(props.object.playtime ?? ''),
+  media_format: Ref<string> = ref(props.object.media_format ?? ''),
 	formMedia: Ref = ref();
 
-// media.value = props.text.media ?? '';
-// media_size.value = props.text.media_size ?? '';
-// playtime.value = props.text.playtime ?? '';
-
 watch(
-	() => props.text,
+	() => props.object,
 	() => {
-		media.value = props.text.media ?? '';
-		media_size.value = props.text.media_size ?? '';
-		playtime.value = props.text.playtime ?? '';
+		media.value = props.object.media ?? '';
+		media_size.value = props.object.media_size ?? '';
+		playtime.value = props.object.playtime ?? '';
 	},
 	{
 		deep: true

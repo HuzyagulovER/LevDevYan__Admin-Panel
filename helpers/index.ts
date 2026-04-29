@@ -16,7 +16,7 @@ export declare type Course = {
     image?: string
     price: number
     language: string
-    days: CourseDays | {}
+    days: CourseDays
 }
 export declare type CoursePreview = {
     id: string
@@ -105,25 +105,21 @@ export declare type Notifications = Array<Notification> | Array<null>
 
 export declare type CourseAbout = PartialBy<Course, 'days'>
 
-export declare interface CourseDayTask {
-    id?: number,
+export declare type CourseDayTask = {
+    id?: string,
     title: string,
     type: string,
     description: string
-}
+} & Media
 
 export declare interface CourseDay {
-    id?: number,
+    id?: string,
     title: string,
     description: string,
-    tasks: {
-        [key: string]: CourseDayTask
-    }
+    tasks: Record<string, CourseDayTask>
 }
 
-export declare type CourseDays = {
-    [key: string]: CourseDay
-};
+export declare type CourseDays = Record<string, CourseDay>;
 
 export declare type CourseToPost = Course & {
     loadedFiles?: File[]
@@ -181,7 +177,7 @@ export declare type ContentPreview = Content & {
 }
 export declare type ContentTexts = { [key: string]: ContentText }
 export declare type ContentText = {
-    id: string
+    id?: string
     title: string | null
     description: string | null
     author: string | null
@@ -189,12 +185,16 @@ export declare type ContentText = {
     info: string | null
     is_premium: boolean
     image?: string | null
-    media?: string | null
     order: number
+} & Media
+export declare type ContentList = { [key: string]: ContentPreview } | {}
+
+export declare type Media = {
+    media?: string | null
     media_size?: string
     playtime?: string
+    media_format?: string
 }
-export declare type ContentList = { [key: string]: ContentPreview } | {}
 
 export declare type Price = {
     id: string

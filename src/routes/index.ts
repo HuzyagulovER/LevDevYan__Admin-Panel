@@ -77,11 +77,12 @@ const routes: Array<RouteRecordRawWithMeta> = [
 	},
 	{
 		path: '/courses/create-edit/:courseId',
+		name: "CoursesCreateEdit",
 		component: ViewCoursesCreateEdit,
 		children: [
 			{
 				path: 'about',
-				name: "CoursesCourseCreate",
+				name: "CoursesCourseAbout",
 				component: CoursesCreateEditAbout,
 			},
 			{
@@ -291,7 +292,8 @@ const router = createRouter({
 const scrollPositions = new Map();
 
 router.beforeEach(async (to, from, next) => {
-	const container = document.querySelector('.main__container')
+	const container = document.querySelector('.main__container');
+
 	if (from.meta?.saveScroll && container) {
 		scrollPositions.set(from.fullPath, container.scrollTop)
 	}
@@ -299,9 +301,17 @@ router.beforeEach(async (to, from, next) => {
 		container.scrollTop = 0
 	}
 
+	// Получаем родительские маршруты (без последнего)
+	const toParent = to.matched[to.matched.length - 2]
+	const fromParent = from.matched[from.matched.length - 2]
+
+	const isToSiblingChild = toParent?.name === fromParent?.name;
+
 	try {
 		const store = Store()
-		store.clearLoadedFiles();
+		if (!isToSiblingChild) {
+			store.clearLoadedFiles();
+		}
 
 		if (IS_DEV) {
 			next();

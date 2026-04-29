@@ -4,7 +4,7 @@
 			<InputImage class="form__file-input" :image="image" :name="'main'" :currentError="currentError"
 				:disabled="disabledForm" @display-image="displayImage" />
 
-			<label for="promocode" class="form__label">Название</label>
+			<label for="title" class="form__label">Название</label>
 			<input id="title" type="text" class="form__input" :class="{ _error: error.includes('title') }" name="title"
 				:disabled="disabledForm" v-model="data.title" @input="error = clearVariable(error)" />
 
@@ -12,9 +12,9 @@
 			<input id="period" type="number" class="form__input" min="0" :class="{ _error: error.includes('period') }"
 				name="period" :disabled="disabledForm" v-model="data.duration_days" @input="error = clearVariable(error)" />
 
-			<label for="price" class="form__label" v-if="false">Стоимость</label>
+			<label for="price" class="form__label" v-show="false">Стоимость</label>
 			<input id="price" type="text" class="form__input" :class="{ _error: error.includes('price') }" name="price"
-				:disabled="disabledForm" v-model="data.price" @input="error = clearVariable(error)" v-if="false" />
+				:disabled="disabledForm" v-model="data.price" @input="error = clearVariable(error)" v-show="false" />
 
 			<label for="category" class="form__label">Категория</label>
 			<input id="category" type="text" class="form__input" :class="{ _error: error.includes('category') }"
@@ -56,7 +56,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(["saveCourse", "updateCourse"]);
 const store = <StoreGeneric>inject("Store");
-const { loadedFiles, languages, acceptedImageExtensions, fileErrorStatuses } =
+const { loadedFiles, languages, loadedMedia } =
 	storeToRefs(store);
 const clearVariable = <Function>inject("clearVariable");
 const isLargeFile: any = inject("isLargeFile");

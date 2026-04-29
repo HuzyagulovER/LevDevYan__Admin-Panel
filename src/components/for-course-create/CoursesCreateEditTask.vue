@@ -3,6 +3,12 @@
 		<div class="task__container">
 			<div class="task__line">
 				<p class="task__header">Задание {{ number + 1 }}</p>
+        <BlockMedia :object="task"
+                    :hash="task.id as string"
+                    :currentError="currentError"
+                    :disabled="disabledForm"
+                    @display-media="displayMedia($event)"
+                    class="task__media-block"/>
 				<IconTrash class="task__icon icon-trash" @click="confirmDeletingActive" />
 			</div>
 
@@ -29,8 +35,9 @@
 import IconTrash from "@icons/IconTrash.vue";
 import { CourseDayTask } from "../../../helpers";
 import { ref, Ref } from "@vue/reactivity";
-import { inject } from "@vue/runtime-core";
+import {inject, watch} from "@vue/runtime-core";
 import { StoreGeneric } from "pinia";
+import BlockMedia from "@add-comps/BlockMedia.vue";
 
 const props = defineProps<{ task: CourseDayTask; number: number }>();
 const emit = defineEmits(["deleteTask"]);
@@ -38,6 +45,15 @@ const store = <StoreGeneric>inject("Store");
 
 let popup: Ref<boolean> = ref(false);
 let deleteIndex: Ref<number> = ref(0);
+const currentError: Ref<string> = ref("");
+const disabledForm: Ref<boolean> = ref(false);
+
+watch(
+    () => currentError,
+    (): void => {
+      if (currentError.value === "") disabledForm.value = false;
+    }
+);
 
 async function confirmDeletingActive() {
 	deleteIndex.value = props.number;
@@ -47,6 +63,12 @@ async function confirmDeletingActive() {
 			deleteIndex.value = 0;
 		}
 	});
+}
+
+function displayMedia(isMedia: boolean): void {
+  if (!isMedia) {
+    props.task.media = "";
+  }
 }
 </script>
 
@@ -70,7 +92,7 @@ async function confirmDeletingActive() {
 	&__line {
 		display: flex;
 		align-items: center;
-		height: 1.5rem;
+		height: auto;
 		margin-bottom: 1.2rem;
 	}
 
@@ -81,10 +103,15 @@ async function confirmDeletingActive() {
 		}
 	}
 
+  &__media-block {
+    margin-left: auto;
+    width: auto;
+  }
+
 	&__icon {
-		height: 100%;
-		margin-left: auto;
+		height: 2rem;
 		width: auto;
+    margin-left: 1rem;
 	}
 
 	.form {
