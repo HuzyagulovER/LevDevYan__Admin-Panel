@@ -61,7 +61,7 @@ function addPromocode(): void {
 			loading.value = false;
 			if (r.success && r.data.is_created) {
 				newPromocode.value = clearVariable(newPromocode.value);
-				router.push({ name: "Promocodes" });
+				router.push({ name: "PromocodesOnce" });
 			}
 		});
 }
