@@ -575,9 +575,12 @@ export const Store = defineStore('Store', {
         async setSubscription(): Promise<void> {
             const fd = new FormData()
             fd.append('identifier', this.popup.additionFields['identifier' as keyof PopupAdditionFields] as string);
-            fd.append('id', this.popup.additionFields['id' as keyof PopupAdditionFields] as string);
             fd.append('app', this.popup.additionFields['app' as keyof PopupAdditionFields] as string);
             fd.append('is_autopayment', this.popup.additionFields['autopayment' as keyof PopupAdditionFields] as string);
+
+            if (Object.hasOwn(this.popup.additionFields, 'id')) {
+                fd.append('id', this.popup.additionFields['id' as keyof PopupAdditionFields] as string);
+            }
 
             return await axiosInstance.post(...formRequest('users/setSubscription', fd) as [string, FormData]).then(
                 r => {

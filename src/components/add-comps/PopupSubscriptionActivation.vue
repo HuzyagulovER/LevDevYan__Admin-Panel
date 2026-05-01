@@ -72,6 +72,12 @@ type PopupAdditionFields = {
   error?: string
 };
 
+type MergedObject = {
+  identifier: string,
+  id?: string,
+  autopayment: number,
+};
+
 const store = <StoreGeneric>inject("Store");
 const { popup, apps } = storeToRefs(store);
 
@@ -130,11 +136,17 @@ function confirm(ans: boolean): void {
 		popup.value.answer = ans;
     popup.value.isReturned = true;
 
-		popup.value.additionFields = merge(popup.value.additionFields, {
-			identifier: user_identifier.value,
-			id: premium_id.value,
-			autopayment: sub_autopayment.value
-		});
+    let mergedObj: MergedObject = {
+      identifier: user_identifier.value,
+      id: premium_id.value,
+      autopayment: sub_autopayment.value
+    };
+
+    if (mergedObj.id === 'null') {
+      delete mergedObj.id;
+    }
+
+		popup.value.additionFields = merge(popup.value.additionFields, mergedObj);
 
 		setTimeout(() => {
 			disabled.value = false;
