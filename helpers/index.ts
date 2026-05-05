@@ -74,6 +74,7 @@ export declare interface ReferralPromocodeAppliedRow {
 
 export declare interface ReferralPromocodeAppliedSummary {
     total_count: number,
+    total_count_just_applied: number,
     total_sum: number,
     date_string: string,
 }

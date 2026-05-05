@@ -54,7 +54,7 @@
       <div class="form__row form__row_summary row-flex-start margin-top-low">
         <div class="form__col">
           <p class="">
-            Всего применен: {{ promocodeApplied.summary.total_count }}
+            Введён с оплатой: {{ promocodeApplied.summary.total_count }} / без оплаты : {{ promocodeApplied.summary.total_count_just_applied }}
           </p>
         </div>
         <div class="form__col">
@@ -156,7 +156,7 @@ const typesByAutopayment: Record<string, string> = {
 };
 
 const promocode: Ref<ReferralPromocode> = ref(defaultReferralPromocode);
-const promocodeApplied: Ref<ReferralPromocodeApplied> = ref({summary: {total_count: 0, total_sum: 0, date_string: ''}, data: {}});
+const promocodeApplied: Ref<ReferralPromocodeApplied> = ref({summary: {total_count: 0, total_count_just_applied: 0, total_sum: 0, date_string: ''}, data: {}});
 const promocodeCalculations: Ref<ReferralPromocodeCalculations> = ref({});
 const type: Ref<string> = ref('currentMonth');
 const dates: DatesProps = reactive({from: '', to: ''});

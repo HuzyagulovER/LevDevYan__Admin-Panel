@@ -391,6 +391,9 @@ function reverseObject(object: { [key: string | number]: any }): { [key: string 
 
 .content-create-edit {
 	.form {
+    &__container {
+      margin-top: 2rem;
+    }
 
 		&__container,
 		&__texts-top-line {

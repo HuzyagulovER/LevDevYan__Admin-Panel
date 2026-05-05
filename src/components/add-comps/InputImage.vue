@@ -27,7 +27,7 @@
 
 		<input id="input_image" type="file" :accept="acceptedImageExtensions.join(',')" :name="name" :disabled="disabled"
 			@change="displayImage($event)" ref="formImage" />
-		<IconTrash @click="deleteImage" class="file-input__delete icon-trash" />
+		<IconTrash @click="deleteImage" class="file-input__delete icon-trash" v-show="image"/>
 	</div>
 </template>
 
@@ -140,8 +140,9 @@ function deleteImage() {
 	&__image {
 		width: 100%;
 		height: 100%;
+    z-index: 3;
 
-		img {
+    img {
 			width: 100%;
 			height: 100%;
 			object-fit: contain;
@@ -189,12 +190,17 @@ function deleteImage() {
 		}
 	}
 
+  #input-image {
+    z-index: 2;
+  }
+
 	&__delete {
 		position: absolute;
 		top: 0.3rem;
 		right: 0.3rem;
 		opacity: 0;
 		transition: var(--transition-03);
+    z-index: 4;
 	}
 
 	&:hover &__delete {
@@ -217,6 +223,10 @@ function deleteImage() {
 				size: 1.7rem;
 			}
 		}
+
+    &__delete {
+      opacity: 1;
+    }
 	}
 }
 </style>
