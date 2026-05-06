@@ -3,7 +3,7 @@
     <div class="subscriptions__top-line top-line">
       <ButtonsPages class="top-line__buttons-pages"/>
       <ButtonCreate :to="'/additional-subscription/create/' + app" class="top-line__button-create">
-        Создать промокод
+        Создать подписку
       </ButtonCreate>
       <Filter :init-value="subs" @on-change-value="subs = $event" class="top-line__filter"/>
     </div>
