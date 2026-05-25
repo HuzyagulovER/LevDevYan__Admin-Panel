@@ -8,7 +8,7 @@ const root_dir = __dirname;
 export default defineConfig({
 	plugins: [vue()],
 	build: {
-		outDir: "dist_",
+		outDir: "dist",
 		rollupOptions: {
 			output: {
 				entryFileNames: `assets/[name].js`,

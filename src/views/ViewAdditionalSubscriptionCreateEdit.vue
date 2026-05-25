@@ -36,6 +36,7 @@
         <div class="item__input-container">
           <select v-model="price.duration_timestamp" name="duration_timestamp" class="price-edit__input form__input">
             <option value="" disabled selected>Выберите продолжительность...</option>
+            <option value="1 hour">Час</option>
             <option value="1 month">Месяц</option>
             <option value="3 month">3 месяца</option>
             <option value="1 year">Год</option>

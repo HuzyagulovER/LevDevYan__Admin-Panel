@@ -5,10 +5,10 @@
 				<div class="popup-user-delete__container">
 					<p class="popup-user-delete__text">Удаление пользователя</p>
 					<div class="popup-user-delete__input">
-						<label for="user_creds" class="form__label">Почта или ID</label>
-						<input id="user_creds" type="text" ref="user_creds" class="form__input" :class="{
+						<label for="identifier" class="form__label">Почта или ID</label>
+						<input id="identifier" type="text" class="form__input" :class="{
 							_err: popup.additionFields.error === 'EMPTY_DELETE_CONDITION',
-						}" :disabled="disabled" :value="init_value ? init_value : ''" />
+						}" :disabled="disabled" v-model="identifier"/>
 					</div>
 					<div class="popup-user-delete__wrapper">
 						<button class="popup-user-delete__button" tabindex="1" @click="confirm(true)">
@@ -35,13 +35,12 @@ const { popup } = storeToRefs(store);
 
 const disabled: Ref<boolean> = ref(false);
 const disable: Ref<boolean> = ref(false);
-const user_creds: Ref<HTMLInputElement | null> = ref(null);
-const init_value: Ref<number | string> = ref('');
+const identifier: Ref<number | string> = ref('');
 
 watch(() => popup.value,
 	() => {
-		disabled.value = !!popup.value.additionFields.creds
-		init_value.value = popup.value.additionFields.creds
+		disabled.value = !!popup.value.additionFields.identifier
+    identifier.value = popup.value.additionFields.identifier
 	},
 	{ deep: true }
 )
@@ -52,7 +51,7 @@ function confirm(ans: boolean) {
 		popup.value.answer = ans;
 		popup.value.isReturned = true;
 		popup.value.additionFields = merge(popup.value.additionFields, {
-			user_creds: (user_creds.value as HTMLInputElement).value,
+      identifier: identifier.value,
 		});
 		setTimeout(() => {
 			disabled.value = false;

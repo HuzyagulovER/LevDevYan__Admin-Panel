@@ -2,7 +2,7 @@
   <div class="referral-promocodes">
     <div class="referral-promocodes__subtop-line subtop-line">
       <ButtonCreate :to="{name: 'ReferralPromocodesCreate' }" class="subtop-line__button-create">
-        Создать подписку
+        Создать промокод
       </ButtonCreate>
     </div>
 

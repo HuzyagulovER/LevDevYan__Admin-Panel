@@ -239,7 +239,7 @@ const routes: Array<RouteRecordRawWithMeta> = [
 		name: "AdditionalSubscriptionCreate",
 		component: ViewAdditionalSubscriptionCreateEdit,
 		meta: {
-			title: "Редактирование дополнительной подписки",
+			title: "Создание дополнительной подписки",
 		},
 	},
 	{

@@ -318,6 +318,7 @@ export declare type User = {
     password?: string
     photo?: string
     typePremium: UsersTypePremiums
+    additional_premiums: UsersAdditionalPremiumsType
     session_series?: string
     session_token?: string
     device_token?: string
@@ -349,6 +350,19 @@ export declare type UsersTypePremium = {
     typeApp: string
     typePremium: string
     is_active: boolean
+}
+export declare type UsersAdditionalPremiumsType = Record<App, UsersAdditionalPremiumType>
+export declare type UsersAdditionalPremiumType = {
+    app: string
+    tag: string
+    subscription_duration?: string
+    paid_at: string
+    payment_id: string
+    subscription_duration_text: string
+    autopayment: boolean
+    payment_method_type: string
+    status: string
+    planned_pay_date: string | number
 }
 
 export declare type Logs = {
